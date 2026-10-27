@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+build/
+dist/
+coverage/
+playwright-report/
+test-results/
+
+# Environment and secrets (only .env.example is versioned)
+.env
+.env.*
+!.env.example
+*.pem
+
+# Tooling
+.vercel/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
