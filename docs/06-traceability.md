@@ -30,7 +30,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-23 | BL-01.1 | | | Planned |
 | RF-24 | BL-01.2 | | | Planned |
 | RNF-01 | EST-04.3, BE-02.2, FE-09.2, FE-10.1 | | | Planned |
-| RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | EST-03.2: `Security` and `CodeQL` workflows (dependency audit, Gitleaks on the full history, CodeQL). EST-03.3: `image.yml` checks the image holds no build placeholders or `.env` files and scans it with Trivy (high and critical fail) | #11, #12 | In progress |
+| RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | EST-03.2: `Security` and `CodeQL` workflows (dependency audit, Gitleaks on the full history, CodeQL). EST-03.3: `image.yml` checks the image holds no build placeholders or `.env` files and scans it with Trivy (high and critical fail). BE-10.2: `pnpm test` (CORS wildcard rule, rate limit logic and stores, payload validation), `integration-tests/http/rate-limit.spec.ts` in CI | #11, #12, #15 | In progress |
 | RNF-03 | EST-05.2, BE-01.3 | | | Planned |
 | RNF-04 | EST-05.1, BE-03.1, BE-03.3, BE-09.2, FE-06.1, FE-07.3, FE-08.1 | | | Planned |
 | RNF-05 | EST-03.3, EST-04.2, EST-05.3, BE-05.4, BE-07.1 | EST-03.3: `image.yml` runs the migrations and checks `/health` from the image, with Postgres and Redis | #11 | In progress |

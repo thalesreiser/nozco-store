@@ -94,6 +94,33 @@ nor Redis, and it answers only after the application has loaded.
 so the same test also calls a protected Medusa route to show the application loaded. The route served by
 `medusa start` itself is covered by the `backend-boot-smoke` CI job (`.github/scripts/backend-boot-smoke.sh`).
 
+## API hardening
+
+**CORS.** `STORE_CORS`, `ADMIN_CORS` and `AUTH_CORS` are set per environment. In production `src/lib/env.ts`
+stops the boot on a wildcard: any plain entry with `*`, and any `/pattern/` that accepts an unrelated
+origin.
+
+**Rate limits.** Medusa 2.22 has no rate limiter, and its cache module has no atomic counter, so
+`src/api/middlewares.ts` adds one to the `/auth` routes. It counts every attempt in a fixed window, so a
+burst across two windows can reach twice the limit.
+
+| Rule                                                  | Per account  | Per client address |
+| ----------------------------------------------------- | ------------ | ------------------ |
+| Login (`POST /auth/:actor/:provider`, admin included) | 10 in 15 min | 100 in 15 min      |
+| Register, password reset, MFA and e-mail verification | 5 in 1 h     | 60 in 1 h          |
+
+Over a limit the API answers `429` with `Retry-After` and `{ "code": "rate_limited", "message": "..." }`.
+Redis holds a hash of the account, never the e-mail address. If Redis stops answering, each process counts
+on its own until it returns. `.env.example` lists the variables.
+
+The client address is Express's `req.ip`, and Medusa trusts one proxy hop. Requests that arrive through the
+storefront's server routes carry the address of the Cloudflare Worker rather than the customer's, so the
+address limit is a shared one for them.
+
+**Custom routes.** Validate with `validateBody(schema)` in `src/api/middlewares.ts` and read
+`req.validatedBody` in the route (`src/api/utils/validate-payload.ts`). Failures answer `400` with
+`{ "code": "invalid_payload", "message": "..." }`.
+
 ## Scripts
 
 | Script                         | What it does                                                  |
