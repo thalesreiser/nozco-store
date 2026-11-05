@@ -8,10 +8,14 @@
     "pnpm": ">=10 <11"
   },
   "scripts": {
+    "dev": "turbo run dev",
     "build": "turbo run build",
+    "start": "turbo run start",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint && eslint .",
     "test": "turbo run test",
+    "test:integration": "turbo run test:integration",
+    "db:migrate": "turbo run db:migrate",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
