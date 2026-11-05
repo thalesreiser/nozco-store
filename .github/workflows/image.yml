@@ -1,0 +1,154 @@
+name: Backend image
+
+# Builds, runs and scans the image. It publishes nothing: publishing depends on EST-04.2.
+on:
+  pull_request:
+    branches: [develop, main]
+    paths:
+      - apps/backend/**
+      - packages/**
+      - infra/docker/**
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - .dockerignore
+      - .github/workflows/image.yml
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  IMAGE: nozco-backend:ci
+
+jobs:
+  image:
+    name: Build, run and scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    # Service containers start before any step, so this password cannot be generated. They are reachable
+    # only from this throwaway runner.
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: nozco
+          POSTGRES_PASSWORD: ci-only
+          POSTGRES_DB: nozco_image
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U nozco"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Build the image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: .
+          file: infra/docker/backend.Dockerfile
+          load: true
+          tags: ${{ env.IMAGE }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Report the image size
+        run: |
+          bytes=$(docker image inspect --format '{{.Size}}' "$IMAGE")
+          disk=$(docker run --rm --user 0 --entrypoint du "$IMAGE" -xsm /)
+          {
+            echo "Image size reported by Docker: $((bytes / 1024 / 1024)) MiB"
+            echo "Size on disk inside the container: ${disk%%[[:space:]]*} MiB"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Check the image contents
+        run: |
+          docker run --rm --entrypoint sh "$IMAGE" -ec '
+            test "$(id -u)" != 0
+            test "$NODE_ENV" = production
+            test "$MEDUSA_DISABLE_TELEMETRY" = true
+            if command -v npm || command -v corepack || command -v yarn; then exit 1; fi
+            test -z "$(find /app -name ".env*" -not -path "*/node_modules/*")"
+            test -z "$(find /app -path /app/node_modules -prune -o -type f -exec grep -l build-time-placeholder {} +)"
+          '
+          # `! command` would not stop the step: `set -e` ignores negated commands.
+          image_env=$(docker image inspect --format '{{json .Config.Env}}' "$IMAGE")
+          echo "Image environment: $image_env"
+          if grep -E 'DATABASE_URL|REDIS_URL|_SECRET|_CORS' <<< "$image_env"; then exit 1; fi
+          if docker history --no-trunc "$IMAGE" | grep build-time-placeholder; then exit 1; fi
+
+      - name: Generate the run-time environment
+        run: |
+          jwt_secret=$(openssl rand -hex 32)
+          cookie_secret=$(openssl rand -hex 32)
+          echo "::add-mask::$jwt_secret"
+          echo "::add-mask::$cookie_secret"
+          # sslmode=disable: Medusa turns on SSL for every host other than localhost, and the failed
+          # handshake with this Postgres only shows up as a connection timeout.
+          cat > "$RUNNER_TEMP/backend.env" <<EOF
+          DATABASE_URL=postgres://nozco:ci-only@host.docker.internal:5432/nozco_image?sslmode=disable
+          REDIS_URL=redis://host.docker.internal:6379
+          STORE_CORS=http://localhost:3000
+          ADMIN_CORS=http://localhost:9000
+          AUTH_CORS=http://localhost:3000,http://localhost:9000
+          JWT_SECRET=$jwt_secret
+          COOKIE_SECRET=$cookie_secret
+          EOF
+
+      - name: Run the migrations
+        run: |
+          docker run --rm --add-host host.docker.internal:host-gateway \
+            --env-file "$RUNNER_TEMP/backend.env" \
+            "$IMAGE" node_modules/.bin/medusa db:migrate
+
+      # The port is published instead of using host networking, to prove the server listens outside the
+      # container. The shorter interval only makes Docker run the image's own health command sooner.
+      - name: Start the server and wait for its healthcheck
+        run: |
+          docker run -d --name api --add-host host.docker.internal:host-gateway \
+            --env-file "$RUNNER_TEMP/backend.env" --health-interval 5s -p 9000:9000 "$IMAGE"
+          for i in $(seq 1 60); do
+            status=$(docker inspect --format '{{.State.Health.Status}}' api)
+            if [ "$status" = healthy ]; then
+              echo "healthy after about $((i * 3)) s"
+              curl -fsS -i http://localhost:9000/health
+              curl -fsS -o /dev/null -w 'GET /app: %{http_code}\n' -L http://localhost:9000/app
+              exit 0
+            fi
+            sleep 3
+          done
+          echo "last status: $status"
+          exit 1
+
+      - name: Server logs
+        if: always()
+        run: docker logs api 2>&1 | tail -n 80 || true
+
+      - name: Scan the image
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          version: v0.76.1
+          image-ref: ${{ env.IMAGE }}
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+          timeout: 15m
