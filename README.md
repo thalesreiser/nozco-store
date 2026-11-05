@@ -3,7 +3,7 @@
 Online store for **NozCo**, a Brazilian streetwear brand of urban-art inspired t-shirts
 (black, white and grey palette). Production domain: **nozco.com.br**.
 
-> Status: planning. See the [development plan](docs/development-plan.md).
+> Status: in development. See the [development plan](docs/development-plan.md).
 
 ## Scope at a glance
 
@@ -54,9 +54,10 @@ scaffolded yet (tasks BE-01.1 and FE-01.1).
 
 ## Workflow
 
-Trunk-based development: every change goes through a pull request to `main`, with
+Every change goes through a pull request to `develop`, with
 [Conventional Commits](https://www.conventionalcommits.org/) and the Definition of Done in the
-PR template. Tasks are tracked on the project's Trello board.
+PR template. `main` holds releases. Contributor rules are in [CLAUDE.md](CLAUDE.md), and tasks are
+tracked on the project's Trello board.
 
 ## License
 

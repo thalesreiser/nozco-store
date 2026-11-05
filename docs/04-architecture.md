@@ -116,4 +116,4 @@ stateDiagram-v2
 | Staging | Cloudflare | Railway, sandbox credentials | Merge to `develop` |
 | Production | `nozco.com.br` | Railway, production credentials | Tag on `main` |
 
-The branch names above take effect in EST-01.3, which adopts `develop` and `main` as in the tabacaria.
+`develop` is the default branch and receives every pull request; `main` holds releases.
