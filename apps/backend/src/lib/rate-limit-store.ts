@@ -35,6 +35,28 @@ export function createRedisStore(client: RedisEvalClient): RateLimitStore {
   }
 }
 
+/**
+ * Holds requests until the first connection attempt ends. Without this, the requests that open the
+ * connection would be counted in memory and the count in Redis would start over right after them.
+ */
+export function afterFirstConnection(
+  client: { once(event: "ready" | "error", listener: () => void): unknown },
+  store: RateLimitStore,
+  maxWaitMs: number,
+): RateLimitStore {
+  const settled = new Promise<void>((resolve) => {
+    client.once("ready", resolve)
+    client.once("error", resolve)
+    setTimeout(resolve, maxWaitMs).unref()
+  })
+  return {
+    async hit(key, windowMs) {
+      await settled
+      return store.hit(key, windowMs)
+    },
+  }
+}
+
 /** Counts per process: right for one instance, and the fallback while Redis is unavailable. */
 export function createMemoryStore(now: () => number = Date.now): RateLimitStore {
   const counters = new Map<string, { count: number; resetAt: number }>()

@@ -12,8 +12,15 @@ import {
   type RateLimitRule,
   type RateLimitStore,
 } from "../../lib/rate-limit"
-import { createMemoryStore, createRedisStore, withFallback } from "../../lib/rate-limit-store"
+import {
+  afterFirstConnection,
+  createMemoryStore,
+  createRedisStore,
+  withFallback,
+} from "../../lib/rate-limit-store"
 import { sendApiError } from "./api-error"
+
+const CONNECT_TIMEOUT_MS = 2000
 
 interface RateLimitRuntime {
   enabled: boolean
@@ -28,19 +35,20 @@ function createStore(redisUrl: string | undefined, logger: Pick<Logger, "warn">)
     logger.warn("Rate limits count per process because REDIS_URL is not set")
     return createMemoryStore()
   }
-  // Fail fast: a request waits at most this long for Redis before the in-memory fallback takes over.
+  // Once connected, a request waits at most the command timeout before the fallback takes over.
   const client = new Redis(redisUrl, {
     enableOfflineQueue: false,
     maxRetriesPerRequest: 1,
     commandTimeout: 500,
-    connectTimeout: 2000,
+    connectTimeout: CONNECT_TIMEOUT_MS,
   })
   const logFailure = (error: unknown) =>
     logger.warn(
       `Rate limit store unavailable: ${error instanceof Error ? error.message : "unknown"}`,
     )
   client.on("error", logFailure)
-  return withFallback(createRedisStore(client), createMemoryStore(), logFailure)
+  const redis = afterFirstConnection(client, createRedisStore(client), CONNECT_TIMEOUT_MS)
+  return withFallback(redis, createMemoryStore(), logFailure)
 }
 
 let runtime: RateLimitRuntime | undefined

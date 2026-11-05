@@ -1,4 +1,10 @@
-import { createMemoryStore, createRedisStore, withFallback } from "../rate-limit-store"
+import { EventEmitter } from "node:events"
+import {
+  afterFirstConnection,
+  createMemoryStore,
+  createRedisStore,
+  withFallback,
+} from "../rate-limit-store"
 
 describe("createMemoryStore", () => {
   it("counts per key and reports the time left in the window", async () => {
@@ -49,6 +55,32 @@ describe("createRedisStore", () => {
       "nozco:rate-limit:login:ip:203.0.113.1",
       900_000,
     )
+  })
+})
+
+describe("afterFirstConnection", () => {
+  const hitResult = { count: 1, resetInMs: 500 }
+
+  it.each(["ready", "error"])("holds requests until the connection reports %s", async (event) => {
+    const client = new EventEmitter()
+    const hit = jest.fn().mockResolvedValue(hitResult)
+    const store = afterFirstConnection(client, { hit }, 60_000)
+
+    const pending = store.hit("a", 500)
+    await new Promise((resolve) => setImmediate(resolve))
+    expect(hit).not.toHaveBeenCalled()
+
+    client.emit(event)
+
+    expect(await pending).toEqual(hitResult)
+    expect(hit).toHaveBeenCalledWith("a", 500)
+  })
+
+  it("stops waiting after the limit when the connection reports nothing", async () => {
+    const hit = jest.fn().mockResolvedValue(hitResult)
+    const store = afterFirstConnection(new EventEmitter(), { hit }, 1)
+
+    expect(await store.hit("a", 500)).toEqual(hitResult)
   })
 })
 
