@@ -1,19 +1,35 @@
 # 03 - Open questions
 
-Business decisions that block or shape tasks. Each one is closed with an answer and a date and,
-when it changes the architecture, an ADR.
+Decisions that block or shape tasks. Each one is closed with an answer and a date and, when it changes
+the architecture or the interface, an ADR.
+
+## Business questions
 
 | ID | Question | Blocks | Status |
 |---|---|---|---|
-| Q-01 | How will NF-e be issued: invoicing API/ERP (Bling, Tiny, eNotas, Focus NFe) or manually by the accountant? | 6.6 | Open |
-| Q-02 | Monthly budget for infrastructure and services (hosting, database, e-mail, images) | 1.2 | Open |
-| Q-03 | Garment types and size grid at launch (P–GG? XGG? oversized? babylook?) and fabric specs | 3.1 | Open |
-| Q-04 | Stock reservation window for unpaid orders (Pix 30 min? boleto 3 days?) | 5.4 | Open |
-| Q-05 | Minimum installment value; do installments apply to every product? | 5.3 | Open |
-| Q-06 | Free-shipping threshold or other promotions at launch | 4.4 | Open |
-| Q-07 | Who runs the back office day to day, and with which roles? | 6.1 | Open |
-| Q-08 | Product photos: who shoots them, format and number per product | 3.2 | Open |
-| Q-09 | Initial catalog size (number of designs and variants) | 3.2 | Open |
-| Q-10 | Shipping origin address, package sizes and carriers to offer | 4.2 | Open |
-| Q-11 | Company data for the legal footer (legal name, CNPJ, address, support e-mail/WhatsApp) | 8.1 | Open |
-| Q-12 | Do logo files and brand fonts already exist, or are they part of epic 2? | 2.1 | Open |
+| Q-01 | How will NF-e be issued: invoicing API/ERP (Focus NFe, Bling, Tiny, eNotas) or manually by the accountant? | BE-08.1 | Open |
+| Q-02 | Monthly budget for infrastructure and services. The new stack needs API, worker, Postgres and Redis running all the time | EST-04.2 | Open |
+| Q-03 | Garment types and size grid at launch (P–GG? XGG? oversized? babylook?) and fabric specs | BE-02.1 | Open |
+| Q-04 | What happens when a payment is approved and the last unit has already been sold: automatic refund, or contact the customer and offer an exchange? For how long can a Pix stay open (30 min minimum)? And a boleto? | BE-05.4 | Open |
+| Q-05 | Minimum installment value; do installments apply to every product? | BE-05.3 | Open |
+| Q-06 | Free-shipping threshold or other promotions at launch | BE-04.2 | Open |
+| Q-07 | Who runs the back office day to day, and with which roles? | BE-01.3 | Open |
+| Q-08 | Product photos: who shoots them, format and number per product and colour | BE-02.3 | Open |
+| Q-09 | Initial catalog size (number of designs and variants) | BE-02.3 | Open |
+| Q-10 | Shipping origin address, package sizes and carriers to offer | BE-06.1 | Open |
+| Q-11 | Company data for the legal footer (legal name, CNPJ, address, support e-mail/WhatsApp) | EST-05.1 | Open |
+| Q-12 | Do logo files and brand fonts already exist, or are they part of FE-12.2? | FE-12.2 | Open |
+
+## Design, product and repository decisions
+
+| ID | Decision | Recommendation | Blocks | Status |
+|---|---|---|---|---|
+| DEC-01 | Visual tokens within black, white and grey: fonts, and whether one accent colour is used for purchase buttons | Decide after the brand guide (FE-12.2), comparing mock-ups with and without an accent. | FE-01.2 | Open |
+| DEC-02 | Base component style: hard outlines and offset shadows, clean surfaces, or sticker/stencil | Compare three directions on one mock-up page, as done for the tabacaria. | FE-12.1 | Open |
+| DEC-03 | Checkout on a single page or in steps | Mock up both on mobile before choosing. | FE-06.1 | Open |
+| DEC-04 | Analytics tool and advertising pixel. The tabacaria banned pixels because of tobacco ad rules; that reason does not apply to apparel | PostHog for the funnel, plus a Meta pixel behind consent only if paid ads are planned. | FE-08.1 | Open |
+| DEC-05 | Guest checkout or account required | Guest checkout, with an optional account later. | BE-03.2, FE-03.1, FE-06.1 | Open |
+| DEC-06 | Home blocks and their order | Decide with the mock-ups in FE-12.3. | BE-02.5, FE-11.1 | Open |
+| DEC-07 | Listing layout: filters in a sidebar or a top bar, and cards per row on mobile | Decide with the mock-ups in FE-12.3. | FE-04.1a | Open |
+| DEC-08 | Repository visibility: private on the free plan has no required checks and shares 2,000 Actions minutes a month; public with the proprietary licence removes both limits | Public with the proprietary licence, as in the tabacaria, keeping business and fiscal data out of the repository. | EST-03.1 | Open |
+| DEC-09 | Confirm on-site payment (ADR 002): card tokenised in the browser instead of the hosted Checkout Pro | Accept, as it matches the tabacaria experience. | BE-05.1 | Open |
