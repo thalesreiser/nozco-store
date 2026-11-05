@@ -1,7 +1,7 @@
 # @nozco/backend
 
 Medusa v2 server, admin dashboard and worker, scaffolded from the official starter without its demo
-seed. Contributor rules are in [`CLAUDE.md`](CLAUDE.md).
+seed.
 
 ## Running it
 
