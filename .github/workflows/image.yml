@@ -74,7 +74,7 @@ jobs:
       - name: Report the image size
         run: |
           bytes=$(docker image inspect --format '{{.Size}}' "$IMAGE")
-          disk=$(docker run --rm --entrypoint du "$IMAGE" -xsm /)
+          disk=$(docker run --rm --user 0 --entrypoint du "$IMAGE" -xsm /)
           {
             echo "Image size reported by Docker: $((bytes / 1024 / 1024)) MiB"
             echo "Size on disk inside the container: ${disk%%[[:space:]]*} MiB"
