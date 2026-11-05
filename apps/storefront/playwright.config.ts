@@ -25,6 +25,7 @@ export default defineConfig({
       NUXT_PUBLIC_API_URL: "http://localhost:9000",
       NUXT_PUBLIC_PUBLISHABLE_KEY: "pk_e2e_placeholder",
       NUXT_PUBLIC_APP_ENV: "preview",
+      NUXT_PUBLIC_DATA_SOURCE: "api",
     },
   },
 })
