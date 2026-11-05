@@ -58,7 +58,7 @@ nor Redis, and it answers only after the application has loaded.
 
 `integration-tests/http/health.spec.ts` covers it. The test runner registers its own copy of this route,
 so the same test also calls a protected Medusa route to show the application loaded. The route served by
-`medusa start` itself needs a smoke test against a running server.
+`medusa start` itself is covered by the `backend-boot-smoke` CI job (`.github/scripts/backend-boot-smoke.sh`).
 
 ## Scripts
 
