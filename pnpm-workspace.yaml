@@ -19,3 +19,20 @@ catalog:
   zod: 4.6.7
 
 engineStrict: true
+
+# Packages allowed to run install scripts (pnpm 10 blocks them by default).
+onlyBuiltDependencies:
+  - "@medusajs/telemetry"
+  - "@swc/core"
+  - esbuild
+
+# tsconfig-paths: required by the Medusa CLI (same override as Medusa's official starter).
+overrides:
+  tsconfig-paths: ^4.2.0
+
+# @nuxt/schema imports vite's types but only lists it as a dev dependency, so it would read whichever
+# vite is hoisted. Medusa's admin needs vite 7 and Nuxt needs vite 8: this keeps Nuxt on its own.
+packageExtensions:
+  "@nuxt/schema":
+    dependencies:
+      vite: 8.3.6

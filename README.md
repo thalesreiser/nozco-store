@@ -39,8 +39,8 @@ pnpm install      # also installs the Git hooks
 | `pnpm preview`      | Builds, then serves the production build             |
 
 Commits must follow Conventional Commits; the `commit-msg` hook rejects anything else, and the
-`pre-commit` hook lints and formats staged files. `apps/backend` is not scaffolded yet (task
-BE-01.1).
+`pre-commit` hook lints and formats staged files. To run the backend, see
+[`apps/backend/README.md`](apps/backend/README.md).
 
 ## Storefront
 
