@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+# Compact requirement and plan tables; aligning them would be a large diff with no content change.
+docs/
+**/dist
+**/.nuxt
+**/.output
+**/.medusa
+**/coverage
+**/.turbo

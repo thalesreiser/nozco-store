@@ -1,14 +1,17 @@
 # Dependencies
 node_modules/
+.pnpm-store/
 
 # Build output
-.next/
-out/
+.nuxt/
+.output/
+.medusa/
 build/
 dist/
 coverage/
 playwright-report/
 test-results/
+*.log
 
 # Environment and secrets (only .env.example is versioned)
 .env
@@ -17,10 +20,8 @@ test-results/
 *.pem
 
 # Tooling
-.vercel/
 .turbo/
 *.tsbuildinfo
-next-env.d.ts
 
 # OS / editors
 .DS_Store

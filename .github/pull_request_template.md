@@ -1,9 +1,11 @@
 ## What changes
 
 ## Related requirements
+
 <!-- e.g. RF-01, RNF-02 -->
 
 ## Definition of Done
+
 - [ ] Lint and type-check passing in CI
 - [ ] Automated tests passing (coverage >= 80% on domain logic; e2e for affected flows)
 - [ ] Documentation updated (README, diagram, ADR if a decision was made)
