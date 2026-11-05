@@ -70,8 +70,8 @@ launch; **C** tasks are backlog.
 | EST-03.2 | Security automation | RNF-02 | M | 2 h | EST-03.1 |
 | EST-03.3 | Backend container image | RNF-02, RNF-05 | M | 3 h | BE-01.1, EST-03.1 |
 
-- **EST-03.1** Quality job (lint, typecheck, format, unit tests) · Build job with Turborepo cache · Backend integration job with Postgres and Redis services · Storefront e2e job on mock data · Merge checklist, or required checks if DEC-08 makes the repo public
-- **EST-03.2** gitleaks in CI · Dependency audit (high and above) · SECURITY.md · CodeQL and secret scanning if available for the repo visibility
+- **EST-03.1** Quality job (lint, typecheck, format, unit tests) · Build job with Turborepo cache · Backend integration job with Postgres and Redis services · Storefront e2e job on mock data · CI jobs as required checks on `develop` and `main`
+- **EST-03.2** gitleaks in CI · Dependency audit (high and above) · SECURITY.md · CodeQL
 - **EST-03.3** Multi-stage Dockerfile · Non-root runtime · Image scan in CI
 
 ### EST-04 - Infrastructure and accounts (11 h)

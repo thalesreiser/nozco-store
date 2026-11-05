@@ -61,4 +61,5 @@ tracked on the project's Trello board.
 
 ## License
 
+This repository is public for transparency and tooling, but the code is not open source.
 Proprietary — all rights reserved. See [LICENSE](LICENSE).
