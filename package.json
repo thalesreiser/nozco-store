@@ -18,6 +18,8 @@
     "test:e2e": "turbo run test:e2e",
     "test:integration": "turbo run test:integration",
     "db:migrate": "turbo run db:migrate",
+    "infra:up": "docker compose -f infra/docker-compose.yml up -d --wait",
+    "infra:down": "docker compose -f infra/docker-compose.yml down",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
