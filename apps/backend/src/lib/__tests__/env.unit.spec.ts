@@ -45,6 +45,64 @@ describe("parseEnv", () => {
     expect(parseEnv(production).NODE_ENV).toBe("production")
   })
 
+  describe.each(["STORE_CORS", "ADMIN_CORS", "AUTH_CORS"])("%s in production", (name) => {
+    it.each([
+      "*",
+      "https://store.example,*",
+      "https://*.store.example",
+      "/.*/",
+      "/.+/",
+      "/./",
+      "/https?:.*/",
+    ])("rejects the wildcard %s", (value) => {
+      expect(() => parseEnv({ ...production, [name]: value })).toThrow(
+        new RegExp(`${name}: must list explicit origins`),
+      )
+    })
+
+    it.each([
+      "https://store.example",
+      "https://store.example,https://www.store.example",
+      "/^https:\\/\\/[a-z0-9-]+\\.store\\.example$/",
+      "/^https:\\/\\/.*\\.store\\.example$/",
+    ])("accepts the explicit list %s", (value) => {
+      expect(parseEnv({ ...production, [name]: value })[name as "STORE_CORS"]).toBe(value)
+    })
+  })
+
+  it("leaves the wildcard rule to production", () => {
+    expect(parseEnv({ NODE_ENV: "development", STORE_CORS: "*" }).STORE_CORS).toBe("*")
+  })
+
+  it("enables rate limits with the documented defaults", () => {
+    expect(parseEnv({ NODE_ENV: "development" })).toMatchObject({
+      RATE_LIMIT_ENABLED: true,
+      RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT: 10,
+      RATE_LIMIT_LOGIN_MAX_PER_IP: 100,
+      RATE_LIMIT_LOGIN_WINDOW_SECONDS: 900,
+      RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: 5,
+      RATE_LIMIT_SENSITIVE_MAX_PER_IP: 60,
+      RATE_LIMIT_SENSITIVE_WINDOW_SECONDS: 3600,
+    })
+  })
+
+  it("reads rate limits from strings and can switch them off", () => {
+    const env = parseEnv({ RATE_LIMIT_ENABLED: "false", RATE_LIMIT_LOGIN_MAX_PER_IP: "7" })
+
+    expect(env.RATE_LIMIT_ENABLED).toBe(false)
+    expect(env.RATE_LIMIT_LOGIN_MAX_PER_IP).toBe(7)
+  })
+
+  it.each(["0", "-1", "1.5", "many"])("rejects the rate limit value %s", (value) => {
+    expect(() => parseEnv({ RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT: value })).toThrow(
+      /RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT/,
+    )
+  })
+
+  it("rejects a misspelled switch instead of leaving the limits on or off by accident", () => {
+    expect(() => parseEnv({ RATE_LIMIT_ENABLED: "no" })).toThrow(/RATE_LIMIT_ENABLED/)
+  })
+
   it("rejects a malformed database URL", () => {
     expect(() => parseEnv({ DATABASE_URL: "not a url" })).toThrow(/DATABASE_URL/)
   })

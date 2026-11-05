@@ -26,6 +26,38 @@ Outside production, the CORS and secret variables fall back to local-only defaul
 are required, as is `DATABASE_URL`. `medusa start` assumes `NODE_ENV=production` when it is unset, and
 `medusa develop` and `medusa build` assume `development`.
 
+## Store setup
+
+`src/migration-scripts/setup-brazil-store.ts` configures the store. `pnpm db:migrate` runs it once per
+environment and records it; if it fails, the next migrate retries it. It creates, or reuses when they
+already exist:
+
+| What                | Value                                                              |
+| ------------------- | ------------------------------------------------------------------ |
+| Region              | `Brasil`, country `br`, currency `brl`, prices include taxes       |
+| Tax region          | `br` with the system tax provider and no rates (rates are pending) |
+| Sales channel       | `loja-online`, default channel of the store                        |
+| Publishable API key | `loja-online storefront`, linked to `loja-online`                  |
+| Stock location      | `Armazém principal` (placeholder), linked to `loja-online`         |
+| Store               | `NozCo`, BRL only and tax-inclusive, defaults above                |
+
+The values live in `src/lib/store-setup/constants.ts` and the decisions in pure, unit-tested functions
+(`plan.ts`). Every record is looked up by country, name or title before anything is created, and links
+are only added when missing, so running it again changes nothing. To rerun it by hand:
+`pnpm exec medusa exec ./src/migration-scripts/setup-brazil-store.ts`. Records are matched by name, so
+renaming one in the admin makes a rerun create a new one.
+
+The shipping origin is not in the repository (Q-10): fill it in the admin under **Settings > Locations &
+Shipping**. Whether prices include taxes, and the tax rates, are still to be confirmed with the
+accountant; the setting can be changed in the admin, on the region and on the store's currency.
+
+### Publishable key for the storefront
+
+The storefront sends this key in the `x-publishable-api-key` header. It scopes Store API requests to the
+`loja-online` channel and is public by design, so it is not a secret. Run `pnpm store:publishable-key`
+(needs the database) and copy the printed line into `apps/storefront/.env`, or copy the token from the
+admin under **Settings > Publishable API Keys**.
+
 ## Server and worker modes
 
 `MEDUSA_WORKER_MODE` selects what the process does:
@@ -62,6 +94,33 @@ nor Redis, and it answers only after the application has loaded.
 so the same test also calls a protected Medusa route to show the application loaded. The route served by
 `medusa start` itself is covered by the `backend-boot-smoke` CI job (`.github/scripts/backend-boot-smoke.sh`).
 
+## API hardening
+
+**CORS.** `STORE_CORS`, `ADMIN_CORS` and `AUTH_CORS` are set per environment. In production `src/lib/env.ts`
+stops the boot on a wildcard: any plain entry with `*`, and any `/pattern/` that accepts an unrelated
+origin.
+
+**Rate limits.** Medusa 2.22 has no rate limiter, and its cache module has no atomic counter, so
+`src/api/middlewares.ts` adds one to the `/auth` routes. It counts every attempt in a fixed window, so a
+burst across two windows can reach twice the limit.
+
+| Rule                                                  | Per account  | Per client address |
+| ----------------------------------------------------- | ------------ | ------------------ |
+| Login (`POST /auth/:actor/:provider`, admin included) | 10 in 15 min | 100 in 15 min      |
+| Register, password reset, MFA and e-mail verification | 5 in 1 h     | 60 in 1 h          |
+
+Over a limit the API answers `429` with `Retry-After` and `{ "code": "rate_limited", "message": "..." }`.
+Redis holds a hash of the account, never the e-mail address. If Redis stops answering, each process counts
+on its own until it returns. `.env.example` lists the variables.
+
+The client address is Express's `req.ip`, and Medusa trusts one proxy hop. Requests that arrive through the
+storefront's server routes carry the address of the Cloudflare Worker rather than the customer's, so the
+address limit is a shared one for them.
+
+**Custom routes.** Validate with `validateBody(schema)` in `src/api/middlewares.ts` and read
+`req.validatedBody` in the route (`src/api/utils/validate-payload.ts`). Failures answer `400` with
+`{ "code": "invalid_payload", "message": "..." }`.
+
 ## Scripts
 
 | Script                         | What it does                                                  |
@@ -69,7 +128,8 @@ so the same test also calls a protected Medusa route to show the application loa
 | `pnpm dev`                     | API and admin with reload                                     |
 | `pnpm build`                   | Compiles server and admin into `.medusa/server`               |
 | `pnpm start`                   | Runs the build                                                |
-| `pnpm db:migrate`              | Applies migrations (needs `DATABASE_URL`)                     |
+| `pnpm db:migrate`              | Applies migrations and the store setup (needs `DATABASE_URL`) |
+| `pnpm store:publishable-key`   | Prints the storefront publishable key (needs `DATABASE_URL`)  |
 | `pnpm lint` / `pnpm typecheck` | ESLint and TypeScript                                         |
 | `pnpm test`                    | Unit tests (`src/**/__tests__/*.unit.spec.ts`)                |
 | `pnpm test:integration`        | HTTP and module integration tests (needs Postgres, see below) |

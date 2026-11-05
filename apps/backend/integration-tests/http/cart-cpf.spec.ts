@@ -95,7 +95,9 @@ medusaIntegrationTestRunner({
         const answer = await send(cartId, body)
 
         expect(answer.status).toBe(400)
-        expect(answer.data).toEqual({ code: "invalid_cpf", message: "The CPF is not valid." })
+        expect(answer.data.code).toBe("invalid_payload")
+        expect(answer.data.message).toContain("cpf: ")
+        expect(answer.data.message).not.toContain(base)
         expect(await storedMetadata()).toEqual({ gift: true })
       })
 

@@ -30,7 +30,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-23 | BL-01.1 | | | Planned |
 | RF-24 | BL-01.2 | | | Planned |
 | RNF-01 | EST-04.3, BE-02.2, FE-09.2, FE-10.1 | | | Planned |
-| RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | EST-03.2: `Security` and `CodeQL` workflows (dependency audit, Gitleaks on the full history, CodeQL). EST-03.3: `image.yml` checks the image holds no build placeholders or `.env` files and scans it with Trivy (high and critical fail) | #11, #12 | In progress |
+| RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | EST-03.2: `Security` and `CodeQL` workflows (dependency audit, Gitleaks on the full history, CodeQL). EST-03.3: `image.yml` checks the image holds no build placeholders or `.env` files and scans it with Trivy (high and critical fail). BE-10.2: `pnpm test` (CORS wildcard rule, rate limit logic and stores, payload validation), `integration-tests/http/rate-limit.spec.ts` in CI | #11, #12, #15 | In progress |
 | RNF-03 | EST-05.2, BE-01.3 | | | Planned |
 | RNF-04 | EST-05.1, BE-03.1, BE-03.3, BE-09.2, FE-06.1, FE-07.3, FE-08.1 | BE-03.1: `log-redaction.unit.spec.ts`, `cpf-privacy.unit.spec.ts`; `integration-tests/http/cart-cpf.spec.ts` (no CPF in logs or in store cart and order responses) | BE-03.1 PR | In progress |
 | RNF-05 | EST-03.3, EST-04.2, EST-05.3, BE-05.4, BE-07.1 | EST-03.3: `image.yml` runs the migrations and checks `/health` from the image, with Postgres and Redis | #11 | In progress |
@@ -38,7 +38,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RNF-07 | FE-04.4 | | | Planned |
 | RNF-08 | EST-04.4, FE-08.1, FE-08.2 | | | Planned |
 | RNF-09 | EST-01.2, EST-01.3, EST-01.4, EST-03.1, BE-01.1, BE-10.1, FE-01.1, FE-02.1, FE-09.1 | EST-01.3: `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, commit-msg hook; FE-01.1: storefront `vue-tsc` and typed lint, `pnpm test` (runtime config, components), `pnpm test:e2e` (SSR smoke, axe); BE-01.1: backend `tsc` and typed lint, `pnpm test` (env validation, Redis modules); `integration-tests/http/health.spec.ts`; EST-03.1: CI jobs `quality`, `build`, `backend-integration` (migrations twice, schema diff, `test:integration`), `backend-boot-smoke` (real `medusa start`, server and worker, refusal on missing variables), `storefront-e2e`, `ci-ok`; FE-02.1: `tests/unit/composables.test.ts`, `tests/unit/data-source.test.ts`, `tests/unit/runtime-config.test.ts`, `scripts/check-fixtures.mjs` after each build | #3, #6, #7, #10, #16 | In progress |
-| RN-01 | BE-01.2, BE-02.1 | | | Planned |
+| RN-01 | BE-01.2, BE-02.1 | BE-01.2: `pnpm test` (`store-setup/__tests__/plan.unit.spec.ts`: Brazil region in BRL); `integration-tests/http/store-setup.spec.ts` passes in CI | #14 | In progress |
 | RN-02 | BE-05.3, FE-06.3 | | | Planned |
 | RN-03 | BE-05.4 | | | Planned |
 | RN-04 | BE-07.2, FE-07.2 | | | Planned |
