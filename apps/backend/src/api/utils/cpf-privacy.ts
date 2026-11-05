@@ -3,8 +3,8 @@ import { withoutCpfInMetadata } from "../../lib/cart-cpf"
 import { redactCpfInText } from "../../lib/log-redaction"
 
 /**
- * Medusa returns `metadata` from the store cart and order routes, and `GET /store/orders/:id` needs
- * only the order ID, so the CPF stored there must not go out with them.
+ * Medusa returns `metadata` by default from the store cart routes, where holding the cart ID is enough,
+ * and from the customer's order list, so the CPF stored there must not go out with them.
  */
 export function hideCpfInResponses(
   _req: MedusaRequest,

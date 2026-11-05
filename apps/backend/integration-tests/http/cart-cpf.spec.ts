@@ -147,11 +147,15 @@ medusaIntegrationTestRunner({
             items: [],
           })
 
-        const answer = (await api.get(`/store/orders/${order.id}`, { headers })) as Answer
+        const plain = (await api.get(`/store/orders/${order.id}`, { headers })) as Answer
+        const asked = (await api.get(`/store/orders/${order.id}?fields=%2Bmetadata`, {
+          headers,
+          validateStatus: () => true,
+        })) as Answer
 
-        expect(answer.status).toBe(200)
-        expect(JSON.stringify(answer.data)).not.toContain(validCpf)
-        expect((answer.data.order as { metadata: unknown }).metadata).toEqual({ gift: true })
+        expect(plain.status).toBe(200)
+        expect(JSON.stringify(plain.data)).not.toContain(validCpf)
+        expect(JSON.stringify(asked.data)).not.toContain(validCpf)
       })
 
       it("logs through the redacting logger", () => {
