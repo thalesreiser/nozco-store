@@ -10,9 +10,15 @@
   "scripts": {
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
-    "test": "turbo run test"
+    "lint": "turbo run lint && eslint .",
+    "test": "turbo run test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@nozco/eslint-config": "workspace:*",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:"
   }
