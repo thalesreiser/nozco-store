@@ -52,6 +52,16 @@
         "JWT_SECRET",
         "COOKIE_SECRET"
       ]
+    },
+    "preview": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "passThroughEnv": ["PLAYWRIGHT_*"]
     }
   }
 }

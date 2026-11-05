@@ -96,6 +96,8 @@ test suites run one at a time.
 
 ## What never goes into this repository
 
+The repository is public.
+
 - Secrets of any kind: API keys, tokens, passwords, `.env` files (only `.env.example`).
 - Customer data: CPF, names, addresses, e-mails, orders, even in tests or fixtures.
 - Business-sensitive data: real tax settings, contracts, supplier prices, draft legal texts. These live
