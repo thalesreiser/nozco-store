@@ -3,7 +3,8 @@
 # The same image runs the API (default) or the worker (MEDUSA_WORKER_MODE=worker). All configuration
 # comes from the environment at run time: see apps/backend/.env.example.
 
-ARG NODE_IMAGE=node:24-bookworm-slim
+# Alpine: node:24-bookworm-slim failed the scan with 34 OS findings that have no fix (EST-03.3 PR).
+ARG NODE_IMAGE=node:24-alpine
 
 FROM ${NODE_IMAGE} AS build
 ENV PNPM_HOME=/pnpm \
@@ -37,10 +38,11 @@ FROM ${NODE_IMAGE} AS runtime
 ENV NODE_ENV=production \
     MEDUSA_DISABLE_TELEMETRY=true \
     PORT=9000
-# npm, npx and corepack ship with the base image but are never used at run time. Removing them also
-# removes their bundled dependencies, and those dependencies' vulnerabilities.
-RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack \
+# npm, npx, corepack and yarn ship with the base image but are never used at run time. Removing them
+# also removes their bundled dependencies, and those dependencies' vulnerabilities.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/corepack /opt/yarn-* \
            /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack \
+           /usr/local/bin/yarn /usr/local/bin/yarnpkg \
  && install -d -o node -g node /app
 WORKDIR /app
 COPY --from=build --chown=node:node /out ./

@@ -74,7 +74,11 @@ jobs:
       - name: Report the image size
         run: |
           bytes=$(docker image inspect --format '{{.Size}}' "$IMAGE")
-          echo "Image size: $((bytes / 1024 / 1024)) MiB ($bytes bytes)" | tee -a "$GITHUB_STEP_SUMMARY"
+          disk=$(docker run --rm --entrypoint du "$IMAGE" -xsm /)
+          {
+            echo "Image size reported by Docker: $((bytes / 1024 / 1024)) MiB"
+            echo "Size on disk inside the container: ${disk%%[[:space:]]*} MiB"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Check the image contents
         run: |
@@ -82,9 +86,9 @@ jobs:
             test "$(id -u)" != 0
             test "$NODE_ENV" = production
             test "$MEDUSA_DISABLE_TELEMETRY" = true
-            if command -v npm || command -v corepack; then exit 1; fi
+            if command -v npm || command -v corepack || command -v yarn; then exit 1; fi
             test -z "$(find /app -name ".env*" -not -path "*/node_modules/*")"
-            if grep -rl build-time-placeholder /app --exclude-dir=node_modules; then exit 1; fi
+            test -z "$(find /app -path /app/node_modules -prune -o -type f -exec grep -l build-time-placeholder {} +)"
           '
           # `! command` would not stop the step: `set -e` ignores negated commands.
           image_env=$(docker image inspect --format '{{json .Config.Env}}' "$IMAGE")
