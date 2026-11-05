@@ -39,6 +39,20 @@ export default defineNuxtConfig({
   },
   // The store and its server routes share one origin, so no response needs CORS headers.
   security: { corsHandler: false },
+  routeRules: {
+    // The XSS validator refuses text containing `<`, which is valid in a password. The route validates
+    // with Zod and only forwards the value to Medusa as JSON.
+    "/api/auth/login": { security: { xssValidator: false } },
+  },
+  hooks: {
+    // Nuxt only adds its own handler when none is set, so this one is put in front of it from here.
+    "nitro:config"(config) {
+      const nuxtHandlers = config.errorHandler ? [config.errorHandler].flat() : []
+      // Forward slashes: Nitro writes this path into an import statement, also on Windows.
+      const bffHandler = fileURLToPath(new URL("./server/error.ts", import.meta.url))
+      config.errorHandler = [bffHandler.replaceAll("\\", "/"), ...nuxtHandlers]
+    },
+  },
   i18n: {
     defaultLocale: "pt-BR",
     strategy: "no_prefix",

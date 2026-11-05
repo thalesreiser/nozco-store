@@ -178,3 +178,29 @@ export interface StorePaymentSession {
 /** The order exists only after the payment webhook, so the store polls for this. */
 export type StorePaymentStatus =
   { status: "pending" } | { status: "paid"; order_id: string } | { status: "failed" }
+
+export interface StoreOrderLineItem {
+  id: string
+  title: string
+  thumbnail: string | null
+  quantity: number
+  variant_title: string
+  unit_price: Cents
+  total: Cents
+}
+
+/** What the store shows of an order. Addresses and contact are added by the task that needs them. */
+export interface StoreOrder {
+  id: string
+  display_id: number
+  status: string
+  payment_status: string
+  fulfillment_status: string
+  created_at: string
+  currency_code: "brl"
+  items: StoreOrderLineItem[]
+  item_subtotal: Cents
+  shipping_total: Cents
+  discount_total: Cents
+  total: Cents
+}
