@@ -33,11 +33,11 @@ pnpm install      # also installs the Git hooks
 | `pnpm format`       | Formats with Prettier (`docs/` is excluded)          |
 | `pnpm format:check` | Checks formatting without changing files             |
 | `pnpm build`        | Builds every package through Turborepo               |
-| `pnpm test`         | Runs tests through Turborepo (none exist yet)        |
+| `pnpm test`         | Runs unit tests through Turborepo                    |
 
 Commits must follow Conventional Commits; the `commit-msg` hook rejects anything else, and the
-`pre-commit` hook lints and formats staged files. `apps/backend` and `apps/storefront` are not
-scaffolded yet (tasks BE-01.1 and FE-01.1).
+`pre-commit` hook lints and formats staged files. `apps/storefront` is not scaffolded yet (task
+FE-01.1). To run the backend, see [`apps/backend/README.md`](apps/backend/README.md).
 
 ## Documentation
 
