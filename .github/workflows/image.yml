@@ -98,8 +98,10 @@ jobs:
           cookie_secret=$(openssl rand -hex 32)
           echo "::add-mask::$jwt_secret"
           echo "::add-mask::$cookie_secret"
+          # sslmode=disable: Medusa turns on SSL for every host other than localhost, and the failed
+          # handshake with this Postgres only shows up as a connection timeout.
           cat > "$RUNNER_TEMP/backend.env" <<EOF
-          DATABASE_URL=postgres://nozco:ci-only@host.docker.internal:5432/nozco_image
+          DATABASE_URL=postgres://nozco:ci-only@host.docker.internal:5432/nozco_image?sslmode=disable
           REDIS_URL=redis://host.docker.internal:6379
           STORE_CORS=http://localhost:3000
           ADMIN_CORS=http://localhost:9000
