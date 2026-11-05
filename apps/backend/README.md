@@ -26,6 +26,38 @@ Outside production, the CORS and secret variables fall back to local-only defaul
 are required, as is `DATABASE_URL`. `medusa start` assumes `NODE_ENV=production` when it is unset, and
 `medusa develop` and `medusa build` assume `development`.
 
+## Store setup
+
+`src/migration-scripts/setup-brazil-store.ts` configures the store. `pnpm db:migrate` runs it once per
+environment and records it; if it fails, the next migrate retries it. It creates, or reuses when they
+already exist:
+
+| What                | Value                                                              |
+| ------------------- | ------------------------------------------------------------------ |
+| Region              | `Brasil`, country `br`, currency `brl`, prices include taxes       |
+| Tax region          | `br` with the system tax provider and no rates (rates are pending) |
+| Sales channel       | `loja-online`, default channel of the store                        |
+| Publishable API key | `loja-online storefront`, linked to `loja-online`                  |
+| Stock location      | `Armazém principal` (placeholder), linked to `loja-online`         |
+| Store               | `NozCo`, BRL only and tax-inclusive, defaults above                |
+
+The values live in `src/lib/store-setup/constants.ts` and the decisions in pure, unit-tested functions
+(`plan.ts`). Every record is looked up by country, name or title before anything is created, and links
+are only added when missing, so running it again changes nothing. To rerun it by hand:
+`pnpm exec medusa exec ./src/migration-scripts/setup-brazil-store.ts`. Records are matched by name, so
+renaming one in the admin makes a rerun create a new one.
+
+The shipping origin is not in the repository (Q-10): fill it in the admin under **Settings > Locations &
+Shipping**. Whether prices include taxes, and the tax rates, are still to be confirmed with the
+accountant; the setting can be changed in the admin, on the region and on the store's currency.
+
+### Publishable key for the storefront
+
+The storefront sends this key in the `x-publishable-api-key` header. It scopes Store API requests to the
+`loja-online` channel and is public by design, so it is not a secret. Run `pnpm store:publishable-key`
+(needs the database) and copy the printed line into `apps/storefront/.env`, or copy the token from the
+admin under **Settings > Publishable API Keys**.
+
 ## Server and worker modes
 
 `MEDUSA_WORKER_MODE` selects what the process does:
@@ -69,7 +101,8 @@ so the same test also calls a protected Medusa route to show the application loa
 | `pnpm dev`                     | API and admin with reload                                     |
 | `pnpm build`                   | Compiles server and admin into `.medusa/server`               |
 | `pnpm start`                   | Runs the build                                                |
-| `pnpm db:migrate`              | Applies migrations (needs `DATABASE_URL`)                     |
+| `pnpm db:migrate`              | Applies migrations and the store setup (needs `DATABASE_URL`) |
+| `pnpm store:publishable-key`   | Prints the storefront publishable key (needs `DATABASE_URL`)  |
 | `pnpm lint` / `pnpm typecheck` | ESLint and TypeScript                                         |
 | `pnpm test`                    | Unit tests (`src/**/__tests__/*.unit.spec.ts`)                |
 | `pnpm test:integration`        | HTTP and module integration tests (needs Postgres, see below) |

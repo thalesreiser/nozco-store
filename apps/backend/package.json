@@ -9,6 +9,7 @@
     "start:server": "cd .medusa/server && cross-env MEDUSA_DISABLE_TELEMETRY=true MEDUSA_WORKER_MODE=server medusa start",
     "start:worker": "cd .medusa/server && cross-env MEDUSA_DISABLE_TELEMETRY=true MEDUSA_WORKER_MODE=worker medusa start",
     "db:migrate": "cross-env MEDUSA_DISABLE_TELEMETRY=true medusa db:migrate",
+    "store:publishable-key": "cross-env MEDUSA_DISABLE_TELEMETRY=true medusa exec ./src/scripts/publishable-key.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "cross-env TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
