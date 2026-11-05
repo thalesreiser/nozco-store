@@ -31,5 +31,5 @@ the architecture or the interface, an ADR.
 | DEC-05 | Guest checkout or account required | Guest checkout, with an optional account later. | BE-03.2, FE-03.1, FE-06.1 | Open |
 | DEC-06 | Home blocks and their order | Decide with the mock-ups in FE-12.3. | BE-02.5, FE-11.1 | Open |
 | DEC-07 | Listing layout: filters in a sidebar or a top bar, and cards per row on mobile | Decide with the mock-ups in FE-12.3. | FE-04.1a | Open |
-| DEC-08 | Repository visibility: private on the free plan has no required checks and shares 2,000 Actions minutes a month; public with the proprietary licence removes both limits | Public with the proprietary licence, as in the tabacaria, keeping business and fiscal data out of the repository. | EST-03.1 | Open |
+| DEC-08 | Repository visibility | Public with the proprietary licence ([ADR 003](adr/003-public-repository.md)) | EST-03.1 | Decided on 2026-11-05 |
 | DEC-09 | Confirm on-site payment (ADR 002): card tokenised in the browser instead of the hosted Checkout Pro | Accept, as it matches the tabacaria experience. | BE-05.1 | Open |

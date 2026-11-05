@@ -60,4 +60,4 @@ Priorities: **M** must, **S** should, **C** could, **W** won't (this version).
 | R-06 | Tax/invoice obligations not ready at launch | Med. | High | Decide Q-01 with the accountant before BE-08.1 |
 | R-07 | Monthly cost of API, worker, Postgres and Redis exceeds the budget | Med. | High | Answer Q-02 before EST-04.2 |
 | R-08 | Medusa does not cover a requirement out of the box (2FA, roles, size and colour filters) | Med. | Med. | Spikes BE-01.3 and BE-02.4 before committing to the screens |
-| R-09 | Monorepo CI exhausts the free Actions minutes on a private repository | Med. | Med. | Decide DEC-08 before EST-03.1 |
+| R-09 | Business-sensitive data reaches the public repository | Low | High | Rules in `CLAUDE.md`, secret scanning with push protection, review on every PR ([ADR 003](adr/003-public-repository.md)) |
