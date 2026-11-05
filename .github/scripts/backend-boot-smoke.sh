@@ -89,7 +89,8 @@ expect_clean_log() {
 
 # Runs `medusa start` without one variable and expects it to refuse to start, naming that variable.
 expect_refusal() {
-  local mode=$1 variable=$2 log="$log_dir/refused-$mode-$variable.log" rc=0
+  local mode=$1 variable=$2 rc=0
+  local log="$log_dir/refused-$mode-$variable.log"
   env -u "$variable" PORT="$refused_port" timeout 120 \
     pnpm --filter @nozco/backend "start:$mode" >"$log" 2>&1 || rc=$?
   [ "$rc" -ne 124 ] || fail "$mode mode without $variable was still running after 120 s"
