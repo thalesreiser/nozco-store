@@ -1,161 +1,371 @@
 # Development plan
 
-Work breakdown: **epics → tasks → sub-tasks**. Each task is one Trello card (pt-BR) and, when it
-changes the repository, one pull request. Estimates are in hours of focused work.
+Work breakdown in three tracks: **structural (EST), backend (BE) and frontend (FE)**. Each task is
+one Trello card (pt-BR) and, when it changes the repository, one pull request. Estimates are in
+hours of focused work. Decisions are in [ADR 001](adr/001-nuxt-medusa-stack.md) and
+[ADR 002](adr/002-mercado-pago-on-site-payment.md); pending ones in
+[03 - Open questions](03-open-questions.md).
 
-**Release cut:** the launch (go-live, task 8.6) needs every **M** task. **S** tasks may ship
-right after launch; **C** tasks are backlog.
+**Release cut:** the go-live (EST-05.4) needs every **M** task. **S** tasks may ship right after
+launch; **C** tasks are backlog.
 
-| Epic | Name | Tasks | Estimate |
+| Track | Tasks | Total | Needed for launch (M) |
 |---|---|---|---|
-| E1 | Foundation | 1.1 – 1.6 | 20 h |
-| E2 | Visual identity and design system | 2.1 – 2.4 | 16 h |
-| E3 | Catalog | 3.1 – 3.7 | 28 h |
-| E4 | Cart and shipping | 4.1 – 4.4 | 15 h |
-| E5 | Checkout and payments | 5.1 – 5.6 | 28 h |
-| E6 | Back office | 6.1 – 6.6 | 30 h |
-| E7 | Post-sale and customer | 7.1 – 7.7 | 20 h |
-| E8 | Legal, quality and launch | 8.1 – 8.6 | 20 h |
-| | **Total** | **46 tasks** | **177 h** |
+| Structural | 16 | 49 h | 49 h |
+| Backend (Medusa v2) | 28 | 94 h | 84 h |
+| Frontend (Nuxt 4) | 32 | 119 h | 108 h |
+| Post-launch backlog | 2 | 5 h | 0 h |
+| **Total** | **78** | **267 h** | **241 h** |
 
 ## Process
-- **Definition of Ready:** requirement and acceptance criterion written, dependencies done (tasks
-  and open questions), estimate set. Only ready cards go to *Pronto*.
-- **Definition of Done:** the checklist in the PR template (lint, type-check, tests, docs,
-  traceability, no secrets) plus the card's sub-tasks ticked.
+- **Definition of Ready:** requirement and acceptance criterion written, dependencies done (tasks,
+  questions and decisions), estimate set. Only ready cards go to *Pronto*.
+- **Definition of Done:** the PR template checklist plus the card's sub-tasks ticked.
 - **Flow:** Backlog → Pronto → Em andamento → Revisão (PR open) → Concluído (merged).
+- **Interface first:** tasks ending in `a` build the screen on fictional mock data and are the design
+  review; tasks ending in `b` connect the real API without changing the composable signature. E2E
+  tests can run on the mock source without a backend.
+- **Who decides:** design, UI, UX, data model breaks, API contract breaks, business rules, security,
+  infrastructure and cost go to Thales with options and a recommendation, and end in an ADR. Routine
+  implementation choices are listed in the PR.
 - Every card gets dated comments at start, PR opened and completion.
-- Decisions with lasting impact get an ADR in `docs/adr/`; business decisions close an item in
-  [03 - Open questions](03-open-questions.md).
 
-## E1 - Foundation
+## Suggested order
+1. **Foundation:** EST-01.3, EST-01.4, FE-01.1, BE-01.1, EST-02.1, EST-03.1.
+2. **Look and feel:** FE-12.2, FE-12.3, FE-01.2, FE-12.1, FE-11.3. Decisions DEC-01, DEC-02, DEC-06 and DEC-07 happen here.
+3. **Screens on mock data:** FE-02.1, FE-11.1, FE-04.1a, FE-04.2a, FE-05.1a. The store can be reviewed on a preview link from this point.
+4. **Real catalog and cart:** BE-01.2, BE-02.x, BE-04.1, then the `b` tasks.
+5. **Paying and shipping:** BE-03.1, BE-05.x, BE-06.x, BE-07.x, FE-02.2, FE-05.2, FE-06.x, FE-07.x.
+6. **Launch:** BE-08.1, BE-09.1, FE-08.x, FE-09.x, EST-05.x.
+
+## Structural
+
+### EST-01 - Repository foundation (13 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 1.1 | Vision, requirements and development plan | — | M | 4 h | — |
-| 1.2 | Architecture and stack ADRs | RNF-02, RNF-09 | M | 4 h | 1.1, Q-02 |
-| 1.3 | Project scaffold | RNF-09 | M | 4 h | 1.2 |
-| 1.4 | CI and repository security | RNF-02, RNF-09 | M | 3 h | 1.3 |
-| 1.5 | Environments and infrastructure | RNF-02, RNF-05 | M | 3 h | 1.2 |
-| 1.6 | Business accounts and domain (manual) | RST-01 | M | 2 h | — |
+| EST-01.1 | Vision, requirements and development plan | — | M | 4 h | — |
+| EST-01.2 | Replan for Nuxt 4 + Medusa v2 | RNF-09 | M | 3 h | EST-01.1 |
+| EST-01.3 | Monorepo and tooling | RNF-09 | M | 4 h | EST-01.2 |
+| EST-01.4 | Contributor rules and templates | RNF-09 | M | 2 h | EST-01.3 |
 
-- **1.1** vision and scope · requirements (MoSCoW) and risks · open questions · development plan · Trello board
-- **1.2** ADR framework (Next.js App Router + TypeScript) · ADR database and ORM (PostgreSQL + Drizzle) · ADR payments (Mercado Pago Checkout Pro vs. transparent checkout vs. other gateways) · ADR shipping (Melhor Envio) · ADR hosting (commercial terms, cost, region) · ADR images and e-mail providers · `docs/04-architecture.md` with a context diagram
-- **1.3** Next.js + TypeScript strict · ESLint + Prettier · Vitest · Playwright · npm scripts · `.env.example` with schema validation of environment variables
-- **1.4** CI workflow (lint, type-check, unit tests, build, e2e) · gitleaks · Dependabot · `SECURITY.md` · merge checklist (private repos on the free plan have no branch protection)
-- **1.5** development and production databases · hosting project with preview deploys · secrets in the host's encrypted variables · migrations applied by the pipeline · automatic backups
-- **1.6** register `nozco.com.br` (registro.br) · Mercado Pago business account and test credentials · Melhor Envio account · e-mail on the domain (SPF, DKIM, DMARC) · company data (Q-11)
+- **EST-01.1** Vision and scope · Requirements and risks · Open questions · Plan and Trello board
+- **EST-01.2** ADRs for stack and payment · Requirements adapted · Architecture and frontend standards docs · Plan with EST, BE and FE tracks · Trello board rebuilt
+- **EST-01.3** pnpm workspaces and Turborepo · Node 24 pinned (.nvmrc, engines) · Strict TypeScript base config · ESLint and Prettier · Husky, lint-staged and commitlint · packages/shared-types and packages/eslint-config
+- **EST-01.4** Root and per-app CLAUDE.md · ADR template with options considered · Updated PR template · CODEOWNERS and Dependabot · Fictional-data rule for fixtures
 
-## E2 - Visual identity and design system
+### EST-02 - Local environment (2 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 2.1 | Brand guide | — | M | 3 h | Q-12 |
-| 2.2 | Design tokens and base components | RNF-06 | M | 5 h | 1.3, 2.1 |
-| 2.3 | Global layout (header, footer, consent) | RF-20, RNF-04 | M | 5 h | 2.2 |
-| 2.4 | Wireframes of key pages | — | M | 3 h | 2.1 |
+| EST-02.1 | Local services | RST-02 | M | 2 h | EST-01.3 |
 
-- **2.1** logo variants (SVG, light/dark) · palette (black, white, greys) · typography (urban display + readable body) · imagery and tone of voice · favicon and Open Graph image
-- **2.2** tokens (colour, spacing, type scale) with WCAG AA contrast check · Button, Input, Select, Badge, Price, ProductCard · focus and disabled states · component tests
-- **2.3** announcement bar · header with category menu, search and cart · mobile menu · footer with legal data, payment methods and social links · floating WhatsApp button · cookie consent banner
-- **2.4** home, listing, product, cart, checkout and tracking (mobile first) · review with the brand owner
+- **EST-02.1** docker-compose with Postgres 15 and Redis 7 · Env examples for both apps · README with and without Docker
 
-## E3 - Catalog
+### EST-03 - CI and security (9 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 3.1 | Catalog data model | RN-01 | M | 4 h | 1.5, Q-03 |
-| 3.2 | Images and initial catalog | RF-15 | M | 3 h | 3.1, Q-08, Q-09 |
-| 3.3 | Home page | RF-01 | M | 4 h | 2.3, 3.1 |
-| 3.4 | Listing page | RF-02 | M | 5 h | 3.3 |
-| 3.5 | Product page | RF-03 | M | 6 h | 2.2, 3.1 |
-| 3.6 | Search | RF-04 | S | 3 h | 3.4 |
-| 3.7 | SEO and performance | RNF-01, RNF-07 | M | 3 h | 3.5 |
+| EST-03.1 | CI pipeline | RNF-09 | M | 4 h | BE-01.1, FE-01.1 |
+| EST-03.2 | Security automation | RNF-02 | M | 2 h | EST-03.1 |
+| EST-03.3 | Backend container image | RNF-02, RNF-05 | M | 3 h | BE-01.1, EST-03.1 |
 
-- **3.1** entities (product, variant, SKU, stock, category, collection, image) · money in integer cents · migrations · ADR on the model · seed data
-- **3.2** image storage and upload · responsive images · alt text · import of the initial products
-- **3.3** banner carousel · value-proposition strip · featured collections · product grid · product card (compare-at price, % off badge, installments)
-- **3.4** category and collection routes · sorting · filters (size, colour, price) · pagination · state in the URL · empty states
-- **3.5** gallery · size/colour selector with availability · size guide · price and installments · fabric and care · add to cart · related products
-- **3.6** PostgreSQL full-text search · results page · no-results state
-- **3.7** metadata and Open Graph · sitemap and robots · schema.org `Product`/`Offer` · canonical URLs · Lighthouse budget in CI
+- **EST-03.1** Quality job (lint, typecheck, format, unit tests) · Build job with Turborepo cache · Backend integration job with Postgres and Redis services · Storefront e2e job on mock data · Merge checklist, or required checks if DEC-08 makes the repo public
+- **EST-03.2** gitleaks in CI · Dependency audit (high and above) · SECURITY.md · CodeQL and secret scanning if available for the repo visibility
+- **EST-03.3** Multi-stage Dockerfile · Non-root runtime · Image scan in CI
 
-## E4 - Cart and shipping
+### EST-04 - Infrastructure and accounts (11 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 4.1 | Cart | RF-05 | M | 5 h | 3.5 |
-| 4.2 | Shipping quote | RF-06 | M | 5 h | 4.1, 1.6, Q-10 |
-| 4.3 | Coupons | RF-07 | S | 3 h | 4.1 |
-| 4.4 | Shipping promotions | RF-07 | S | 2 h | 4.2, Q-06 |
+| EST-04.1 | Business accounts and domain (manual) | RST-01 | M | 2 h | — |
+| EST-04.2 | Railway staging | RNF-05 | M | 4 h | EST-03.3, EST-04.1, Q-02 |
+| EST-04.3 | DNS and object storage | RNF-01 | M | 2 h | EST-04.1 |
+| EST-04.4 | Backend observability | RNF-08 | M | 3 h | EST-04.2 |
 
-- **4.1** server-side cart keyed by cookie · add, update, remove · cap at available stock · mini-cart drawer · totals · unit and e2e tests
-- **4.2** Melhor Envio client · package dimensions and weight per product · quote on product page and cart · cache, timeout and fallback · tests with mocks
-- **4.3** coupon model · rules (validity, usage limit, minimum value) · apply/remove in cart · tests
-- **4.4** free-shipping threshold · "R$ X left for free shipping" progress bar
+- **EST-04.1** Register nozco.com.br · Mercado Pago business account and test credentials · Melhor Envio account · E-mail on the domain (SPF, DKIM, DMARC) · Cloudflare and Railway accounts · Company data (Q-11)
+- **EST-04.2** API and worker services · Managed Postgres and Redis · Encrypted variables per environment · Migrations in the deploy pipeline · Automatic backups
+- **EST-04.3** DNS on Cloudflare · R2 bucket and CDN domain · Scoped access keys
+- **EST-04.4** Sentry on API and worker · JSON logs without PII · Uptime monitoring · Payment and webhook failure alerts
 
-## E5 - Checkout and payments
+### EST-05 - Launch (14 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 5.1 | Checkout flow | RF-08, RNF-04 | M | 6 h | 4.2 |
-| 5.2 | Order model and state machine | RN-03, RNF-05 | M | 4 h | 3.1 |
-| 5.3 | Mercado Pago integration | RF-09, RN-02 | M | 6 h | 5.1, 5.2, 1.6, Q-05 |
-| 5.4 | Payment webhook and reconciliation | RF-10, RNF-02, RNF-05 | M | 6 h | 5.3, Q-04 |
-| 5.5 | Transactional e-mails | RF-11 | M | 3 h | 5.2, 1.6 |
-| 5.6 | Checkout end-to-end tests | RNF-09 | M | 3 h | 5.4 |
+| EST-05.1 | Legal texts (manual) | RST-01, RNF-04 | M | 3 h | Q-11 |
+| EST-05.2 | Security review | RNF-02, RNF-03 | M | 4 h | BE-05.2, BE-10.2, FE-06.3 |
+| EST-05.3 | Production setup | RNF-05 | M | 3 h | EST-04.2, FE-10.1 |
+| EST-05.4 | Go-live | — | M | 4 h | all M tasks |
 
-- **5.1** contact and CPF (validated) · address with ViaCEP auto-fill · shipping choice · order review · LGPD notice
-- **5.2** order and items with price snapshot · states (`pending`, `paid`, `picking`, `shipped`, `delivered`, `cancelled`, `refunded`) and allowed transitions · transactional stock reservation · concurrency tests
-- **5.3** ADR on the integration · payment preference creation · Pix, card up to 6x interest-free and boleto · return pages (approved, pending, rejected) · sandbox tests
-- **5.4** signature validation · idempotency · status mapping · stock commit/release · expiry job for unpaid reservations · reconciliation job against Mercado Pago · failure alerts
-- **5.5** e-mail provider · brand templates · triggers per order event · tests
-- **5.6** Playwright purchase in the sandbox (Pix, approved card, rejected card) · CI job
+- **EST-05.1** Terms of use · Privacy policy (LGPD) · Exchange and return policy · Cookie policy · Legal review
+- **EST-05.2** OWASP ASVS L1 checklist · Headers and CSP review, including the Mercado Pago SDK · Secrets and dependency review · PII in logs and analytics
+- **EST-05.3** Production environment · DNS and HTTPS on nozco.com.br · Mercado Pago and Melhor Envio production credentials · Backup restore test
+- **EST-05.4** Real purchase with Pix and card, then refund · Launch checklist · Operator runbook · First week of close monitoring
 
-## E6 - Back office
+## Backend (Medusa v2)
+
+### BE-01 - Medusa setup (8 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 6.1 | Admin authentication and roles | RF-14, RNF-03 | M | 5 h | 1.5, Q-07 |
-| 6.2 | Catalog management | RF-15 | M | 6 h | 6.1, 3.1 |
-| 6.3 | Order management and shipping labels | RF-16 | M | 6 h | 6.1, 5.4, 4.2 |
-| 6.4 | Exchanges, returns and refunds | RF-17 | S | 5 h | 6.3, 7.2 |
-| 6.5 | Dashboard and stock alerts | RF-21 | S | 4 h | 6.3 |
-| 6.6 | Invoices (NF-e) | RF-18 | M | 4 h | 5.4, Q-01 |
+| BE-01.1 | Medusa scaffold | RNF-09 | M | 3 h | EST-01.3 |
+| BE-01.2 | Store setup | RN-01 | M | 3 h | BE-01.1 |
+| BE-01.3 | Admin access spike | RF-14, RNF-03 | M | 2 h | BE-01.1, Q-07 |
 
-- **6.1** login · TOTP 2FA · roles (admin, operator) · login rate limit · audit log
-- **6.2** products and variants CRUD · stock adjustments with reason · image upload · categories, collections and banners
-- **6.3** order list with filters · order detail and notes · buy label on Melhor Envio · print label · tracking code saved and e-mailed
-- **6.4** request queue · reverse-logistics code · refund via Mercado Pago · restock
-- **6.5** sales KPIs · best sellers · low-stock threshold per variant and alert
-- **6.6** decide the approach with the accountant (Q-01) · integration or documented manual process · store invoice key/link on the order · send invoice to the customer
+- **BE-01.1** Medusa v2 from the official starter, without demo seed · Zod validation of environment variables · Server and worker modes · Health route
+- **BE-01.2** Brazil region in BRL · loja-online sales channel and publishable key · Stock location · Idempotent script and integration test
+- **BE-01.3** Check 2FA and role support in the current Medusa version · Options: extension, proxy-level access control or reduced requirement · ADR with the decision
 
-## E7 - Post-sale and customer
+### BE-02 - Apparel catalog (15 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 7.1 | Order tracking page | RF-12 | M | 3 h | 5.2, 6.3 |
-| 7.2 | Exchange/return request | RF-13, RN-04 | M | 4 h | 7.1 |
-| 7.3 | Newsletter with consent | RF-19, RNF-04 | S | 2 h | 2.3 |
-| 7.4 | Customer account | RF-22 | C | 4 h | 5.2 |
-| 7.5 | Institutional pages (FAQ, About, contact) | RF-20 | S | 2 h | 2.3 |
-| 7.6 | Product reviews | RF-23 | C | 3 h | 7.1 |
-| 7.7 | Abandoned-cart e-mail | RF-24 | C | 2 h | 5.5 |
+| BE-02.1 | Apparel product model | RF-03, RF-15, RN-01 | M | 3 h | BE-01.2, Q-03 |
+| BE-02.2 | Image storage | RF-15, RNF-01 | M | 2 h | BE-01.1, EST-04.3 |
+| BE-02.3 | Catalog seed and import | RF-15 | M | 2 h | BE-02.1, Q-08, Q-09 |
+| BE-02.4 | Store API for listing and search | RF-02, RF-04 | M | 5 h | BE-02.1 |
+| BE-02.5 | Home content | RF-01, RF-15 | M | 3 h | BE-01.1, DEC-06 |
 
-- **7.1** lookup by order number + e-mail · status history · carrier tracking link
-- **7.2** request form · rules (7-day withdrawal, size-exchange window) · policy text · operator notification
-- **7.3** sign-up form with consent record · double opt-in · unsubscribe · export
-- **7.4** passwordless login (e-mail link) · order history · saved addresses
-- **7.5** FAQ · About the brand · contact
-- **7.6** review after delivery · moderation · rating on product page
-- **7.7** consent check · one reminder per cart · unsubscribe link
+- **BE-02.1** Size and colour options; one variant and SKU per combination · Stock per variant · Compare-at price through price lists · Categories and collections · Fabric, care, weight and dimensions as typed metadata · ADR on the model
+- **BE-02.2** S3 file module pointing at R2 · Upload from the admin · Images per colour
+- **BE-02.3** Fictional development seed · Spreadsheet import of the real catalog
+- **BE-02.4** Map what the standard Store API already covers · Custom routes for size and colour filters and facets · Best-seller and on-sale sorting · Availability per variant · Text search
+- **BE-02.5** Content module for banners and announcement bar · Admin screen · Store API route
 
-## E8 - Legal, quality and launch
+### BE-03 - Customers and LGPD (8 h)
+
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
-| 8.1 | Legal pages | RST-01, RNF-04 | M | 3 h | Q-11 |
-| 8.2 | Security review | RNF-02, RNF-03 | M | 4 h | 5.4, 6.1 |
-| 8.3 | Accessibility and performance audit | RNF-01, RNF-06 | M | 3 h | 5.1 |
-| 8.4 | Analytics and monitoring | RNF-08 | M | 3 h | 2.3 |
-| 8.5 | Production setup | RNF-05 | M | 3 h | 1.5, 1.6 |
-| 8.6 | Go-live | — | M | 4 h | all M tasks |
+| BE-03.1 | Customer data and CPF | RF-08, RNF-04 | M | 3 h | BE-01.2 |
+| BE-03.2 | Customer authentication | RF-22 | S | 2 h | BE-03.1, DEC-05 |
+| BE-03.3 | LGPD requests | RNF-04 | M | 3 h | BE-03.1 |
 
-- **8.1** terms of use · privacy policy (LGPD) · exchange and return policy · cookie policy · legal footer data · review by a lawyer/accountant
-- **8.2** OWASP ASVS L1 checklist · security headers (CSP, HSTS) · rate limits · dependency audit · secrets review · no PII in logs
-- **8.3** axe on key pages · keyboard navigation · Lighthouse · fixes
-- **8.4** analytics only after consent · error tracking · uptime monitoring · payment/webhook alerts
-- **8.5** DNS and HTTPS on `nozco.com.br` · production variables · Mercado Pago production credentials · backup restore test
-- **8.6** real purchase with Pix and card, then refund · launch checklist · operator runbook · first week of close monitoring
+- **BE-03.1** CPF field and check-digit validation · Shared Zod schema · Masking in logs and admin
+- **BE-03.2** E-mail and password · Password reset by e-mail · Login rate limit
+- **BE-03.3** Data export · Anonymisation that keeps fiscal records · Request log
+
+### BE-04 - Cart and promotions (4 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-04.1 | Cart rules | RF-05 | M | 2 h | BE-02.1 |
+| BE-04.2 | Coupons and free shipping | RF-07 | S | 2 h | BE-04.1, Q-06 |
+
+- **BE-04.1** Stock validation by variant · Typed errors · Integration tests
+- **BE-04.2** Promotion module configuration · Validity and usage limits · Free-shipping rule
+
+### BE-05 - Payments (20 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-05.1 | Mercado Pago provider and Pix | RF-09 | M | 5 h | BE-01.2, EST-04.1, DEC-09 |
+| BE-05.2 | Payment webhook | RF-10, RNF-02 | M | 5 h | BE-05.1 |
+| BE-05.3 | Card, boleto and refunds | RF-09, RN-02 | M | 6 h | BE-05.2, Q-05 |
+| BE-05.4 | Last-unit race and reconciliation | RN-03, RNF-05 | M | 4 h | BE-05.2, Q-04 |
+
+- **BE-05.1** Own provider with the official SDK · Pix charge with expiry · Status mapping · Unit tests with a mocked client
+- **BE-05.2** x-signature validation · Deduplication and idempotency · Fetch the payment from the API before applying · Cart completion creates the order
+- **BE-05.3** Card token flow and pending states · Up to 6x interest-free with minimum installment · Boleto with CPF and address · Full and partial refunds
+- **BE-05.4** Spike: Medusa reservation timing versus order creation after payment · Rule for an approved payment with no stock left (Q-04) · Concurrency tests · Reconciliation job against Mercado Pago
+
+### BE-06 - Shipping (9 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-06.1 | Melhor Envio quote | RF-06 | M | 5 h | BE-02.1, EST-04.1, Q-10 |
+| BE-06.2 | Labels and tracking | RF-16 | M | 4 h | BE-06.1, BE-07.1 |
+
+- **BE-06.1** Fulfillment provider · Package weight and dimensions by variant quantity · Cache, timeout and fallback · Tests with MSW
+- **BE-06.2** Buy and print label · Save tracking code · Delivery status updates
+
+### BE-07 - Orders and post-sale (13 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-07.1 | Order states | RF-16, RNF-05 | M | 3 h | BE-05.2 |
+| BE-07.2 | Exchanges and returns | RF-13, RF-17, RN-04 | M | 4 h | BE-07.1, BE-05.3 |
+| BE-07.3 | Guest order lookup | RF-12 | M | 2 h | BE-07.1 |
+| BE-07.4 | Admin extensions | RF-16, RF-21 | S | 4 h | BE-06.2 |
+
+- **BE-07.1** Picking, shipped and delivered states on top of Medusa · Allowed transitions · Subscribers per event
+- **BE-07.2** Medusa returns and exchanges · 7-day withdrawal rule · First free size exchange · Refund and restock
+- **BE-07.3** Lookup by number and e-mail · Signed token in e-mail links · Rate limit
+- **BE-07.4** Label action on the order screen · Low-stock threshold and alert · Sales indicators
+
+### BE-08 - Invoices (5 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-08.1 | Invoices (NF-e) | RF-18 | M | 5 h | BE-07.1, Q-01 |
+
+- **BE-08.1** Invoice module linked to the order · Integration or documented manual process (Q-01) · Key and DANFE on the order · Retry on failure
+
+### BE-09 - Notifications (6 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-09.1 | Transactional e-mails | RF-11 | M | 4 h | BE-07.1, EST-04.1 |
+| BE-09.2 | Newsletter | RF-19, RNF-04 | S | 2 h | BE-09.1 |
+
+- **BE-09.1** Resend provider · Templates with the brand · Triggers per order event
+- **BE-09.2** Consent record · Double opt-in · Unsubscribe
+
+### BE-10 - API contract and hardening (6 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BE-10.1 | API contract | RNF-09 | M | 3 h | BE-02.4 |
+| BE-10.2 | API hardening | RNF-02 | M | 3 h | BE-01.1 |
+
+- **BE-10.1** Types and Zod schemas in shared-types · Contract document for custom routes · Contract tests
+- **BE-10.2** CORS per environment · Rate limits on sensitive routes · Payload validation on custom routes
+
+## Frontend (Nuxt 4)
+
+### FE-01 - Storefront setup (8 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-01.1 | Nuxt 4 scaffold | RNF-09 | M | 4 h | EST-01.3 |
+| FE-01.2 | Design tokens | RNF-06 | M | 4 h | FE-01.1, FE-12.2, DEC-01 |
+
+- **FE-01.1** Nuxt 4 with strict TypeScript · Tailwind 4 and shadcn-vue on Reka UI · Pinia, i18n and nuxt-security · Runtime config validated by Zod · Vitest, Testing Library, Playwright and axe
+- **FE-01.2** Colour, type, spacing, radius and shadow tokens · Brand fonts self-hosted · Contrast check for every text pair · Ban on raw colours in components
+
+### FE-02 - Data layer (8 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-02.1 | Typed composables and mock source | RNF-09 | M | 4 h | FE-01.1 |
+| FE-02.2 | Server routes (BFF) | RNF-02 | M | 4 h | FE-02.1, BE-01.2 |
+
+- **FE-02.1** useProducts, useCart and useCheckout signatures · mock and api data sources · Fictional apparel fixtures outside the production build · Medusa JS SDK client
+- **FE-02.2** /api/auth, /api/checkout and /api/orders routes · httpOnly cookie · Zod validation and { code, message } errors · Cloudflare-compatible APIs only
+
+### FE-03 - Authentication (4 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-03.1 | Sign-in pages | RF-22 | S | 4 h | FE-02.2, BE-03.2, DEC-05 |
+
+- **FE-03.1** Sign in, sign up and password reset · VeeValidate and Zod forms · Route middleware for the account area
+
+### FE-04 - Catalog pages (22 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-04.1a | Listing: interface | RF-02 | M | 5 h | FE-02.1, FE-12.1, DEC-07 |
+| FE-04.1b | Listing: integration | RF-02 | M | 2 h | FE-04.1a, BE-02.4 |
+| FE-04.2a | Product page: interface | RF-03 | M | 7 h | FE-02.1, FE-12.1 |
+| FE-04.2b | Product page: integration | RF-03 | M | 2 h | FE-04.2a, BE-02.4 |
+| FE-04.3 | Search | RF-04 | S | 3 h | FE-04.1b |
+| FE-04.4 | Catalog SEO | RNF-07 | M | 3 h | FE-04.2b |
+
+- **FE-04.1a** Category and collection routes · Size, colour and price filters; mobile filter drawer · Sorting and pagination · State in the URL · Loading, empty, error and content states
+- **FE-04.1b** api source in the composable · routeRules with 10 min SWR
+- **FE-04.2a** Gallery with swipe and zoom, by colour · Size and colour selector with availability · Size guide dialog · Price, compare-at and installments · Fabric and care · Sticky add-to-cart on mobile · Related products
+- **FE-04.2b** api source and SSR · Fresh stock check on the client
+- **FE-04.3** Header search field · Results page · No-results state
+- **FE-04.4** Meta tags and Open Graph · schema.org Product and Offer · Sitemap and robots · Canonical URLs for filters
+
+### FE-05 - Cart (10 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-05.1a | Cart: interface | RF-05 | M | 4 h | FE-02.1, FE-12.1 |
+| FE-05.1b | Cart: integration | RF-05 | M | 3 h | FE-05.1a, BE-04.1 |
+| FE-05.2 | Shipping estimate and coupon | RF-06, RF-07 | M | 3 h | FE-05.1b, BE-06.1 |
+
+- **FE-05.1a** Mini-cart drawer · Cart page · Quantity stepper with stock cap · Totals and empty state
+- **FE-05.1b** cart_id cookie · Pinia store mirroring the API · Optimistic update with rollback
+- **FE-05.2** CEP widget on product page and cart · Coupon field · Free-shipping progress bar
+
+### FE-06 - Checkout (17 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-06.1 | Checkout: identification, address and shipping | RF-08, RNF-04 | M | 6 h | FE-05.2, FE-02.2, BE-03.1, DEC-03, DEC-05 |
+| FE-06.2 | Checkout: Pix | RF-09 | M | 4 h | FE-06.1, BE-05.2 |
+| FE-06.3 | Checkout: card and boleto | RF-09, RN-02 | M | 5 h | FE-06.2, BE-05.3 |
+| FE-06.4 | Order confirmation | RF-11, RF-12 | M | 2 h | FE-06.2, BE-07.3 |
+
+- **FE-06.1** Contact and CPF with masks · Address auto-filled by CEP · Shipping options · Order summary · LGPD notice
+- **FE-06.2** QR Code and copy button · Expiry countdown · Status polling every 3 s · Expired-charge recovery
+- **FE-06.3** Card tokenised by the Mercado Pago JS SDK · Installment selector · Boleto with digitable line · Payment error messages
+- **FE-06.4** Confirmation page · Tokenised link · Next steps and tracking link
+
+### FE-07 - Post-sale and account (10 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-07.1 | Order tracking page | RF-12 | M | 3 h | BE-07.3, FE-02.2 |
+| FE-07.2 | Exchange and return request | RF-13, RN-04 | M | 3 h | FE-07.1, BE-07.2 |
+| FE-07.3 | Customer area | RF-22, RNF-04 | S | 4 h | FE-03.1, BE-03.3 |
+
+- **FE-07.1** Lookup form · Status history · Carrier link
+- **FE-07.2** Request form · Deadline rules on screen · Confirmation
+- **FE-07.3** Orders and order detail · Addresses · Privacy requests
+
+### FE-08 - Consent and observability (4 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-08.1 | Consent and analytics | RNF-04, RNF-08 | M | 3 h | FE-11.3, DEC-04 |
+| FE-08.2 | Frontend error tracking | RNF-08 | M | 1 h | FE-10.1 |
+
+- **FE-08.1** Cookie banner and preferences · Purchase funnel events · Scripts only after consent
+- **FE-08.2** @sentry/nuxt · PII scrubbing
+
+### FE-09 - Frontend quality (8 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-09.1 | Purchase journey tests | RNF-06, RNF-09 | M | 5 h | FE-06.3 |
+| FE-09.2 | Performance budget | RNF-01 | M | 3 h | FE-04.2b, FE-11.1 |
+
+- **FE-09.1** Product-to-confirmation journey · Pix, approved card and rejected card · Mobile viewport · axe on every key page
+- **FE-09.2** Lighthouse in CI · Bundle size check · Image sizes and formats · Keyboard navigation audit
+
+### FE-10 - Storefront deployment (3 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-10.1 | Cloudflare deployment | RNF-01 | M | 3 h | FE-01.1, EST-04.1 |
+
+- **FE-10.1** Nitro preset for Cloudflare · Preview per PR · Staging and production environments · Runtime variables
+
+### FE-11 - Home, global layout and institutional pages (13 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-11.1 | Home page | RF-01 | M | 5 h | FE-11.3, FE-12.1, BE-02.5, DEC-06 |
+| FE-11.2 | Institutional and error pages | RF-20, RST-01 | M | 3 h | FE-11.3, EST-05.1 |
+| FE-11.3 | Global layout | RF-19, RF-20, RST-01 | M | 5 h | FE-12.1 |
+
+- **FE-11.1** Hero and banners · Value-proposition strip · Featured collections · Product grid
+- **FE-11.2** @nuxt/content pages · About, FAQ, contact, shipping, exchanges and legal texts · 404 and 500 pages
+- **FE-11.3** Announcement bar · Header with category menu, search and cart · Mobile menu · Footer with legal data, payment methods and social links · WhatsApp button · Newsletter form
+
+### FE-12 - Design system (12 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| FE-12.1 | Base components | RNF-06 | M | 6 h | FE-01.2, DEC-02 |
+| FE-12.2 | Brand guide | — | M | 3 h | Q-12 |
+| FE-12.3 | Key page mock-ups | — | M | 3 h | FE-12.2 |
+
+- **FE-12.1** Price, Skeleton, EmptyState and ErrorState · QuantityStepper, StockBadge and ProductCard · SizeSelector and ColourSwatch · Focus, hover, disabled and error states · Internal /_componentes gallery · axe on each component
+- **FE-12.2** Logo variants · Typography candidates · Black, white and grey palette with accent decision · Photo treatment and tone of voice
+- **FE-12.3** Options for home, listing, product and checkout · Mobile first · Review and ADRs for DEC-02, DEC-03, DEC-06 and DEC-07
+
+## Post-launch backlog
+
+### BL-01 - After go-live (5 h)
+
+| ID | Task | Req. | Prio. | Est. | Depends on |
+|---|---|---|---|---|---|
+| BL-01.1 | Product reviews | RF-23 | C | 3 h | go-live |
+| BL-01.2 | Abandoned-cart e-mail | RF-24 | C | 2 h | go-live |
+
+- **BL-01.1** Review after delivery · Moderation · Rating on the product page
+- **BL-01.2** Consent check · One reminder per cart · Unsubscribe link

@@ -5,41 +5,42 @@ delivered it. Updated in every PR (Definition of Done).
 
 | Req. | Task(s) | Tests | PR | Status |
 |---|---|---|---|---|
-| RF-01 | 3.3 | | | Planned |
-| RF-02 | 3.4 | | | Planned |
-| RF-03 | 3.5 | | | Planned |
-| RF-04 | 3.6 | | | Planned |
-| RF-05 | 4.1 | | | Planned |
-| RF-06 | 4.2 | | | Planned |
-| RF-07 | 4.3, 4.4 | | | Planned |
-| RF-08 | 5.1 | | | Planned |
-| RF-09 | 5.3 | | | Planned |
-| RF-10 | 5.4 | | | Planned |
-| RF-11 | 5.5 | | | Planned |
-| RF-12 | 7.1 | | | Planned |
-| RF-13 | 7.2 | | | Planned |
-| RF-14 | 6.1 | | | Planned |
-| RF-15 | 3.2, 6.2 | | | Planned |
-| RF-16 | 6.3 | | | Planned |
-| RF-17 | 6.4 | | | Planned |
-| RF-18 | 6.6 | | | Planned |
-| RF-19 | 7.3 | | | Planned |
-| RF-20 | 2.3, 7.5 | | | Planned |
-| RF-21 | 6.5 | | | Planned |
-| RF-22 | 7.4 | | | Planned |
-| RF-23 | 7.6 | | | Planned |
-| RF-24 | 7.7 | | | Planned |
-| RNF-01 | 3.7, 8.3 | | | Planned |
-| RNF-02 | 1.2, 1.4, 1.5, 5.4, 8.2 | | | Planned |
-| RNF-03 | 6.1, 8.2 | | | Planned |
-| RNF-04 | 2.3, 5.1, 7.3, 8.1 | | | Planned |
-| RNF-05 | 1.5, 5.2, 5.4, 8.5 | | | Planned |
-| RNF-06 | 2.2, 8.3 | | | Planned |
-| RNF-07 | 3.7 | | | Planned |
-| RNF-08 | 8.4 | | | Planned |
-| RNF-09 | 1.2, 1.3, 1.4, 5.6 | | | Planned |
-| RN-01 | 3.1 | | | Planned |
-| RN-02 | 5.3 | | | Planned |
-| RN-03 | 5.2 | | | Planned |
-| RN-04 | 7.2 | | | Planned |
-| RST-01 | 1.6, 8.1 | | | Planned |
+| RF-01 | BE-02.5, FE-11.1 | | | Planned |
+| RF-02 | BE-02.4, FE-04.1a, FE-04.1b | | | Planned |
+| RF-03 | BE-02.1, FE-04.2a, FE-04.2b | | | Planned |
+| RF-04 | BE-02.4, FE-04.3 | | | Planned |
+| RF-05 | BE-04.1, FE-05.1a, FE-05.1b | | | Planned |
+| RF-06 | BE-06.1, FE-05.2 | | | Planned |
+| RF-07 | BE-04.2, FE-05.2 | | | Planned |
+| RF-08 | BE-03.1, FE-06.1 | | | Planned |
+| RF-09 | BE-05.1, BE-05.3, FE-06.2, FE-06.3 | | | Planned |
+| RF-10 | BE-05.2 | | | Planned |
+| RF-11 | BE-09.1, FE-06.4 | | | Planned |
+| RF-12 | BE-07.3, FE-06.4, FE-07.1 | | | Planned |
+| RF-13 | BE-07.2, FE-07.2 | | | Planned |
+| RF-14 | BE-01.3 | | | Planned |
+| RF-15 | BE-02.1, BE-02.2, BE-02.3, BE-02.5 | | | Planned |
+| RF-16 | BE-06.2, BE-07.1, BE-07.4 | | | Planned |
+| RF-17 | BE-07.2 | | | Planned |
+| RF-18 | BE-08.1 | | | Planned |
+| RF-19 | BE-09.2, FE-11.3 | | | Planned |
+| RF-20 | FE-11.2, FE-11.3 | | | Planned |
+| RF-21 | BE-07.4 | | | Planned |
+| RF-22 | BE-03.2, FE-03.1, FE-07.3 | | | Planned |
+| RF-23 | BL-01.1 | | | Planned |
+| RF-24 | BL-01.2 | | | Planned |
+| RNF-01 | EST-04.3, BE-02.2, FE-09.2, FE-10.1 | | | Planned |
+| RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | | | Planned |
+| RNF-03 | EST-05.2, BE-01.3 | | | Planned |
+| RNF-04 | EST-05.1, BE-03.1, BE-03.3, BE-09.2, FE-06.1, FE-07.3, FE-08.1 | | | Planned |
+| RNF-05 | EST-03.3, EST-04.2, EST-05.3, BE-05.4, BE-07.1 | | | Planned |
+| RNF-06 | FE-01.2, FE-09.1, FE-12.1 | | | Planned |
+| RNF-07 | FE-04.4 | | | Planned |
+| RNF-08 | EST-04.4, FE-08.1, FE-08.2 | | | Planned |
+| RNF-09 | EST-01.2, EST-01.3, EST-01.4, EST-03.1, BE-01.1, BE-10.1, FE-01.1, FE-02.1, FE-09.1 | | | Planned |
+| RN-01 | BE-01.2, BE-02.1 | | | Planned |
+| RN-02 | BE-05.3, FE-06.3 | | | Planned |
+| RN-03 | BE-05.4 | | | Planned |
+| RN-04 | BE-07.2, FE-07.2 | | | Planned |
+| RST-01 | EST-04.1, EST-05.1, FE-11.2, FE-11.3 | | | Planned |
+| RST-02 | EST-02.1 | | | Planned |
