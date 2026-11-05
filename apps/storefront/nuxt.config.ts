@@ -1,7 +1,15 @@
+import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
+import { shouldBundleMockSource } from "./shared/data-source"
+
+// The alias decides at build time, so a build without fixtures has no import path that reaches them.
+const mockSourceFile = shouldBundleMockSource(process.env) ? "index" : "excluded"
 
 export default defineNuxtConfig({
   compatibilityDate: "2026-11-01",
+  alias: {
+    "#mock-source": fileURLToPath(new URL(`./app/data/mock/${mockSourceFile}`, import.meta.url)),
+  },
   modules: ["@pinia/nuxt", "nuxt-security", "@nuxtjs/i18n", "shadcn-nuxt"],
   css: ["~/assets/css/main.css"],
   vite: { plugins: [tailwindcss()] },
@@ -26,6 +34,7 @@ export default defineNuxtConfig({
       apiUrl: "",
       publishableKey: "",
       appEnv: "",
+      dataSource: "",
     },
   },
   // The store and its server routes share one origin, so no response needs CORS headers.

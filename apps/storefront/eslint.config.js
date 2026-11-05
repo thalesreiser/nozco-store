@@ -17,6 +17,23 @@ export default [
     },
   },
   {
+    // Only the composables know where data comes from.
+    files: ["app/components/**", "app/pages/**", "app/layouts/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["~/data", "~/data/*", "@/data", "@/data/*", "#mock-source", "@medusajs/*"],
+              message: "Use useProducts, useCart or useCheckout.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     // Nuxt names these components from the file name, which the routing convention fixes.
     files: ["app/pages/**/*.vue", "app/layouts/**/*.vue"],
     rules: { "vue/multi-word-component-names": "off" },
