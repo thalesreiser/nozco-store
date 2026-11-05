@@ -17,6 +17,28 @@ Online store for **NozCo**, a Brazilian streetwear brand of urban-art inspired t
 Monorepo with a **Nuxt 4** storefront and a **Medusa v2** backend (PostgreSQL, Redis), Mercado Pago and
 Melhor Envio, hosted on Cloudflare and Railway. See [ADR 001](docs/adr/001-nuxt-medusa-stack.md).
 
+## Setup
+
+Requires **Node.js 24** (see `.nvmrc`) and **pnpm**, pinned in `package.json` and provided by Corepack.
+
+```sh
+corepack enable   # if it lacks permission, prefix pnpm commands with "corepack"
+pnpm install      # also installs the Git hooks
+```
+
+| Command             | What it does                                         |
+| ------------------- | ---------------------------------------------------- |
+| `pnpm lint`         | ESLint in every package and on the root config files |
+| `pnpm typecheck`    | TypeScript check in every package                    |
+| `pnpm format`       | Formats with Prettier (`docs/` is excluded)          |
+| `pnpm format:check` | Checks formatting without changing files             |
+| `pnpm build`        | Builds every package through Turborepo               |
+| `pnpm test`         | Runs tests through Turborepo (none exist yet)        |
+
+Commits must follow Conventional Commits; the `commit-msg` hook rejects anything else, and the
+`pre-commit` hook lints and formats staged files. `apps/backend` and `apps/storefront` are not
+scaffolded yet (tasks BE-01.1 and FE-01.1).
+
 ## Documentation
 
 | Doc                                                      | Content                                                                        |
