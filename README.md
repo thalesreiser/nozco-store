@@ -33,11 +33,34 @@ pnpm install      # also installs the Git hooks
 | `pnpm format`       | Formats with Prettier (`docs/` is excluded)          |
 | `pnpm format:check` | Checks formatting without changing files             |
 | `pnpm build`        | Builds every package through Turborepo               |
-| `pnpm test`         | Runs tests through Turborepo (none exist yet)        |
+| `pnpm test`         | Runs unit and component tests through Turborepo      |
+| `pnpm test:e2e`     | Builds, then runs the Playwright tests               |
+| `pnpm dev`          | Starts the apps in development mode                  |
+| `pnpm preview`      | Builds, then serves the production build             |
 
 Commits must follow Conventional Commits; the `commit-msg` hook rejects anything else, and the
-`pre-commit` hook lints and formats staged files. `apps/backend` and `apps/storefront` are not
-scaffolded yet (tasks BE-01.1 and FE-01.1).
+`pre-commit` hook lints and formats staged files. `apps/backend` is not scaffolded yet (task
+BE-01.1).
+
+## Storefront
+
+`apps/storefront` is the Nuxt 4 store, currently a placeholder page.
+
+```sh
+cp apps/storefront/.env.example apps/storefront/.env
+pnpm dev                                                # http://localhost:3000
+```
+
+The server refuses to start if a `NUXT_PUBLIC_*` variable in `.env.example` is missing or invalid,
+and the error names each one. `nuxt preview` reads `.env`; a production server must receive the
+variables from its environment.
+
+The first e2e run needs a browser, which is not installed with the dependencies:
+
+```sh
+pnpm --filter @nozco/storefront exec playwright install chromium
+pnpm test:e2e
+```
 
 ## Documentation
 
