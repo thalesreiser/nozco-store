@@ -1,0 +1,29 @@
+# Build output and dependencies are recreated inside the image.
+**/node_modules
+**/.medusa
+**/.nuxt
+**/.output
+**/build
+**/dist
+**/coverage
+**/.turbo
+**/.cache
+**/playwright-report
+**/test-results
+**/*.log
+**/*.tsbuildinfo
+
+# Secrets never enter the build context.
+**/.env
+**/.env.*
+**/*.pem
+
+# Not needed to build the backend.
+.git
+.github
+.husky
+.claude
+.vscode
+.idea
+docs
+infra
