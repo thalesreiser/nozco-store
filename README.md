@@ -37,10 +37,54 @@ pnpm install      # also installs the Git hooks
 | `pnpm test:e2e`     | Builds, then runs the Playwright tests               |
 | `pnpm dev`          | Starts the apps in development mode                  |
 | `pnpm preview`      | Builds, then serves the production build             |
+| `pnpm infra:up`     | Starts Postgres and Redis in Docker (see below)      |
+| `pnpm infra:down`   | Stops them and keeps their data                      |
 
 Commits must follow Conventional Commits; the `commit-msg` hook rejects anything else, and the
 `pre-commit` hook lints and formats staged files. To run the backend, see
 [`apps/backend/README.md`](apps/backend/README.md).
+
+## Local services
+
+Docker is optional. Only running the backend and its integration tests needs PostgreSQL or Redis.
+
+### With Docker
+
+`infra/docker-compose.yml` runs PostgreSQL 15 and Redis 7, reachable from this machine only.
+
+```sh
+pnpm infra:up     # needs Docker Compose v2; returns once both services are healthy
+pnpm infra:down   # stops them; the data stays in named volumes
+```
+
+| Service    | Address          | Defaults                                         |
+| ---------- | ---------------- | ------------------------------------------------ |
+| PostgreSQL | `127.0.0.1:5432` | user `nozco`, password `nozco_local`, db `nozco` |
+| Redis      | `127.0.0.1:6379` | no password                                      |
+
+These credentials are for local use only. To change them or the ports, copy `infra/.env.example` to
+`infra/.env`, and update `DATABASE_URL` and `REDIS_URL` in `apps/backend/.env` to match. Postgres applies
+its user, password and database only when the volume is first created, so a change to them needs a reset,
+which **deletes the local data**:
+
+```sh
+docker compose -f infra/docker-compose.yml down -v
+```
+
+`DATABASE_URL` in `apps/backend/.env.example` already matches the defaults. To use Redis, set
+`REDIS_URL=redis://127.0.0.1:6379` there. To run the backend integration tests against these services:
+
+```sh
+DB_HOST=127.0.0.1 DB_USERNAME=nozco DB_PASSWORD=nozco_local pnpm test:integration
+```
+
+### Without Docker
+
+Lint, type-check, build and unit tests need neither service, and the storefront does not need them yet.
+Database-backed tests (migrations and integration tests) belong in GitHub Actions, so a laptop does not
+need Docker. That CI job arrives with EST-03.1; until then these tests only run where a database is
+available. To run the backend itself, set `DATABASE_URL` in `apps/backend/.env` to any PostgreSQL 15
+server.
 
 ## Storefront
 
