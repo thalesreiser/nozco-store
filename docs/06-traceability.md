@@ -37,7 +37,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RNF-06 | FE-01.2, FE-09.1, FE-12.1 | | | Planned |
 | RNF-07 | FE-04.4 | | | Planned |
 | RNF-08 | EST-04.4, FE-08.1, FE-08.2 | | | Planned |
-| RNF-09 | EST-01.2, EST-01.3, EST-01.4, EST-03.1, BE-01.1, BE-10.1, FE-01.1, FE-02.1, FE-09.1 | EST-01.3: `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, commit-msg hook; FE-01.1: storefront `vue-tsc` and typed lint, `pnpm test` (runtime config, components), `pnpm test:e2e` (SSR smoke, axe); BE-01.1: backend `tsc` and typed lint, `pnpm test` (env validation, Redis modules); `integration-tests/http/health.spec.ts` not run yet, pending CI in EST-03.1 | #3, #6, #7 | In progress |
+| RNF-09 | EST-01.2, EST-01.3, EST-01.4, EST-03.1, BE-01.1, BE-10.1, FE-01.1, FE-02.1, FE-09.1 | EST-01.3: `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, commit-msg hook; FE-01.1: storefront `vue-tsc` and typed lint, `pnpm test` (runtime config, components), `pnpm test:e2e` (SSR smoke, axe); BE-01.1: backend `tsc` and typed lint, `pnpm test` (env validation, Redis modules); `integration-tests/http/health.spec.ts`; EST-03.1: CI jobs `quality`, `build`, `backend-integration` (migrations twice, schema diff, `test:integration`), `backend-boot-smoke` (real `medusa start`, server and worker, refusal on missing variables), `storefront-e2e`, `ci-ok` | #3, #6, #7, #10 | In progress |
 | RN-01 | BE-01.2, BE-02.1 | BE-01.2: `pnpm test` (`store-setup/__tests__/plan.unit.spec.ts`: Brazil region in BRL); `integration-tests/http/store-setup.spec.ts` not run yet, pending CI in EST-03.1 | #14 | In progress |
 | RN-02 | BE-05.3, FE-06.3 | | | Planned |
 | RN-03 | BE-05.4 | | | Planned |
