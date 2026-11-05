@@ -7,10 +7,12 @@ seed.
 
 You only need PostgreSQL 15 (and Redis 7 for server and worker modes) to run the application. Lint,
 type-check, build and unit tests work without them, so a local database is optional: EST-03.1 runs
-migrations and integration tests in CI against real services.
+migrations and integration tests in CI against real services. Without Docker, skip `pnpm infra:up` and
+set `DATABASE_URL` to your own server.
 
 ```sh
-cp .env.example .env       # then set DATABASE_URL
+pnpm infra:up              # from the repository root; see "Local services" in the root README
+cp .env.example .env       # DATABASE_URL already matches the Docker defaults
 pnpm db:migrate
 pnpm dev                   # API and admin on http://localhost:9000 (admin under /app)
 ```
