@@ -43,4 +43,4 @@ delivered it. Updated in every PR (Definition of Done).
 | RN-03 | BE-05.4 | | | Planned |
 | RN-04 | BE-07.2, FE-07.2 | | | Planned |
 | RST-01 | EST-04.1, EST-05.1, FE-11.2, FE-11.3 | | | Planned |
-| RST-02 | EST-02.1 | | | Planned |
+| RST-02 | EST-02.1 | EST-02.1: `infra/docker-compose.yml` validated structurally only; `pnpm infra:up` not run, as the laptop has no Docker | #9 | In progress |
