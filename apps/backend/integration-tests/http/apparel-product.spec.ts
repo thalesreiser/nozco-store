@@ -239,6 +239,7 @@ medusaIntegrationTestRunner({
         )
       })
 
+      // Medusa rejects with a serialized error, a plain object that rejects.toThrow does not recognise.
       it("returns the garment metadata and rejects an invalid one, undoing the work", async () => {
         const metadata = { fabric: "Tecido de exemplo", care: "Exemplo", weight_g: 180 }
         const { productId } = await createExample("exemplo-meta", "META", metadata)
@@ -248,14 +249,14 @@ medusaIntegrationTestRunner({
 
         await expect(
           createExample("exemplo-invalido", "INVALIDO", { weight_g: "x" }),
-        ).rejects.toThrow("Invalid product metadata: weight_g")
+        ).rejects.toMatchObject({ message: "Invalid product metadata: weight_g" })
         expect(await productCount("exemplo-invalido")).toBe(0)
 
         await expect(
           updateProductsWorkflow(getContainer()).run({
             input: { products: [{ id: productId, metadata: { length_cm: -1 } }] },
           }),
-        ).rejects.toThrow("Invalid product metadata: length_cm")
+        ).rejects.toMatchObject({ message: "Invalid product metadata: length_cm" })
         const [unchanged] = await listProducts({ handle: "exemplo-meta" })
         expect(unchanged?.metadata).toEqual(metadata)
       })
@@ -263,7 +264,9 @@ medusaIntegrationTestRunner({
       it("refuses a SKU already in use by another product, leaving nothing behind", async () => {
         await createExample("exemplo-primeiro", "REPETIDO")
 
-        await expect(createExample("exemplo-segundo", "REPETIDO")).rejects.toThrow()
+        await expect(createExample("exemplo-segundo", "REPETIDO")).rejects.toMatchObject({
+          message: expect.stringMatching(/sku/i),
+        })
 
         expect(await productCount("exemplo-segundo")).toBe(0)
       })
