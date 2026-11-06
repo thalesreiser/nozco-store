@@ -26,7 +26,7 @@ RUN NODE_ENV=production \
     AUTH_CORS=http://build-time-placeholder \
     JWT_SECRET=build-time-placeholder-build-time-placeholder \
     COOKIE_SECRET=build-time-placeholder-build-time-placeholder \
-    pnpm --filter @nozco/backend build
+    pnpm --filter "@nozco/backend..." build
 # The image gets only the compiled app (.medusa/server) and production node_modules. `pnpm deploy` also
 # copies the TypeScript sources, which must not ship: Medusa would try to load them.
 RUN pnpm --filter @nozco/backend deploy --prod --legacy /deploy \

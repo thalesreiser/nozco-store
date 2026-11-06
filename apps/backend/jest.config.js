@@ -16,6 +16,12 @@ module.exports = {
   moduleFileExtensions: ["js", "ts", "json"],
   modulePathIgnorePatterns: ["dist/", "<rootDir>/.medusa/"],
   setupFiles: ["./integration-tests/setup.js"],
+  // Jest cannot require an ES module, as Node.js does. It reads the package's TypeScript sources
+  // instead, whose relative imports end in `.js`.
+  moduleNameMapper: {
+    "^@nozco/shared-types$": "<rootDir>/../../packages/shared-types/src/index.ts",
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
 }
 
 if (process.env.TEST_TYPE === "integration") {
