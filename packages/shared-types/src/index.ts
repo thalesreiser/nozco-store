@@ -10,3 +10,4 @@ export interface Money {
 }
 
 export type * from "./store.js"
+export * from "./cpf.js"

@@ -12,7 +12,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-05 | BE-04.1, FE-05.1a, FE-05.1b | | | Planned |
 | RF-06 | BE-06.1, FE-05.2 | | | Planned |
 | RF-07 | BE-04.2, FE-05.2 | | | Planned |
-| RF-08 | BE-03.1, FE-06.1 | | | Planned |
+| RF-08 | BE-03.1, FE-06.1 | BE-03.1: `packages/shared-types/tests/cpf.test.ts` (check digits, shared schema, mask); `integration-tests/http/cart-cpf.spec.ts` (invalid CPF rejected end to end) | BE-03.1 PR | In progress |
 | RF-09 | BE-05.1, BE-05.3, FE-06.2, FE-06.3 | | | Planned |
 | RF-10 | BE-05.2 | | | Planned |
 | RF-11 | BE-09.1, FE-06.4 | | | Planned |
@@ -32,7 +32,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RNF-01 | EST-04.3, BE-02.2, FE-09.2, FE-10.1 | | | Planned |
 | RNF-02 | EST-03.2, EST-03.3, EST-05.2, BE-05.2, BE-10.2, FE-02.2 | EST-03.2: `Security` and `CodeQL` workflows (dependency audit, Gitleaks on the full history, CodeQL). EST-03.3: `image.yml` checks the image holds no build placeholders or `.env` files and scans it with Trivy (high and critical fail). BE-10.2: `pnpm test` (CORS wildcard rule, rate limit logic and stores, payload validation), `integration-tests/http/rate-limit.spec.ts` in CI; FE-02.2: `apps/storefront/tests/server/*.test.ts` (cookie flags, token never in a body, CSRF, error contract, cents, guest routes, no Node modules) | #11, #12, #15, #18 | In progress |
 | RNF-03 | EST-05.2, BE-01.3 | | | Planned |
-| RNF-04 | EST-05.1, BE-03.1, BE-03.3, BE-09.2, FE-06.1, FE-07.3, FE-08.1 | | | Planned |
+| RNF-04 | EST-05.1, BE-03.1, BE-03.3, BE-09.2, FE-06.1, FE-07.3, FE-08.1 | BE-03.1: `log-redaction.unit.spec.ts`, `cpf-privacy.unit.spec.ts`; `integration-tests/http/cart-cpf.spec.ts` (no CPF in logs or in store cart and order responses) | BE-03.1 PR | In progress |
 | RNF-05 | EST-03.3, EST-04.2, EST-05.3, BE-05.4, BE-07.1 | EST-03.3: `image.yml` runs the migrations and checks `/health` from the image, with Postgres and Redis | #11 | In progress |
 | RNF-06 | FE-01.2, FE-09.1, FE-12.1 | | | Planned |
 | RNF-07 | FE-04.4 | | | Planned |

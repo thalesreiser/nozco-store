@@ -1,5 +1,7 @@
+import { logger } from "@medusajs/framework/logger"
 import { defineConfig, loadEnv } from "@medusajs/framework/utils"
 import { parseEnv } from "./src/lib/env"
+import { redactingLogger } from "./src/lib/log-redaction"
 import { redisModules } from "./src/lib/redis-modules"
 
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
@@ -7,6 +9,7 @@ loadEnv(process.env.NODE_ENV || "development", process.cwd())
 const env = parseEnv()
 
 module.exports = defineConfig({
+  logger: redactingLogger(logger),
   projectConfig: {
     databaseUrl: env.DATABASE_URL,
     redisUrl: env.REDIS_URL,
