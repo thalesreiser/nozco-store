@@ -12,10 +12,10 @@ launch; **C** tasks are backlog.
 | Track | Tasks | Total | Needed for launch (M) |
 |---|---|---|---|
 | Structural | 16 | 49 h | 49 h |
-| Backend (Medusa v2) | 28 | 94 h | 84 h |
+| Backend (Medusa v2) | 30 | 103 h | 93 h |
 | Frontend (Nuxt 4) | 32 | 119 h | 108 h |
 | Post-launch backlog | 2 | 5 h | 0 h |
-| **Total** | **78** | **267 h** | **241 h** |
+| **Total** | **80** | **276 h** | **250 h** |
 
 ## Process
 - **Definition of Ready:** requirement and acceptance criterion written, dependencies done (tasks,
@@ -132,17 +132,21 @@ launch; **C** tasks are backlog.
 - **BE-02.4** Map what the standard Store API already covers · Custom routes for size and colour filters and facets · Best-seller and on-sale sorting · Availability per variant · Text search
 - **BE-02.5** Content module for banners and announcement bar · Admin screen · Store API route
 
-### BE-03 - Customers and LGPD (8 h)
+### BE-03 - Customers and LGPD (17 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
 | BE-03.1 | Customer data and CPF | RF-08, RNF-04 | M | 3 h | BE-01.2 |
 | BE-03.2 | Customer authentication | RF-22 | S | 2 h | BE-03.1, DEC-05 |
 | BE-03.3 | LGPD requests | RNF-04 | M | 3 h | BE-03.1 |
+| BE-03.4 | Protected CPF storage | RF-08, RNF-02, RNF-04 | M | 6 h | BE-03.1 |
+| BE-03.5 | CPF mask in the admin | RF-08, RNF-02, RNF-04 | M | 3 h | BE-03.4, BE-01.3 |
 
-- **BE-03.1** CPF field and check-digit validation · Shared Zod schema · Masking in logs and admin
+- **BE-03.1** CPF field and check-digit validation · Shared Zod schema · Masking in logs
 - **BE-03.2** E-mail and password · Password reset by e-mail · Login rate limit
 - **BE-03.3** Data export · Anonymisation that keeps fiscal records · Request log
+- **BE-03.4** Own module linked to cart and order · AES-256-GCM with the key outside the repository · Key rotation and key validated at boot · Migration of any CPF in metadata · BE-03.3 adjusted to the new storage · Integration tests in CI. No real customer data before this task.
+- **BE-03.5** Mask on admin screens and API responses · Saving never overwrites the real value · Access to the full CPF logged, if allowed · Integration tests in CI
 
 ### BE-04 - Cart and promotions (4 h)
 
