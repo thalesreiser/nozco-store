@@ -42,7 +42,7 @@ Priorities: **M** must, **S** should, **C** could, **W** won't (this version).
 | RNF-07 | SEO | Server-rendered pages, sitemap, canonical URLs, Open Graph, schema.org `Product`/`Offer` |
 | RNF-08 | Observability | Error tracking, structured logs without PII, uptime monitoring, alerts on payment/webhook failures |
 | RNF-09 | Maintainability | TypeScript strict; types and Zod schemas shared by backend and storefront; ≥ 80% coverage on domain logic; e2e tests on cart and checkout; ADR for every relevant decision |
-| RN-01 | Business rule | Money stored as integer cents (BRL); price shown with compare-at price and installments |
+| RN-01 | Business rule | Medusa stores money in major units; the storefront works in integer cents (BRL); price shown with compare-at price and installments |
 | RN-02 | Business rule | Up to 6x interest-free installments (minimum installment value: Q-05) |
 | RN-03 | Business rule | The order is created only after the payment is approved, so the rule for an approved payment with no stock left is defined in Q-04 and tested in BE-05.4 |
 | RN-04 | Business rule | First size exchange is free for the customer |
