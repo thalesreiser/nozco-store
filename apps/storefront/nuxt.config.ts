@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
 import { shouldBundleMockSource } from "./shared/data-source"
+import { GALLERY_PATH, isGalleryAllowedIn } from "./shared/gallery"
 
 // The alias decides at build time, so a build without fixtures has no import path that reaches them.
 const mockSourceFile = shouldBundleMockSource(process.env) ? "index" : "excluded"
@@ -49,6 +50,12 @@ export default defineNuxtConfig({
     "/api/auth/login": { security: { xssValidator: false } },
   },
   hooks: {
+    // Leaves the internal gallery out of the build, so production has no route and no chunk for it.
+    "pages:extend"(pages) {
+      if (isGalleryAllowedIn(process.env.NUXT_PUBLIC_APP_ENV)) return
+      const index = pages.findIndex((page) => page.path === GALLERY_PATH)
+      if (index !== -1) pages.splice(index, 1)
+    },
     // Nuxt only adds its own handler when none is set, so this one is put in front of it from here.
     "nitro:config"(config) {
       const nuxtHandlers = config.errorHandler ? [config.errorHandler].flat() : []
