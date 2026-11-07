@@ -91,6 +91,7 @@ describe("catalog menu", () => {
     expect(menuLinksFrom(productFixtures).map(({ to }) => to)).toEqual([
       "/categoria/camisetas-exemplo",
       "/categoria/moletons-exemplo",
+      "/categoria/estampas-exemplo",
       "/colecao/colecao-exemplo",
     ])
   })

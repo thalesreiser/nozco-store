@@ -69,5 +69,64 @@
       "submit": "[Assinar]",
       "notSent": "[Cadastro ainda indisponível. Nenhum dado foi enviado.]"
     }
+  },
+  "listing": {
+    "categoryFallback": "[Categoria]",
+    "collectionFallback": "[Coleção]",
+    "count": "[Nenhum produto] | [1 produto] | [{count} produtos]",
+    "saleBadge": "[% OFF]",
+    "filters": {
+      "open": "[Filtrar]",
+      "title": "[FILTROS]",
+      "close": "Fechar filtros",
+      "price": "[Preço]",
+      "clearOne": "[Limpar]",
+      "clearNamed": "Limpar filtro {name}",
+      "clearAll": "[Limpar filtros]",
+      "showResults": "[Ver resultados]"
+    },
+    "price": {
+      "min": "[Mínimo (R$)]",
+      "max": "[Máximo (R$)]",
+      "apply": "[Aplicar]",
+      "set": "[definido]",
+      "rangeFrom": "[De]",
+      "rangeTo": "[a]",
+      "invalid": "[Informe um valor como 49,90.]",
+      "order": "[O mínimo não pode passar do máximo.]"
+    },
+    "order": {
+      "label": "Ordenar produtos",
+      "newest": "[Ordenar: novidades]",
+      "best_selling": "[Ordenar: mais vendidos]",
+      "price_asc": "[Ordenar: menor preço]",
+      "price_desc": "[Ordenar: maior preço]",
+      "on_sale": "[Ordenar: promoções]"
+    },
+    "pagination": {
+      "label": "Páginas",
+      "previous": "Página anterior",
+      "next": "Próxima página",
+      "page": "Página"
+    },
+    "error": {
+      "title": "[Não foi possível carregar os produtos.]",
+      "description": "[Tente de novo em instantes.]",
+      "retry": "[Tentar de novo]"
+    },
+    "empty": {
+      "title": "[Nada por aqui ainda]",
+      "description": "[Ainda não há produtos nesta página.]",
+      "action": "[Voltar para o início]"
+    },
+    "emptyFiltered": {
+      "title": "[Nenhum produto encontrado]",
+      "description": "[Tente tirar algum filtro.]"
+    },
+    "pastTheEnd": {
+      "title": "[Esta página não existe]",
+      "description": "[A lista tem menos páginas agora.]",
+      "action": "[Ir para a primeira página]"
+    }
   }
 }
