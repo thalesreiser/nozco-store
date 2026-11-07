@@ -258,6 +258,35 @@ medusaIntegrationTestRunner({
         )
       })
 
+      it("keeps a cost in metadata out of the standard product routes", async () => {
+        const { productId } = await createProduct("custo", {
+          product: { metadata: { fabric: "Tecido de exemplo", cost: 12.5 }, external_id: "erp-1" },
+        })
+        const [stored] = await queryList<{ metadata: Record<string, unknown> }>(getContainer(), {
+          entity: "product",
+          fields: ["metadata"],
+          filters: { id: productId },
+        })
+        expect(stored?.metadata.cost).toBe(12.5)
+
+        const fields =
+          "+metadata,+external_id,*variants.calculated_price,+variants.inventory_quantity," +
+          "+variants.barcode,*variants.prices," +
+          "*variants.inventory_items.inventory.location_levels"
+        for (const path of ["/store/products", `/store/products/${productId}`]) {
+          const answer = await get<unknown>(path, { fields })
+          const body = JSON.stringify(answer.data)
+
+          expect(answer.status).toBe(200)
+          expect(body).toContain("calculated_amount")
+          expect(body).toContain("inventory_quantity")
+          expect(body).not.toMatch(
+            /"(metadata|external_id|barcode|prices|inventory_items|location_levels)"|erp-1/,
+          )
+          expect(body).not.toContain("cost")
+        }
+      })
+
       it("exposes nothing private", async () => {
         const container = getContainer()
         const { result: categories } = await createProductCategoriesWorkflow(container).run({

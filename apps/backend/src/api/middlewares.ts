@@ -1,5 +1,12 @@
-import { authenticate, defineMiddlewares } from "@medusajs/framework/http"
+import {
+  authenticate,
+  defineMiddlewares,
+  type MedusaNextFunction,
+  type MedusaRequest,
+  type MedusaResponse,
+} from "@medusajs/framework/http"
 import { cpfPayloadSchema, privacyRequestPayloadSchema } from "@nozco/shared-types"
+import { withoutPrivateProductFields } from "../lib/public-product"
 import { hideCpfInResponses, redactCpfInRequestLine } from "./utils/cpf-privacy"
 import { rateLimit } from "./utils/rate-limit"
 import { validateBody } from "./utils/validate-payload"
@@ -8,11 +15,24 @@ import { validateBody } from "./utils/validate-payload"
 const asCustomer = authenticate("customer", ["session", "bearer"])
 const asOperator = authenticate("user", ["session", "bearer", "api-key"])
 
+/** The publishable key is public, so what these routes can be asked for must not be private. */
+function hidePrivateProductFields(
+  _req: MedusaRequest,
+  res: MedusaResponse,
+  next: MedusaNextFunction,
+): void {
+  const send = res.json.bind(res)
+  res.json = (body: unknown) => send(withoutPrivateProductFields(body))
+  next()
+}
+
 export default defineMiddlewares({
   routes: [
     { matcher: "/*", middlewares: [redactCpfInRequestLine] },
     { matcher: "/store/carts*", middlewares: [hideCpfInResponses] },
     { matcher: "/store/orders*", middlewares: [hideCpfInResponses] },
+    { matcher: "/store/products*", method: ["GET"], middlewares: [hidePrivateProductFields] },
+    { matcher: "/store/catalog*", method: ["GET"], middlewares: [rateLimit("catalog")] },
     {
       matcher: "/store/carts/:id/cpf",
       method: ["POST"],

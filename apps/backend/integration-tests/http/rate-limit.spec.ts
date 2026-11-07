@@ -1,22 +1,69 @@
+import type { MedusaContainer } from "@medusajs/framework/types"
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { Redis } from "ioredis"
 import { createRedisStore } from "../../src/lib/rate-limit-store"
+import { queryList } from "../../src/lib/store-setup/query"
+import { setupStore } from "../../src/lib/store-setup/setup-store"
 
 jest.setTimeout(120 * 1000)
 
 const validateStatus = () => true
 
+type Answer = { status: number; data: unknown; headers: Record<string, string> }
+
 type Api = {
-  post(
+  post(url: string, body: unknown, config: { validateStatus: () => boolean }): Promise<Answer>
+  get(
     url: string,
-    body: unknown,
-    config: { validateStatus: () => boolean },
-  ): Promise<{ status: number; data: unknown; headers: Record<string, string> }>
+    config: {
+      headers: Record<string, string>
+      params: Record<string, string>
+      validateStatus: () => boolean
+    },
+  ): Promise<Answer>
 }
 
 medusaIntegrationTestRunner({
-  env: { RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT: "2", RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: "1" },
-  testSuite: ({ api }: { api: Api }) => {
+  env: {
+    RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT: "2",
+    RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: "1",
+    RATE_LIMIT_CATALOG_MAX_PER_IP: "3",
+  },
+  testSuite: ({ api, getContainer }: { api: Api; getContainer: () => MedusaContainer }) => {
+    describe("rate limit on the store catalog", () => {
+      it("counts the three routes together and refuses with { code, message }", async () => {
+        const container = getContainer()
+        const setup = await setupStore(container)
+        const [key] = await queryList<{ token: string }>(container, {
+          entity: "api_key",
+          fields: ["token"],
+          filters: { id: setup.publishableApiKeyId },
+        })
+        const read = (path: string) =>
+          api.get(path, {
+            headers: { "x-publishable-api-key": key?.token ?? "" },
+            params: { region_id: setup.regionId },
+            validateStatus,
+          })
+        const routes = [
+          "/store/catalog/products",
+          "/store/catalog/products/any-handle",
+          "/store/catalog/facets",
+        ]
+
+        // Counters may be in Redis, shared with other specs, so the limit may be reached earlier.
+        for (const path of routes) {
+          expect([200, 404, 429]).toContain((await read(path)).status)
+        }
+        for (const path of routes) {
+          const refused = await read(path)
+          expect(refused.status).toBe(429)
+          expect(refused.data).toEqual({ code: "rate_limited", message: expect.any(String) })
+          expect(Number(refused.headers["retry-after"])).toBeGreaterThan(0)
+        }
+      })
+    })
+
     const login = (email: string) =>
       api.post("/auth/customer/emailpass", { email, password: "wrong" }, { validateStatus })
 
