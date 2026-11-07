@@ -1,10 +1,12 @@
 import { defineMiddlewares } from "@medusajs/framework/http"
 import { cpfPayloadSchema } from "@nozco/shared-types"
+import { cartErrorHandler } from "./utils/cart-error-handler"
 import { hideCpfInResponses, redactCpfInRequestLine } from "./utils/cpf-privacy"
 import { rateLimit } from "./utils/rate-limit"
 import { validateBody } from "./utils/validate-payload"
 
 export default defineMiddlewares({
+  errorHandler: cartErrorHandler,
   routes: [
     { matcher: "/*", middlewares: [redactCpfInRequestLine] },
     { matcher: "/store/carts*", middlewares: [hideCpfInResponses] },
