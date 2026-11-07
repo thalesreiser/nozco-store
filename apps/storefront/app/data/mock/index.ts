@@ -11,6 +11,16 @@ import { paymentProviderFixtures, productFixtures, shippingOptionFixtures } from
 const lowestPrice = (product: StoreProduct) =>
   Math.min(...product.variants.map((variant) => variant.calculated_price.calculated_amount))
 
+const isOnSale = (product: StoreProduct) =>
+  product.variants.some((variant) => variant.calculated_price.compare_at_amount !== null)
+
+/** The fixtures have no sales or dates, so `best_selling` and `newest` keep their order. */
+function sortByQuery(products: StoreProduct[], order: StoreProductListQuery["order"]) {
+  if (order === "price_asc") products.sort((a, b) => lowestPrice(a) - lowestPrice(b))
+  if (order === "price_desc") products.sort((a, b) => lowestPrice(b) - lowestPrice(a))
+  if (order === "on_sale") products.sort((a, b) => Number(isOnSale(b)) - Number(isOnSale(a)))
+}
+
 function matchesQuery(product: StoreProduct, query: StoreProductListQuery) {
   const price = lowestPrice(product)
   const wanted = Object.entries(query.option_values ?? {})
@@ -129,10 +139,7 @@ export function createMockSource(): DataSource {
         const limit = query.limit ?? 20
         const offset = query.offset ?? 0
         const matches = productFixtures.filter((product) => matchesQuery(product, query))
-        if (query.order) {
-          const direction = query.order === "price_asc" ? 1 : -1
-          matches.sort((a, b) => direction * (lowestPrice(a) - lowestPrice(b)))
-        }
+        sortByQuery(matches, query.order)
         return {
           products: structuredClone(matches.slice(offset, offset + limit)),
           count: matches.length,

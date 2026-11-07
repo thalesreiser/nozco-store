@@ -18,7 +18,7 @@ the architecture or the interface, an ADR.
 | Q-09 | Initial catalog size (number of designs and variants) | BE-02.3 | Open |
 | Q-10 | Shipping origin address, package sizes and carriers to offer | BE-06.1 | Open |
 | Q-11 | Company data for the legal footer (legal name, CNPJ, address, support e-mail/WhatsApp) | EST-05.1 | Open |
-| Q-12 | Do logo files and brand fonts already exist, or are they part of FE-12.2? | FE-12.2 | Open |
+| Q-12 | Do logo files and brand fonts already exist, or are they part of FE-12.2? | FE-12.2 | Decided on 2026-11-07: [ADR 006](adr/006-logo.md) |
 
 ## Design, product and repository decisions
 
