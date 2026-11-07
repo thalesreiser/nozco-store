@@ -108,7 +108,11 @@ describe("buildRateLimitPolicies", () => {
       RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: 5,
       RATE_LIMIT_SENSITIVE_MAX_PER_IP: 60,
       RATE_LIMIT_SENSITIVE_WINDOW_SECONDS: 3600,
+      RATE_LIMIT_CATALOG_MAX_PER_IP: 600,
+      RATE_LIMIT_CATALOG_WINDOW_SECONDS: 60,
     })
+
+    expect(policies.catalog).toEqual({ maxPerIp: 600, maxPerAccount: 600, windowMs: 60_000 })
 
     expect(policies.login).toEqual({ maxPerIp: 100, maxPerAccount: 10, windowMs: 900_000 })
     expect(policies.password_reset).toEqual({ maxPerIp: 60, maxPerAccount: 5, windowMs: 3_600_000 })
