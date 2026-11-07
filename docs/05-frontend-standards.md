@@ -28,7 +28,7 @@ component style, page layouts) are decisions for Thales, listed in
 - `<script setup lang="ts">` with typed `defineProps` and `defineEmits`.
 - Domain components receive props and emit events. Pages call the API through composables.
 - Every component that shows data has four states: loading (skeleton), empty, error and content.
-- Prices always go through `Price` (BRL, integer cents). Medusa v2 returns major units; `server/utils/store-mappers.ts` converts them.
+- Prices always go through `BasePrice` (BRL, integer cents). Medusa v2 returns major units; `server/utils/store-mappers.ts` converts them.
 - An internal `/_componentes` gallery, visible only in development and preview, shows every component in
   every state for visual review.
 

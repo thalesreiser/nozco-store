@@ -15,7 +15,7 @@ route map.
 - The cart lives in Medusa; the Pinia store only mirrors the last API response. Nothing personal or
   secret goes to `localStorage`.
 - Every data component has loading, empty, error and content states.
-- Prices always go through the `Price` component (BRL, integer cents). Medusa v2 returns major units
+- Prices always go through the `BasePrice` component (BRL, integer cents). Medusa v2 returns major units
   (20.5 is R$ 20,50); `server/utils/store-mappers.ts` converts them.
 - Components use semantic design tokens, never raw colours or sizes.
 - Forms: VeeValidate + Zod with the shared schemas; masked inputs send unmasked values.
