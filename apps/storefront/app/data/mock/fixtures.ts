@@ -11,7 +11,8 @@ import type {
 //
 // The size and colour lists are EXAMPLES ONLY, because the size grid is still open (Q-03). Every name,
 // description, price and stock number is invented and is not a business decision. Image URLs use the
-// reserved example.com domain and do not load.
+// reserved example.com domain and do not load, so
+// `thumbnail` is null: a listing shows the placeholder instead of asking another origin for a photo.
 
 /** Unique string that lets the build check find these fixtures. Keep in sync with that script. */
 export const FIXTURE_MARKER = "nozco-fictional-fixture-7f3a9c"
@@ -77,7 +78,7 @@ function makeProduct(input: FixtureInput): StoreProduct {
     handle: input.slug,
     subtitle: "Produto fictício para desenvolvimento",
     description: "Peça inventada, usada apenas para testar as telas da loja.",
-    thumbnail: images[0]?.url ?? null,
+    thumbnail: null,
     options: [sizes, colors],
     variants,
     images,
@@ -98,10 +99,40 @@ function makeProduct(input: FixtureInput): StoreProduct {
 const TAXON_NAMES: Record<string, string> = {
   "camisetas-exemplo": "Camisetas exemplo",
   "moletons-exemplo": "Moletons exemplo",
+  "estampas-exemplo": "Estampas exemplo",
   "colecao-exemplo": "Coleção exemplo",
 }
 
 const taxonName = (handle: string) => TAXON_NAMES[handle] ?? handle
+
+/** More than one page of a listing, with sales, a sold-out product and a name that needs to wrap. */
+function printFixtures() {
+  const sizes = ["P", "M", "G", "GG"]
+  return Array.from({ length: 24 }, (_, index) => {
+    const number = String(index + 1).padStart(2, "0")
+    const price = 7000 + index * 100
+    const colors = index % 2 === 0 ? ["Azul"] : ["Azul", "Verde"]
+    return makeProduct({
+      slug: `estampa-ficticia-${number}`,
+      title:
+        index === 1
+          ? "Estampa Fictícia com um Nome Bem Comprido para Testar a Quebra de Linha"
+          : `Estampa Fictícia ${number}`,
+      price,
+      compareAt: index % 4 === 0 ? price + 2000 : null,
+      sizes,
+      colors,
+      category: "estampas-exemplo",
+      collection: null,
+      stock:
+        index === 2
+          ? Object.fromEntries(
+              sizes.flatMap((size) => colors.map((color) => [`${size}/${color}`, 0])),
+            )
+          : undefined,
+    })
+  })
+}
 
 export const productFixtures: StoreProduct[] = [
   makeProduct({
@@ -136,6 +167,7 @@ export const productFixtures: StoreProduct[] = [
     collection: "colecao-exemplo",
     stock: { "M/Cinza": 0, "G/Cinza": 0 },
   }),
+  ...printFixtures(),
 ]
 
 export const shippingOptionFixtures: StoreCartShippingOption[] = [

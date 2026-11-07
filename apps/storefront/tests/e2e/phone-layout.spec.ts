@@ -188,6 +188,13 @@ for (const [name, use] of Object.entries({ desktop, mobile })) {
 test.describe("stacking of the WhatsApp button", () => {
   test.use(mobile)
 
+  const isCovered = (page: Page) =>
+    page.evaluate(() => {
+      const { x, y, width, height } = document.querySelector("aside a")!.getBoundingClientRect()
+      const element = document.elementFromPoint(x + width / 2, y + height / 2)
+      return element?.closest("aside") === null
+    })
+
   test("stays under the sticky row and the mobile menu", async ({ page }) => {
     await openHome(page)
     const zIndex = (selector: string) =>
@@ -197,12 +204,15 @@ test.describe("stacking of the WhatsApp button", () => {
     await page.getByRole("button", { name: "Abrir menu" }).click()
     await expect(page.getByRole("dialog")).toBeVisible()
 
-    const covered = await page.evaluate(() => {
-      const { x, y, width, height } = document.querySelector("aside a")!.getBoundingClientRect()
-      const element = document.elementFromPoint(x + width / 2, y + height / 2)
-      return element?.closest("aside") === null
-    })
-    expect(covered).toBe(true)
+    expect(await isCovered(page)).toBe(true)
+  })
+
+  test("stays under the filter drawer", async ({ page }) => {
+    await openHome(page, "/categoria/estampas-exemplo")
+    await page.getByRole("button", { name: "[Filtrar]" }).click()
+    await expect(page.getByRole("dialog")).toBeVisible()
+
+    expect(await isCovered(page)).toBe(true)
   })
 
   test("is clear of the cart link", async ({ page }) => {
