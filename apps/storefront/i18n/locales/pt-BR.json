@@ -2,5 +2,27 @@
   "home": {
     "title": "NozCo",
     "underConstruction": "Nossa loja está em construção."
+  },
+  "price": {
+    "previous": "Preço anterior:"
+  },
+  "stock": {
+    "in": "[EM ESTOQUE]",
+    "low": "Últimas",
+    "out": "[ESGOTADO]"
+  },
+  "quantity": {
+    "decrease": "Diminuir quantidade",
+    "increase": "Aumentar quantidade"
+  },
+  "option": {
+    "unavailable": "indisponível"
+  },
+  "state": {
+    "loading": "Carregando"
+  },
+  "product": {
+    "buy": "Comprar",
+    "buyNamed": "Comprar {name}"
   }
 }
