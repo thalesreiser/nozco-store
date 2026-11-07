@@ -53,6 +53,8 @@ function buildSchema(isProduction: boolean) {
       RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: positiveInt(5),
       RATE_LIMIT_SENSITIVE_MAX_PER_IP: positiveInt(60),
       RATE_LIMIT_SENSITIVE_WINDOW_SECONDS: positiveInt(3600),
+      RATE_LIMIT_CATALOG_MAX_PER_IP: positiveInt(600),
+      RATE_LIMIT_CATALOG_WINDOW_SECONDS: positiveInt(60),
     })
     .superRefine((env, ctx) => {
       // Without Redis a worker never receives events. Server mode cannot have this rule: Medusa's

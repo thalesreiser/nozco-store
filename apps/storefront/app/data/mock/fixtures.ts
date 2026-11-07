@@ -50,13 +50,16 @@ function makeProduct(input: FixtureInput): StoreProduct {
       rank,
     }))
 
+  const quantityOf = (size: string, color: string) => input.stock?.[`${size}/${color}`] ?? 5
+
   const variants: StoreProductVariant[] = colors.values.flatMap((color) =>
     sizes.values.map((size) => ({
       id: `variant_mock_${input.slug}_${size.value}_${color.value}`,
       product_id: id,
       title: `${size.value} / ${color.value}`,
       sku: null,
-      inventory_quantity: input.stock?.[`${size.value}/${color.value}`] ?? 5,
+      inventory_quantity: quantityOf(size.value, color.value),
+      in_stock: quantityOf(size.value, color.value) > 0,
       options: [size, color],
       images: imagesOf(color.value),
       calculated_price: {
