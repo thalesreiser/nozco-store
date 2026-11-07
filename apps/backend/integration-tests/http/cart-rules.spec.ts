@@ -242,33 +242,40 @@ medusaIntegrationTestRunner({
       })
 
       describe("quantities that are not whole numbers", () => {
-        const expectInvalidQuantity = (answer: Answer) => {
+        // Medusa's validator runs first and refuses a negative number itself, whole or not.
+        const cases: [number, string][] = [
+          [1.5, "invalid_quantity"],
+          [0.5, "invalid_quantity"],
+          [-1.5, "invalid_request"],
+        ]
+        const expectRejected = (answer: Answer, code: string) => {
           expect(answer.status).toBe(400)
-          expect(answer.data).toEqual({ code: "invalid_quantity", message: expect.any(String) })
+          expect(answer.data).toEqual({ code, message: expect.any(String) })
         }
 
-        it.each([1.5, 0.5, -1.5])("rejects %d when adding a line", async (quantity) => {
-          expectInvalidQuantity(await addLine({ variant_id: inStock, quantity }))
+        it.each(cases)("rejects %d when adding a line, as %s", async (quantity, code) => {
+          expectRejected(await addLine({ variant_id: inStock, quantity }), code)
           expect(await lines()).toEqual([])
         })
 
-        it.each([1.5, 0.5, -1.5])("rejects %d when updating a line", async (quantity) => {
+        it.each(cases)("rejects %d when updating a line, as %s", async (quantity, code) => {
           await addLine({ variant_id: inStock, quantity: 2 })
           const [line] = await lines()
 
-          expectInvalidQuantity(await updateLine(line?.id ?? "", quantity))
+          expectRejected(await updateLine(line?.id ?? "", quantity), code)
           expect((await lines())[0]?.quantity).toBe(2)
         })
 
-        it.each([1.5, 0.5, -1.5])("rejects %d when creating a cart", async (quantity) => {
+        it.each(cases)("rejects %d when creating a cart, as %s", async (quantity, code) => {
           const carts = getContainer().resolve(Modules.CART)
           const before = await carts.listCarts({})
 
-          expectInvalidQuantity(
+          expectRejected(
             await post("/store/carts", {
               region_id: setup.regionId,
               items: [{ variant_id: inStock, quantity }],
             }),
+            code,
           )
           expect(await carts.listCarts({})).toHaveLength(before.length)
         })

@@ -47,7 +47,7 @@ export function validateBody<T>(schema: PayloadSchema<T>) {
 }
 
 /**
- * Route middleware for a route of Medusa's own, whose validator still runs and sets `req.validatedBody`:
+ * Route middleware for a route of Medusa's own, whose validator sets `req.validatedBody` and runs first:
  * answers 400 with `{ code, message }` under the given code, and otherwise only lets the request through.
  */
 export function checkBody<T>(schema: PayloadSchema<T>, code: string) {
