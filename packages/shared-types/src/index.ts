@@ -12,3 +12,4 @@ export interface Money {
 export type * from "./store.js"
 export * from "./apparel.js"
 export * from "./cpf.js"
+export * from "./privacy.js"

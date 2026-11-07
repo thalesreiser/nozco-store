@@ -38,7 +38,11 @@ export default defineNuxtConfig({
     },
   },
   // The store and its server routes share one origin, so no response needs CORS headers.
-  security: { corsHandler: false },
+  // Fonts are self-hosted, so the default font-src (which allows any https: origin) is narrowed.
+  security: {
+    corsHandler: false,
+    headers: { contentSecurityPolicy: { "font-src": ["'self'"] } },
+  },
   routeRules: {
     // The XSS validator refuses text containing `<`, which is valid in a password. The route validates
     // with Zod and only forwards the value to Medusa as JSON.

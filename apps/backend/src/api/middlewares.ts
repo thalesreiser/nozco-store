@@ -1,9 +1,13 @@
-import { defineMiddlewares } from "@medusajs/framework/http"
-import { cpfPayloadSchema } from "@nozco/shared-types"
+import { authenticate, defineMiddlewares } from "@medusajs/framework/http"
+import { cpfPayloadSchema, privacyRequestPayloadSchema } from "@nozco/shared-types"
 import { cartErrorHandler } from "./utils/cart-error-handler"
 import { hideCpfInResponses, redactCpfInRequestLine } from "./utils/cpf-privacy"
 import { rateLimit } from "./utils/rate-limit"
 import { validateBody } from "./utils/validate-payload"
+
+// Named here as well as by Medusa, because the limits below count the authenticated actor.
+const asCustomer = authenticate("customer", ["session", "bearer"])
+const asOperator = authenticate("user", ["session", "bearer", "api-key"])
 
 export default defineMiddlewares({
   errorHandler: cartErrorHandler,
@@ -15,6 +19,30 @@ export default defineMiddlewares({
       matcher: "/store/carts/:id/cpf",
       method: ["POST"],
       middlewares: [validateBody(cpfPayloadSchema)],
+    },
+    {
+      matcher: "/store/customers/me/privacy-requests",
+      method: ["POST"],
+      middlewares: [
+        asCustomer,
+        rateLimit("privacy_request"),
+        validateBody(privacyRequestPayloadSchema),
+      ],
+    },
+    {
+      matcher: "/store/customers/me/privacy-requests",
+      method: ["GET"],
+      middlewares: [asCustomer, rateLimit("privacy_read")],
+    },
+    {
+      matcher: "/admin/privacy-requests",
+      method: ["GET"],
+      middlewares: [asOperator, rateLimit("privacy_read")],
+    },
+    {
+      matcher: "/admin/privacy-requests/:id/:decision",
+      method: ["POST"],
+      middlewares: [asOperator, rateLimit("privacy_review")],
     },
     {
       matcher: "/auth/:actor_type/:auth_provider",
