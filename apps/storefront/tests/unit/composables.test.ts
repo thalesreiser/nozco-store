@@ -43,7 +43,7 @@ describe("useProducts on the mock source", () => {
   it("lists with the count of all matches and applies the page", async () => {
     const page = await useProducts().listProducts({ limit: 2, offset: 1 })
 
-    expect(page).toMatchObject({ count: 3, limit: 2, offset: 1 })
+    expect(page).toMatchObject({ count: productFixtures.length, limit: 2, offset: 1 })
     expect(page.products).toHaveLength(2)
   })
 
@@ -66,8 +66,12 @@ describe("useProducts on the mock source", () => {
 
   it("sorts by price in both directions", async () => {
     const { listProducts } = useProducts()
-    const ascending = (await listProducts({ order: "price_asc" })).products.map((p) => p.handle)
-    const descending = (await listProducts({ order: "price_desc" })).products.map((p) => p.handle)
+    const ascending = (await listProducts({ order: "price_asc", limit: 100 })).products.map(
+      (p) => p.handle,
+    )
+    const descending = (await listProducts({ order: "price_desc", limit: 100 })).products.map(
+      (p) => p.handle,
+    )
 
     expect(ascending[0]).toBe(ALFA)
     expect(descending).toEqual([...ascending].reverse())
