@@ -241,6 +241,65 @@ medusaIntegrationTestRunner({
         })
       })
 
+      describe("quantities that are not whole numbers", () => {
+        const expectInvalidQuantity = (answer: Answer) => {
+          expect(answer.status).toBe(400)
+          expect(answer.data).toEqual({ code: "invalid_quantity", message: expect.any(String) })
+        }
+
+        it.each([1.5, 0.5, -1.5])("rejects %d when adding a line", async (quantity) => {
+          expectInvalidQuantity(await addLine({ variant_id: inStock, quantity }))
+          expect(await lines()).toEqual([])
+        })
+
+        it.each([1.5, 0.5, -1.5])("rejects %d when updating a line", async (quantity) => {
+          await addLine({ variant_id: inStock, quantity: 2 })
+          const [line] = await lines()
+
+          expectInvalidQuantity(await updateLine(line?.id ?? "", quantity))
+          expect((await lines())[0]?.quantity).toBe(2)
+        })
+
+        it.each([1.5, 0.5, -1.5])("rejects %d when creating a cart", async (quantity) => {
+          const carts = getContainer().resolve(Modules.CART)
+          const before = await carts.listCarts({})
+
+          expectInvalidQuantity(
+            await post("/store/carts", {
+              region_id: setup.regionId,
+              items: [{ variant_id: inStock, quantity }],
+            }),
+          )
+          expect(await carts.listCarts({})).toHaveLength(before.length)
+        })
+
+        it("still accepts whole numbers on all three routes", async () => {
+          const created = await post("/store/carts", {
+            region_id: setup.regionId,
+            items: [{ variant_id: inStock, quantity: 1 }],
+          })
+          expect(created.status).toBe(200)
+          expect(created.data.cart?.items.map((line) => line.quantity)).toEqual([1])
+
+          expect((await addLine({ variant_id: inStock, quantity: 2 })).status).toBe(200)
+          const [line] = await lines()
+          expect(line?.quantity).toBe(2)
+
+          expect((await updateLine(line?.id ?? "", 3)).status).toBe(200)
+          expect((await lines())[0]?.quantity).toBe(3)
+        })
+
+        it("leaves a quantity that is not a number to Medusa", async () => {
+          const answer = await post(`/store/carts/${cartId}/line-items`, {
+            variant_id: inStock,
+            quantity: "1.5",
+          })
+
+          expect(answer.status).toBe(400)
+          expect(answer.data.code).toBe("invalid_request")
+        })
+      })
+
       describe("the other failures of a cart route", () => {
         it("answers with the codes the storefront uses", async () => {
           expectAnswer(await addLine({ variant_id: "variant_inexistente", quantity: 1 }), {

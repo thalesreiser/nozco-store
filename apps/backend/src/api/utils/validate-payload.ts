@@ -45,3 +45,18 @@ export function validateBody<T>(schema: PayloadSchema<T>) {
     next()
   }
 }
+
+/**
+ * Route middleware for a route of Medusa's own, whose validator still runs and sets `req.validatedBody`:
+ * answers 400 with `{ code, message }` under the given code, and otherwise only lets the request through.
+ */
+export function checkBody<T>(schema: PayloadSchema<T>, code: string) {
+  return (req: MedusaRequest, res: MedusaResponse, next: MedusaNextFunction): void => {
+    const result = parsePayload(schema, req.body)
+    if (!result.ok) {
+      sendApiError(res, 400, { code, message: result.error.message })
+      return
+    }
+    next()
+  }
+}
