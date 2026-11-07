@@ -19,10 +19,9 @@ import { queryList } from "../../lib/store-setup/query"
 type InventoryVariant = ConfirmVariantInventoryWorkflowInputDTO["variants"][number]
 
 // Medusa types the `cart` of these hooks as any. These are the fields it holds that are read here.
-type HookCart = {
-  id: string
+type HookCart<Line = CartLineQuantity> = {
   sales_channel_id?: string | null
-  items?: (CartLineQuantity & { id: string })[]
+  items?: Line[]
 }
 
 // What Medusa's inventory check reads. Medusa does not export its own list from the core flows.
@@ -79,12 +78,12 @@ addToCartWorkflow.hooks.validate(async ({ input, ...data }, { container }) => {
   const cart = data.cart as HookCart
   const existing = await container
     .resolve(Modules.CART)
-    .listLineItems({ cart_id: cart.id }, { select: ["variant_id", "quantity"] })
+    .listLineItems({ cart_id: input.cart_id }, { select: ["variant_id", "quantity"] })
   await confirmSplitVariants(container, cart.sales_channel_id, [...existing, ...input.items])
 })
 
 updateLineItemInCartWorkflow.hooks.validate(async ({ input, ...data }, { container }) => {
-  const cart = data.cart as HookCart
+  const cart = data.cart as HookCart<CartLineQuantity & { id: string }>
   const { quantity } = input.update
   // Zero removes the line, which never needs stock.
   if (quantity === undefined || Number(quantity) === 0) return
