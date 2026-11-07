@@ -16,6 +16,8 @@ function setup(enabled = true) {
       RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT: 1,
       RATE_LIMIT_SENSITIVE_MAX_PER_IP: 100,
       RATE_LIMIT_SENSITIVE_WINDOW_SECONDS: 3600,
+      RATE_LIMIT_CATALOG_MAX_PER_IP: 2,
+      RATE_LIMIT_CATALOG_WINDOW_SECONDS: 60,
     }),
   }
   return { config, logger }

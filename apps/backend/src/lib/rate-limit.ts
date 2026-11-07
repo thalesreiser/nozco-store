@@ -10,6 +10,7 @@ export type RateLimitRule =
   | "privacy_request"
   | "privacy_read"
   | "privacy_review"
+  | "catalog"
 
 export interface RateLimitPolicy {
   maxPerIp: number
@@ -42,6 +43,8 @@ type RateLimitEnv = Pick<
   | "RATE_LIMIT_SENSITIVE_MAX_PER_IP"
   | "RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT"
   | "RATE_LIMIT_SENSITIVE_WINDOW_SECONDS"
+  | "RATE_LIMIT_CATALOG_MAX_PER_IP"
+  | "RATE_LIMIT_CATALOG_WINDOW_SECONDS"
 >
 
 export function buildRateLimitPolicies(env: RateLimitEnv): Record<RateLimitRule, RateLimitPolicy> {
@@ -64,6 +67,12 @@ export function buildRateLimitPolicies(env: RateLimitEnv): Record<RateLimitRule,
     // Reading a status and working through a queue are routine, so the tighter limit would get in the way.
     privacy_read: login,
     privacy_review: login,
+    // Anonymous reads have no account, so only the address counts.
+    catalog: {
+      maxPerIp: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
+      maxPerAccount: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
+      windowMs: env.RATE_LIMIT_CATALOG_WINDOW_SECONDS * 1000,
+    },
   }
 }
 

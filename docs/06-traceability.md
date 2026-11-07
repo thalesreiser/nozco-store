@@ -6,9 +6,9 @@ delivered it. Updated in every PR (Definition of Done).
 | Req. | Task(s) | Tests | PR | Status |
 |---|---|---|---|---|
 | RF-01 | BE-02.5, FE-11.1 | | | Planned |
-| RF-02 | BE-02.4, FE-04.1a, FE-04.1b | | | Planned |
+| RF-02 | BE-02.4, FE-04.1a, FE-04.1b | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `packages/shared-types/tests/catalog.test.ts`, `apps/storefront/tests/server/product-mappers.test.ts`, `integration-tests/http/store-catalog.spec.ts` (filters, facets, sorting, availability, privacy) | BE-02.4 PR | In progress |
 | RF-03 | BE-02.1, FE-04.2a, FE-04.2b | BE-02.1: `apparel/__tests__/variants.unit.spec.ts`, `packages/shared-types/tests/apparel.test.ts`, `integration-tests/http/apparel-product.spec.ts` (variants, stock and availability, compare-at price, fabric metadata) | BE-02.1 PR | In progress |
-| RF-04 | BE-02.4, FE-04.3 | | | Planned |
+| RF-04 | BE-02.4, FE-04.3 | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `integration-tests/http/store-catalog.spec.ts` (text search) | BE-02.4 PR | In progress |
 | RF-05 | BE-04.1, FE-05.1a, FE-05.1b | BE-04.1: `lib/__tests__/cart-errors.unit.spec.ts`, `lib/__tests__/cart-stock.unit.spec.ts`, `packages/shared-types/tests/cart.test.ts`, `integration-tests/http/cart-rules.spec.ts` | BE-04.1: #25 | In progress |
 | RF-06 | BE-06.1, FE-05.2 | | | Planned |
 | RF-07 | BE-04.2, FE-05.2 | | | Planned |

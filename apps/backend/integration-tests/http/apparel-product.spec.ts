@@ -39,7 +39,6 @@ type StoreVariant = {
 type StoreProductRow = {
   id: string
   handle: string
-  metadata: Record<string, unknown> | null
   type: { value: string } | null
   collection: { handle: string; title: string } | null
   categories: { handle: string; name: string }[]
@@ -76,12 +75,21 @@ medusaIntegrationTestRunner({
           params: {
             region_id: setup.regionId,
             fields:
-              "+metadata,*categories,*variants.calculated_price,+variants.inventory_quantity," +
+              "*categories,*variants.calculated_price,+variants.inventory_quantity," +
               "+variants.manage_inventory,+variants.allow_backorder",
             ...params,
           },
         })) as { data: { products: StoreProductRow[] } }
         return response.data.products
+      }
+
+      // The standard routes hide metadata; the store reads the garment's through its catalog route.
+      const garmentMetadata = async (handle: string) => {
+        const response = (await api.get(`/store/catalog/products/${handle}`, {
+          headers,
+          params: { region_id: setup.regionId },
+        })) as { data: { product: { metadata: Record<string, unknown> | null } } }
+        return response.data.product.metadata
       }
 
       const productCount = async (handle: string) =>
@@ -244,8 +252,7 @@ medusaIntegrationTestRunner({
         const metadata = { fabric: "Tecido de exemplo", care: "Exemplo", weight_g: 180 }
         const { productId } = await createExample("exemplo-meta", "META", metadata)
 
-        const [product] = await listProducts({ handle: "exemplo-meta" })
-        expect(product?.metadata).toEqual(metadata)
+        expect(await garmentMetadata("exemplo-meta")).toEqual(metadata)
 
         await expect(
           createExample("exemplo-invalido", "INVALIDO", { weight_g: "x" }),
@@ -257,16 +264,14 @@ medusaIntegrationTestRunner({
             input: { products: [{ id: productId, metadata: { length_cm: -1 } }] },
           }),
         ).rejects.toMatchObject({ message: "Invalid product metadata: length_cm" })
-        const [unchanged] = await listProducts({ handle: "exemplo-meta" })
-        expect(unchanged?.metadata).toEqual(metadata)
+        expect(await garmentMetadata("exemplo-meta")).toEqual(metadata)
 
         await expect(
           updateProductsWorkflow(getContainer()).run({
             input: { products: [{ id: productId, metadata: { weight_g: -1 } }] },
           }),
         ).rejects.toMatchObject({ message: "Invalid product metadata: weight_g" })
-        const [restored] = await listProducts({ handle: "exemplo-meta" })
-        expect(restored?.metadata).toEqual(metadata)
+        expect(await garmentMetadata("exemplo-meta")).toEqual(metadata)
       })
 
       it("refuses a SKU already in use by another product, leaving nothing behind", async () => {

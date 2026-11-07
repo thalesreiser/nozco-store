@@ -60,8 +60,8 @@ stays at the boundary, in `apps/storefront/server/utils/store-mappers.ts`.
 1. **Typed metadata validated by a Zod schema in `packages/shared-types` (chosen, as the plan asks):**
    needs no migration, states its units (`weight_g`, `length_cm`), and covers `care`, which Medusa has no
    field for. It is flat because the admin editor cannot edit nested values. Product hooks validate it on
-   every create and update, including the admin's, and undo the change when it is invalid. The cost is
-   that the Store API needs `+metadata` to return it.
+   every create and update, including the admin's, and undo the change when it is invalid. The store
+   reads it through `/store/catalog`; the standard product routes hide metadata (ADR 007).
 2. **Medusa's own columns (`weight`, `length`, `height`, `width`, `material`):** shown as form fields in
    the admin, returned by default and available per variant, but with no stated unit, no `care` field and
    no shared validation. The admin still shows these fields, so whoever fills in products must leave them
