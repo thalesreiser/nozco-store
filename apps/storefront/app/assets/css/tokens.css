@@ -1,0 +1,171 @@
+/* NozCo design tokens (docs/adr/005-visual-direction.md). This is the only file with raw colours.
+   Every text pair is checked by tests/design/contrast.test.ts, and a new colour token fails that test
+   until it is classified there. */
+
+/* Raw greys of the palette: no accent colour. Use the semantic names below, not these. */
+:root {
+  --palette-black: #0d0d0d;
+  --palette-ink: #111111;
+  --palette-white: #ffffff;
+  --palette-grey-100: #f1f1f1;
+  --palette-grey-300: #d6d6d6;
+  --palette-grey-400: #bdbdbd;
+  --palette-grey-500: #767676;
+  --palette-grey-700: #595959;
+}
+
+/* Store ground (white): the page default, for listing, product, cart and checkout. */
+:root,
+.ground-store {
+  color-scheme: light;
+  --background: var(--palette-white);
+  --foreground: var(--palette-ink);
+  --card: var(--palette-white);
+  --card-foreground: var(--palette-ink);
+  --popover: var(--palette-white);
+  --popover-foreground: var(--palette-ink);
+  --primary: var(--palette-black);
+  --primary-foreground: var(--palette-white);
+  --secondary: var(--palette-grey-100);
+  --secondary-foreground: var(--palette-ink);
+  --muted: var(--palette-grey-100);
+  --muted-foreground: var(--palette-grey-700);
+  --accent: var(--palette-grey-100);
+  --accent-foreground: var(--palette-ink);
+  --destructive: var(--palette-black);
+  --destructive-foreground: var(--palette-white);
+  --border: var(--palette-grey-300);
+  --input: var(--palette-grey-500);
+  --ring: var(--palette-black);
+  --link: var(--palette-ink);
+  --link-hover: var(--palette-grey-700);
+  /* Status has no colour of its own: always show it with an icon and text. */
+  --error: var(--palette-ink);
+  --error-surface: var(--palette-grey-100);
+  --success: var(--palette-ink);
+  --success-surface: var(--palette-grey-100);
+}
+
+/* Brand ground (black): header, home highlight, section titles. The same names change value here, so a
+   component works on both grounds; on black, purchase-style actions invert to white. */
+.ground-brand {
+  color-scheme: dark;
+  --background: var(--palette-black);
+  --foreground: var(--palette-white);
+  --card: var(--palette-black);
+  --card-foreground: var(--palette-white);
+  --popover: var(--palette-black);
+  --popover-foreground: var(--palette-white);
+  --primary: var(--palette-white);
+  --primary-foreground: var(--palette-black);
+  --secondary: var(--palette-grey-300);
+  --secondary-foreground: var(--palette-black);
+  --muted: var(--palette-black);
+  --muted-foreground: var(--palette-grey-300);
+  --accent: var(--palette-white);
+  --accent-foreground: var(--palette-black);
+  --destructive: var(--palette-white);
+  --destructive-foreground: var(--palette-black);
+  --border: var(--palette-white);
+  --input: var(--palette-grey-400);
+  --ring: var(--palette-white);
+  --link: var(--palette-white);
+  --link-hover: var(--palette-grey-400);
+  --error: var(--palette-white);
+  --error-surface: var(--palette-black);
+  --success: var(--palette-white);
+  --success-surface: var(--palette-black);
+}
+
+.ground-store,
+.ground-brand {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* No dark mode is planned: `dark:` classes from shadcn-vue must not follow the visitor's system setting. */
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  /* Removes Tailwind's defaults, so bg-red-500, text-white, text-sm or font-medium generate no CSS. */
+  --color-*: initial;
+  --font-*: initial;
+  --font-weight-*: initial;
+  --text-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+
+  --font-display: "Big Shoulders Display", "Arial Narrow", sans-serif;
+  --font-sans: "Archivo", sans-serif;
+
+  --font-weight-regular: 400;
+  --font-weight-emphasis: 600;
+  --font-weight-action: 700;
+  --font-weight-heavy: 900;
+
+  --text-display: 6.5rem;
+  --text-display--line-height: 0.9;
+  --text-heading: 2.5rem;
+  --text-heading--line-height: 1;
+  --text-lead: 1.125rem;
+  --text-lead--line-height: 1.5;
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-action: 0.9375rem;
+  --text-action--line-height: 1.25;
+  --text-note: 0.875rem;
+  --text-note--line-height: 1.4;
+  --text-tag: 0.8125rem;
+  --text-tag--line-height: 1.2;
+
+  --tracking-label: 0.04em;
+
+  /* Named steps; the numeric scale (p-4, h-9) still works through --spacing. */
+  --spacing-page: 3rem;
+  --spacing-hero: 2.5rem;
+  --spacing-section: 2rem;
+  --spacing-inline: 2rem;
+  --spacing-grid: 1.5rem;
+  --spacing-stack: 0.75rem;
+  --spacing-touch: 2.75rem;
+
+  /* Square corners everywhere. The sm to xl names are the ones shadcn-vue components ask for. */
+  --radius-control: 0;
+  --radius-surface: 0;
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-control);
+  --radius-lg: var(--radius-surface);
+  --radius-xl: var(--radius-surface);
+
+  /* Only for what floats above the page. Cards have no outline and no offset shadow, so no token. */
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.16);
+}
+
+/* Inline, so utilities read the variable where they are used and follow the ground. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-error: var(--error);
+  --color-error-surface: var(--error-surface);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+}
