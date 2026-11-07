@@ -34,10 +34,12 @@ defineEmits<{ buy: [] }>()
 </script>
 
 <template>
-  <article class="flex flex-col gap-stack">
+  <article class="@container flex flex-col gap-stack">
     <!-- The link stretches over this block, so the photo and the prices are one big touch target. -->
     <div class="relative flex flex-1 flex-col gap-stack">
-      <div class="relative flex h-64 items-center justify-center bg-muted text-foreground">
+      <div
+        class="relative flex aspect-product items-center justify-center bg-muted text-foreground"
+      >
         <img
           v-if="imageSrc"
           :src="imageSrc"
@@ -52,11 +54,11 @@ defineEmits<{ buy: [] }>()
           fill="none"
           stroke="currentColor"
           stroke-width="2"
-          class="size-32"
+          class="size-1/2"
         >
           <path d="M42 18 18 32l8 22 12-5v53h44V49l12 5 8-22-24-14c-3 9-9 13-18 13s-15-4-18-13Z" />
         </svg>
-        <div class="absolute top-3 left-3">
+        <div class="absolute top-2 left-2 @2xs:top-3 @2xs:left-3">
           <StockBadge v-if="stock === 'out'" status="out" />
           <span
             v-else-if="badge"
@@ -71,7 +73,10 @@ defineEmits<{ buy: [] }>()
           <StockBadge v-else-if="stock === 'low'" status="low" />
         </div>
       </div>
-      <div class="flex items-baseline justify-between gap-4">
+      <!-- Name and price only share a row when the card is wide enough; two per row on a phone is not. -->
+      <div
+        class="flex flex-col gap-1 @2xs:flex-row @2xs:items-baseline @2xs:justify-between @2xs:gap-4"
+      >
         <NuxtLink
           :to="to"
           class="text-body font-emphasis underline-offset-4 after:absolute after:inset-0 hover:underline"
@@ -82,15 +87,16 @@ defineEmits<{ buy: [] }>()
       </div>
       <div
         v-if="note || compareAt"
-        class="flex items-baseline justify-between gap-4 text-note text-muted-foreground"
+        class="flex flex-col gap-1 text-note text-muted-foreground @2xs:flex-row @2xs:items-baseline @2xs:justify-between @2xs:gap-4"
       >
-        <span>{{ note }}</span>
+        <span v-if="note">{{ note }}</span>
         <BasePrice v-if="compareAt" :amount="compareAt" previous />
       </div>
     </div>
     <Button
       size="lg"
       type="button"
+      class="px-2 @2xs:px-8"
       :disabled="stock === 'out'"
       :aria-label="$t('product.buyNamed', { name })"
       @click="$emit('buy')"

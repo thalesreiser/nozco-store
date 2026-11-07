@@ -9,6 +9,7 @@ import ErrorState from "~/components/base/ErrorState.vue"
 import QuantityStepper from "~/components/base/QuantityStepper.vue"
 import StockBadge from "~/components/base/StockBadge.vue"
 import ColourSwatch from "~/components/catalog/ColourSwatch.vue"
+import ListingResults from "~/components/catalog/ListingResults.vue"
 import ProductCard from "~/components/catalog/ProductCard.vue"
 import ProductCardSkeleton from "~/components/catalog/ProductCardSkeleton.vue"
 import SizeSelector from "~/components/catalog/SizeSelector.vue"
@@ -24,6 +25,8 @@ useSeoMeta({ robots: "noindex, nofollow" })
 
 // The gallery tests each component alone, so the store's header and footer stay out of it.
 definePageMeta({ layout: false })
+
+const samePage = () => ({})
 
 const grounds = [
   { id: "store", className: "ground-store", title: "[Fundo branco: loja]" },
@@ -170,6 +173,14 @@ const quantity = ref(1)
           <ProductCard name="Estampa 04" to="#estampa-04" :price="8990" stock="out" />
           <ProductCardSkeleton />
         </div>
+      </section>
+
+      <section data-component="listing-results" class="flex flex-col gap-section">
+        <h3 class="text-lead">ListingResults</h3>
+        <ListingResults loading :products="[]" :count="0" :page="1" :page-to="samePage" />
+        <ListingResults failed :products="[]" :count="0" :page="1" :page-to="samePage" />
+        <ListingResults :products="[]" :count="0" :page="1" :page-to="samePage" />
+        <ListingResults has-filters :products="[]" :count="0" :page="1" :page-to="samePage" />
       </section>
     </div>
   </main>

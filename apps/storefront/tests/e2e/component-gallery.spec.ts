@@ -15,6 +15,7 @@ const components = [
   "size-selector",
   "colour-swatch",
   "product-card",
+  "listing-results",
 ]
 const grounds = ["store", "brand"]
 
