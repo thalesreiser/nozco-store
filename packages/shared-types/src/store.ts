@@ -1,6 +1,7 @@
 // Types shaped like the Medusa v2 Store API: same field names, reduced to what the store uses. One
 // deliberate difference: every amount here is in integer cents (see `Cents`), and the `compare_at_amount`
 // of a price replaces Medusa's `calculated_price.original_amount`, set only when it is above the price.
+import type { StoreProductOrder } from "./catalog.js"
 import type { Cents } from "./index.js"
 
 export interface StoreProductImage {
@@ -35,8 +36,10 @@ export interface StoreProductVariant {
   product_id: string
   title: string
   sku: string | null
-  /** Units available for this variant. */
+  /** Units available for this variant; 0 for a variant whose stock is not tracked. */
   inventory_quantity: number
+  /** Whether it can be bought now. Decide with this: stock is not all that allows a sale. */
+  in_stock: boolean
   /** One value per product option. */
   options: StoreProductOptionValue[]
   /** The gallery for this variant's colour. Variants of one colour share the same images. */
@@ -73,7 +76,8 @@ export interface StoreProductListQuery {
   option_values?: Record<string, string[]>
   min_price?: Cents
   max_price?: Cents
-  order?: "price_asc" | "price_desc"
+  /** Left out, the listing is `newest`. */
+  order?: StoreProductOrder
   limit?: number
   offset?: number
 }
@@ -83,6 +87,25 @@ export interface StoreProductListResponse {
   count: number
   limit: number
   offset: number
+}
+
+export interface StoreProductFacetValue {
+  value: string
+  /** Products that remain when this value is picked, keeping the filters of the other options. */
+  count: number
+}
+
+export interface StoreProductFacet {
+  /** An option title, such as size or colour (`APPAREL_OPTION_TITLES`). */
+  title: string
+  values: StoreProductFacetValue[]
+}
+
+/** What the filter controls offer for the current filters. */
+export interface StoreProductFacets {
+  options: StoreProductFacet[]
+  /** Range of the products' lowest prices, ignoring the price filter; null with no products. */
+  price: { min: Cents; max: Cents } | null
 }
 
 export interface StoreCartLineItem {
