@@ -1,18 +1,36 @@
 import { authenticate, defineMiddlewares } from "@medusajs/framework/http"
-import { cpfPayloadSchema, privacyRequestPayloadSchema } from "@nozco/shared-types"
+import {
+  cartQuantitiesSchema,
+  cpfPayloadSchema,
+  privacyRequestPayloadSchema,
+} from "@nozco/shared-types"
+import { cartErrorHandler } from "./utils/cart-error-handler"
 import { hideCpfInResponses, redactCpfInRequestLine } from "./utils/cpf-privacy"
 import { rateLimit } from "./utils/rate-limit"
-import { validateBody } from "./utils/validate-payload"
+import { checkBody, validateBody } from "./utils/validate-payload"
 
 // Named here as well as by Medusa, because the limits below count the authenticated actor.
 const asCustomer = authenticate("customer", ["session", "bearer"])
 const asOperator = authenticate("user", ["session", "bearer", "api-key"])
+const checkCartQuantities = checkBody(cartQuantitiesSchema, "invalid_quantity")
 
 export default defineMiddlewares({
+  errorHandler: cartErrorHandler,
   routes: [
     { matcher: "/*", middlewares: [redactCpfInRequestLine] },
     { matcher: "/store/carts*", middlewares: [hideCpfInResponses] },
     { matcher: "/store/orders*", middlewares: [hideCpfInResponses] },
+    { matcher: "/store/carts", method: ["POST"], middlewares: [checkCartQuantities] },
+    {
+      matcher: "/store/carts/:id/line-items",
+      method: ["POST"],
+      middlewares: [checkCartQuantities],
+    },
+    {
+      matcher: "/store/carts/:id/line-items/:line_id",
+      method: ["POST"],
+      middlewares: [checkCartQuantities],
+    },
     {
       matcher: "/store/carts/:id/cpf",
       method: ["POST"],
