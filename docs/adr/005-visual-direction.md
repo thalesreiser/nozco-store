@@ -27,6 +27,7 @@ Option D.
 - **Store areas (listing, product, cart, checkout):** white ground, generous space around photos, and no
   outlines or offset shadows on cards.
 - **Palette:** black, white and greys only. No accent colour; purchase buttons are black on white.
+  Amended by [ADR 010](010-accent-colours.md), which adds two accents for small details.
 - **Fonts:** Big Shoulders Display for titles and Archivo for all other text, self-hosted.
 
 The NOZCO wordmark in the mock-up is placeholder text, not a logo. The logo stays open in Q-12.
