@@ -52,8 +52,9 @@ describe("useProducts on the mock source", () => {
     [{ category_handle: "moletons-exemplo" }, ["moletom-ficticio-gama"]],
     [{ option_values: { Cor: ["Branco"] } }, [ALFA]],
     [
+      // Gama has this size and colour, but sold out.
       { option_values: { Cor: ["Cinza"], Tamanho: ["M"] } },
-      ["camiseta-ficticia-beta", "moletom-ficticio-gama"],
+      ["camiseta-ficticia-beta"],
     ],
     [{ option_values: { Cor: ["Branco"], Tamanho: ["XX"] } }, []],
     [{ min_price: 5000, max_price: 6000 }, ["camiseta-ficticia-beta"]],

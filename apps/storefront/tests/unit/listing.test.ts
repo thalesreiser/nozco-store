@@ -226,7 +226,8 @@ describe("listFacets on the mock source", () => {
     })
 
     expect(valuesOf(facets, "Cor")?.map(({ value }) => value)).toEqual(["Branco", "Preto"])
-    expect(valuesOf(facets, "Tamanho")?.map(({ value }) => value)).toEqual(["G", "M", "P"])
+    // G exists in Branco, but sold out.
+    expect(valuesOf(facets, "Tamanho")?.map(({ value }) => value)).toEqual(["M", "P"])
   })
 
   it("keeps the price range when the price filter leaves nothing", async () => {
@@ -245,12 +246,30 @@ describe("listFacets on the mock source", () => {
     expect(facets.price).toBeNull()
   })
 
-  it("still lists a product whose chosen size is sold out, like the API", async () => {
+  it("does not list a product whose chosen size is sold out (ADR 011)", async () => {
     const { products } = await useProducts().listProducts({
       collection_handle: "colecao-exemplo",
       option_values: { Tamanho: ["G"], Cor: ["Branco"] },
     })
 
-    expect(products.map(({ handle }) => handle)).toEqual(["camiseta-ficticia-alfa"])
+    expect(products).toEqual([])
+  })
+
+  it("does not offer a value that only sold-out variants have", async () => {
+    const facets = await useProducts().listFacets({ category_handle: "moletons-exemplo" })
+
+    expect(valuesOf(facets, "Cor")?.map(({ value }) => value)).toEqual(["Preto"])
+  })
+
+  it("lists a fully sold-out product when no size or colour is chosen, but not when one is", async () => {
+    const { listProducts } = useProducts()
+    const handle = "estampa-ficticia-03"
+    const scope = { category_handle: "estampas-exemplo" }
+
+    const all = await listProducts(scope)
+    const filtered = await listProducts({ ...scope, option_values: { Tamanho: ["M"] } })
+
+    expect(all.products.map((product) => product.handle)).toContain(handle)
+    expect(filtered.products.map((product) => product.handle)).not.toContain(handle)
   })
 })

@@ -23,10 +23,15 @@ function sortByQuery(products: StoreProduct[], order: StoreProductListQuery["ord
   if (order === "on_sale") products.sort((a, b) => Number(isOnSale(b)) - Number(isOnSale(a)))
 }
 
+const inStock = (product: StoreProduct) =>
+  product.variants.filter((variant) => variant.inventory_quantity > 0)
+
+/** Size and colour filters match only variants in stock (ADR 011). No filter keeps every variant. */
 function variantsMatching(product: StoreProduct, wanted: Record<string, string[]>) {
   const titles = new Map(product.options.map((option) => [option.id, option.title]))
   const entries = Object.entries(wanted)
-  return product.variants.filter((variant) =>
+  if (entries.length === 0) return product.variants
+  return inStock(product).filter((variant) =>
     entries.every(([title, values]) =>
       variant.options.some(
         (value) => titles.get(value.option_id) === title && values.includes(value.value),
@@ -70,7 +75,11 @@ function facetFor(
   const counts = new Map<string, number>()
   for (const product of products) {
     const optionId = product.options.find((option) => option.title === title)?.id
-    const values = variantsMatching(product, others).flatMap((variant) =>
+    // Picking a value offered here must find something, so a facet counts in-stock variants only.
+    const matching = Object.keys(others).length
+      ? variantsMatching(product, others)
+      : inStock(product)
+    const values = matching.flatMap((variant) =>
       variant.options.filter((value) => value.option_id === optionId).map((value) => value.value),
     )
     for (const value of new Set(values)) counts.set(value, (counts.get(value) ?? 0) + 1)
