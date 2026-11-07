@@ -7,13 +7,13 @@ the architecture or the interface, an ADR.
 
 | ID | Question | Blocks | Status |
 |---|---|---|---|
-| Q-01 | How will NF-e be issued: invoicing API/ERP (Focus NFe, Bling, Tiny, eNotas) or manually by the accountant? | BE-08.1 | Open |
+| Q-01 | How will NF-e be issued: invoicing API/ERP (Focus NFe, Bling, Tiny, eNotas) or manually by the accountant? | BE-08.1 | Partly answered on 2026-11-07: integrated system, provider open ([ADR 012](adr/012-operations-and-card-decisions.md)) |
 | Q-02 | Monthly budget for infrastructure and services. The new stack needs API, worker, Postgres and Redis running all the time | EST-04.2 | Open |
-| Q-03 | Garment types and size grid at launch (P–GG? XGG? oversized? babylook?) and fabric specs | BE-02.1 | Open |
-| Q-04 | What happens when a payment is approved and the last unit has already been sold: automatic refund, or contact the customer and offer an exchange? For how long can a Pix stay open (30 min minimum)? And a boleto? | BE-05.4 | Open |
-| Q-05 | Minimum installment value; do installments apply to every product? | BE-05.3 | Open |
-| Q-06 | Free-shipping threshold or other promotions at launch | BE-04.2 | Open |
-| Q-07 | Who runs the back office day to day, and with which roles? | BE-01.3 | Open |
+| Q-03 | Garment types and size grid at launch (P–GG? XGG? oversized? babylook?) and fabric specs | BE-02.1 | Partly answered on 2026-11-07: sizes P, M, G, GG, XGG; garment types and fabric open ([ADR 012](adr/012-operations-and-card-decisions.md)) |
+| Q-04 | What happens when a payment is approved and the last unit has already been sold: automatic refund, or contact the customer and offer an exchange? For how long can a Pix stay open (30 min minimum)? And a boleto? | BE-05.4 | Partly answered on 2026-11-07: contact and offer exchange or refund; deadlines open ([ADR 012](adr/012-operations-and-card-decisions.md)) |
+| Q-05 | Minimum installment value; do installments apply to every product? | BE-05.3 | Partly answered on 2026-11-07: installments with a minimum; values open ([ADR 012](adr/012-operations-and-card-decisions.md)) |
+| Q-06 | Free-shipping threshold or other promotions at launch | BE-04.2 | Partly answered on 2026-11-07: launch coupon; percentage and code open ([ADR 012](adr/012-operations-and-card-decisions.md)) |
+| Q-07 | Who runs the back office day to day, and with which roles? | BE-01.3 | Decided on 2026-11-07: Thales and people he fully trusts, option C ([ADR 012](adr/012-operations-and-card-decisions.md)) |
 | Q-08 | Product photos: who shoots them, format and number per product and colour | BE-02.3 | Open |
 | Q-09 | Initial catalog size (number of designs and variants) | BE-02.3 | Open |
 | Q-10 | Shipping origin address, package sizes and carriers to offer | BE-06.1 | Open |
