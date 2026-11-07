@@ -62,6 +62,30 @@ medusaIntegrationTestRunner({
           expect(Number(refused.headers["retry-after"])).toBeGreaterThan(0)
         }
       })
+
+      it("limits the home content route too", async () => {
+        const container = getContainer()
+        const setup = await setupStore(container)
+        const [key] = await queryList<{ token: string }>(container, {
+          entity: "api_key",
+          fields: ["token"],
+          filters: { id: setup.publishableApiKeyId },
+        })
+        const read = () =>
+          api.get("/store/content/home", {
+            headers: { "x-publishable-api-key": key?.token ?? "" },
+            params: {},
+            validateStatus,
+          })
+
+        // Counters may be in Redis, shared with other specs, so the limit may be reached earlier.
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          expect([200, 429]).toContain((await read()).status)
+        }
+        const refused = await read()
+        expect(refused.status).toBe(429)
+        expect(refused.data).toEqual({ code: "rate_limited", message: expect.any(String) })
+      })
     })
 
     const login = (email: string) =>

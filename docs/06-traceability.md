@@ -5,7 +5,7 @@ delivered it. Updated in every PR (Definition of Done).
 
 | Req. | Task(s) | Tests | PR | Status |
 |---|---|---|---|---|
-| RF-01 | BE-02.5, FE-11.1 | | | Planned |
+| RF-01 | BE-02.5, FE-11.1 | BE-02.5: `content/__tests__/home.unit.spec.ts`, `packages/shared-types/tests/content.test.ts`, `integration-tests/http/home-content.spec.ts` (banners and announcements for the store) | BE-02.5 PR | In progress |
 | RF-02 | BE-02.4, FE-04.1a, FE-04.1b | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `packages/shared-types/tests/catalog.test.ts`, `apps/storefront/tests/server/product-mappers.test.ts`, `integration-tests/http/store-catalog.spec.ts` (filters, facets, sorting, availability, privacy). FE-04.1a: `apps/storefront/tests/unit/listing.test.ts`, `tests/components/listing.test.ts`, `tests/e2e/listing.spec.ts` | BE-02.4 PR, FE-04.1a PR | In progress |
 | RF-03 | BE-02.1, FE-04.2a, FE-04.2b | BE-02.1: `apparel/__tests__/variants.unit.spec.ts`, `packages/shared-types/tests/apparel.test.ts`, `integration-tests/http/apparel-product.spec.ts` (variants, stock and availability, compare-at price, fabric metadata) | BE-02.1 PR | In progress |
 | RF-04 | BE-02.4, FE-04.3 | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `integration-tests/http/store-catalog.spec.ts` (text search) | BE-02.4 PR | In progress |
@@ -19,7 +19,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-12 | BE-07.3, FE-06.4, FE-07.1 | | | Planned |
 | RF-13 | BE-07.2, FE-07.2 | | | Planned |
 | RF-14 | BE-01.3 | | | Planned |
-| RF-15 | BE-02.1, BE-02.2, BE-02.3, BE-02.5 | BE-02.1: `integration-tests/http/apparel-product.spec.ts` (categories, collections and types through Medusa's models) | BE-02.1 PR | In progress |
+| RF-15 | BE-02.1, BE-02.2, BE-02.3, BE-02.5 | BE-02.1: `integration-tests/http/apparel-product.spec.ts` (categories, collections and types through Medusa's models); BE-02.5: `integration-tests/http/home-content.spec.ts` (banner and announcement management) | BE-02.1 PR, BE-02.5 PR | In progress |
 | RF-16 | BE-06.2, BE-07.1, BE-07.4 | | | Planned |
 | RF-17 | BE-07.2 | | | Planned |
 | RF-18 | BE-08.1 | | | Planned |

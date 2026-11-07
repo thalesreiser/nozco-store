@@ -54,6 +54,7 @@ export default defineMiddlewares({
       middlewares: [hidePrivateProductFields],
     })),
     { matcher: "/store/catalog*", method: ["GET"], middlewares: [rateLimit("catalog")] },
+    { matcher: "/store/content*", method: ["GET"], middlewares: [rateLimit("content")] },
     { matcher: "/store/carts", method: ["POST"], middlewares: [checkCartQuantities] },
     {
       matcher: "/store/carts/:id/line-items",
