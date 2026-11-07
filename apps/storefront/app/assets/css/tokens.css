@@ -2,7 +2,7 @@
    Every text pair is checked by tests/design/contrast.test.ts, and a new colour token fails that test
    until it is classified there. */
 
-/* Raw greys of the palette: no accent colour. Use the semantic names below, not these. */
+/* Raw palette: greys plus the two accents of ADR 010. Use the semantic names below, not these. */
 :root {
   --palette-black: #0d0d0d;
   --palette-ink: #111111;
@@ -12,6 +12,8 @@
   --palette-grey-400: #bdbdbd;
   --palette-grey-500: #767676;
   --palette-grey-700: #595959;
+  --palette-silver: #c9ced6;
+  --palette-amber: #f2b01e;
 }
 
 /* Store ground (white): the page default, for listing, product, cart and checkout. */
@@ -44,6 +46,10 @@
   --error-surface: var(--palette-grey-100);
   --success: var(--palette-ink);
   --success-surface: var(--palette-grey-100);
+  /* ADR 010: small details only. Neither reads as text on white, so neither is a text colour here. */
+  --highlight: var(--palette-amber);
+  --highlight-foreground: var(--palette-black);
+  --sheen: var(--palette-silver);
 }
 
 /* Brand ground (black): header, home highlight, section titles. The same names change value here, so a
@@ -75,6 +81,9 @@
   --error-surface: var(--palette-black);
   --success: var(--palette-white);
   --success-surface: var(--palette-black);
+  --highlight: var(--palette-amber);
+  --highlight-foreground: var(--palette-black);
+  --sheen: var(--palette-silver);
 }
 
 .ground-store,
@@ -168,4 +177,7 @@
   --color-error-surface: var(--error-surface);
   --color-success: var(--success);
   --color-success-surface: var(--success-surface);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-sheen: var(--sheen);
 }

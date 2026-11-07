@@ -60,7 +60,12 @@ defineEmits<{ buy: [] }>()
           <StockBadge v-if="stock === 'out'" status="out" />
           <span
             v-else-if="badge"
-            class="inline-block bg-primary px-2 py-1 text-tag font-action text-primary-foreground"
+            class="inline-block px-2 py-1 text-tag font-action"
+            :class="
+              compareAt
+                ? 'bg-highlight text-highlight-foreground'
+                : 'bg-primary text-primary-foreground'
+            "
             >{{ badge }}</span
           >
           <StockBadge v-else-if="stock === 'low'" status="low" />
