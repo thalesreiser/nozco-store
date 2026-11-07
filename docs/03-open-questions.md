@@ -29,7 +29,7 @@ the architecture or the interface, an ADR.
 | DEC-03 | Checkout on a single page or in steps | Mock up both on mobile before choosing. | FE-06.1 | Open |
 | DEC-04 | Analytics tool and advertising pixel. The tabacaria banned pixels because of tobacco ad rules; that reason does not apply to apparel | PostHog for the funnel, plus a Meta pixel behind consent only if paid ads are planned. | FE-08.1 | Open |
 | DEC-05 | Guest checkout or account required | Guest checkout, with an optional account later. | BE-03.2, FE-03.1, FE-06.1 | Open |
-| DEC-06 | Home blocks and their order | Decide with the mock-ups in FE-12.3. | BE-02.5, FE-11.1 | Open |
+| DEC-06 | Home blocks and their order | Option A: banner, value-proposition strip, new arrivals, collections ([ADR 008](adr/008-home-blocks.md)) | BE-02.5, FE-11.1 | Decided on 2026-11-07 |
 | DEC-07 | Listing layout: filters in a sidebar or a top bar, and cards per row on mobile | Decide with the mock-ups in FE-12.3. | FE-04.1a | Open |
 | DEC-08 | Repository visibility | Public with the proprietary licence ([ADR 003](adr/003-public-repository.md)) | EST-03.1 | Decided on 2026-11-05 |
 | DEC-09 | Confirm on-site payment (ADR 002): card tokenised in the browser instead of the hosted Checkout Pro | Accept, as it matches the tabacaria experience. | BE-05.1 | Open |
