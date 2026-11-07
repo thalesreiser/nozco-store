@@ -1,4 +1,4 @@
-import { assertApparelMetadata } from "../metadata"
+import { assertApparelMetadata, invalidApparelMetadataKeys } from "../metadata"
 
 describe("assertApparelMetadata", () => {
   it("accepts missing metadata and unrelated keys", () => {
@@ -10,5 +10,18 @@ describe("assertApparelMetadata", () => {
     expect(() => assertApparelMetadata({ weight_g: "valor-secreto" })).toThrow(
       "Invalid product metadata: weight_g",
     )
+  })
+})
+
+describe("invalidApparelMetadataKeys", () => {
+  it("lists only the keys that fail the schema", () => {
+    expect(
+      invalidApparelMetadataKeys({ fabric: "x", other: "y", weight_g: -1, length_cm: "z" }),
+    ).toEqual(["weight_g", "length_cm"])
+  })
+
+  it("is empty for valid or missing metadata", () => {
+    expect(invalidApparelMetadataKeys({ weight_g: 180 })).toEqual([])
+    expect(invalidApparelMetadataKeys(null)).toEqual([])
   })
 })

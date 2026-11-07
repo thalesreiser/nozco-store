@@ -259,6 +259,14 @@ medusaIntegrationTestRunner({
         ).rejects.toMatchObject({ message: "Invalid product metadata: length_cm" })
         const [unchanged] = await listProducts({ handle: "exemplo-meta" })
         expect(unchanged?.metadata).toEqual(metadata)
+
+        await expect(
+          updateProductsWorkflow(getContainer()).run({
+            input: { products: [{ id: productId, metadata: { weight_g: -1 } }] },
+          }),
+        ).rejects.toMatchObject({ message: "Invalid product metadata: weight_g" })
+        const [restored] = await listProducts({ handle: "exemplo-meta" })
+        expect(restored?.metadata).toEqual(metadata)
       })
 
       it("refuses a SKU already in use by another product, leaving nothing behind", async () => {
