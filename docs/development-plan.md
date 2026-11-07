@@ -12,10 +12,10 @@ launch; **C** tasks are backlog.
 | Track | Tasks | Total | Needed for launch (M) |
 |---|---|---|---|
 | Structural | 16 | 49 h | 49 h |
-| Backend (Medusa v2) | 30 | 103 h | 93 h |
-| Frontend (Nuxt 4) | 32 | 119 h | 108 h |
+| Backend (Medusa v2) | 33 | 109 h | 99 h |
+| Frontend (Nuxt 4) | 33 | 122 h | 111 h |
 | Post-launch backlog | 2 | 5 h | 0 h |
-| **Total** | **80** | **276 h** | **250 h** |
+| **Total** | **84** | **285 h** | **259 h** |
 
 ## Process
 - **Definition of Ready:** requirement and acceptance criterion written, dependencies done (tasks,
@@ -116,7 +116,7 @@ launch; **C** tasks are backlog.
 - **BE-01.2** Brazil region in BRL · loja-online sales channel and publishable key · Stock location · Idempotent script and integration test
 - **BE-01.3** Check 2FA and role support in the current Medusa version · Options: extension, proxy-level access control or reduced requirement · ADR with the decision
 
-### BE-02 - Apparel catalog (15 h)
+### BE-02 - Apparel catalog (18 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
@@ -125,14 +125,16 @@ launch; **C** tasks are backlog.
 | BE-02.3 | Catalog seed and import | RF-15 | M | 2 h | BE-02.1, Q-08, Q-09 |
 | BE-02.4 | Store API for listing and search | RF-02, RF-04 | M | 5 h | BE-02.1 |
 | BE-02.5 | Home content | RF-01, RF-15 | M | 3 h | BE-01.1, DEC-06 |
+| BE-02.6 | Catalog decisions of ADR 011 | RF-02, RF-03 | M | 3 h | BE-02.4 |
 
 - **BE-02.1** Size and colour options; one variant and SKU per combination · Stock per variant · Compare-at price through price lists · Categories and collections · Fabric, care, weight and dimensions as typed metadata · ADR on the model
 - **BE-02.2** S3 file module pointing at R2 · Upload from the admin · Images per colour
 - **BE-02.3** Fictional development seed · Spreadsheet import of the real catalog
 - **BE-02.4** Map what the standard Store API already covers · Custom routes for size and colour filters and facets · Best-seller and on-sale sorting · Availability per variant · Text search
 - **BE-02.5** Content module for banners and announcement bar · Admin screen · Store API route
+- **BE-02.6** Size and colour filters match only variants in stock · Public stock capped at 10 · Colour value for the swatch
 
-### BE-03 - Customers and LGPD (17 h)
+### BE-03 - Customers and LGPD (18 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
@@ -141,22 +143,26 @@ launch; **C** tasks are backlog.
 | BE-03.3 | LGPD requests | RNF-04 | M | 3 h | BE-03.1 |
 | BE-03.4 | Protected CPF storage | RF-08, RNF-02, RNF-04 | M | 6 h | BE-03.1 |
 | BE-03.5 | CPF mask in the admin | RF-08, RNF-02, RNF-04 | M | 3 h | BE-03.4, BE-01.3 |
+| BE-03.6 | Reason for refusing a privacy request | RNF-04 | M | 1 h | BE-03.3 |
 
 - **BE-03.1** CPF field and check-digit validation · Shared Zod schema · Masking in logs
 - **BE-03.2** E-mail and password · Password reset by e-mail · Login rate limit
 - **BE-03.3** Data export · Anonymisation that keeps fiscal records · Request log
 - **BE-03.4** Own module linked to cart and order · AES-256-GCM with the key outside the repository · Key rotation and key validated at boot · Migration of any CPF in metadata · BE-03.3 adjusted to the new storage · Integration tests in CI. No real customer data before this task.
 - **BE-03.5** Mask on admin screens and API responses · Saving never overwrites the real value · Access to the full CPF logged, if allowed · Integration tests in CI
+- **BE-03.6** Reason stored on refusal · Shown to the customer · Migration and tests
 
-### BE-04 - Cart and promotions (4 h)
+### BE-04 - Cart and promotions (6 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
 | BE-04.1 | Cart rules | RF-05 | M | 2 h | BE-02.1 |
 | BE-04.2 | Coupons and free shipping | RF-07 | S | 2 h | BE-04.1, Q-06 |
+| BE-04.3 | Stock check before payment | RF-05, RN-03 | M | 2 h | BE-04.1, BE-05.1 |
 
 - **BE-04.1** Stock validation by variant · Typed errors · Integration tests
 - **BE-04.2** Promotion module configuration · Validity and usage limits · Free-shipping rule
+- **BE-04.3** Stock check before payment · Typed error · The line stays in the cart with a warning · Integration tests
 
 ### BE-05 - Payments (20 h)
 
@@ -338,17 +344,19 @@ launch; **C** tasks are backlog.
 
 - **FE-10.1** Nitro preset for Cloudflare · Preview per PR · Staging and production environments · Runtime variables
 
-### FE-11 - Home, global layout and institutional pages (13 h)
+### FE-11 - Home, global layout and institutional pages (16 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
 | FE-11.1 | Home page | RF-01 | M | 5 h | FE-11.3, FE-12.1, BE-02.5, DEC-06 |
 | FE-11.2 | Institutional and error pages | RF-20, RST-01 | M | 3 h | FE-11.3, EST-05.1 |
 | FE-11.3 | Global layout | RF-19, RF-20, RST-01 | M | 5 h | FE-12.1 |
+| FE-11.4 | Layout on a phone (ADR 011) | RF-19, RF-20, RST-01 | M | 3 h | FE-11.3 |
 
 - **FE-11.1** Hero and banners · Value-proposition strip · Featured collections · Product grid
 - **FE-11.2** @nuxt/content pages · About, FAQ, contact, shipping, exchanges and legal texts · 404 and 500 pages
 - **FE-11.3** Announcement bar · Header with category menu, search and cart · Mobile menu · Footer with legal data, payment methods and social links · WhatsApp button · Newsletter form
+- **FE-11.4** Sticky logo row and one-line announcement · Fixed WhatsApp button · Search icon in the header · Legal data required in production
 
 ### FE-12 - Design system (12 h)
 

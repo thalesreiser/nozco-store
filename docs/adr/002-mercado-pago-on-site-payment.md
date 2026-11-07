@@ -1,6 +1,6 @@
 # 002 - On-site payment with Mercado Pago
 
-- **Status:** proposed (DEC-09, awaiting Thales)
+- **Status:** accepted on 2026-11-07 by Thales Reiser (DEC-09, [ADR 011](011-store-decisions-2026-11-07.md))
 - **Date:** 2026-11-05
 
 ## Context
