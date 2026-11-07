@@ -17,6 +17,13 @@
     @apply bg-background text-foreground;
   }
 
+  /* One visible focus for everything: --ring is the ground's strongest colour, and the gap keeps the
+     outline readable on a filled control of that same colour. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
   h1,
   h2,
   h3 {
