@@ -9,7 +9,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-02 | BE-02.4, FE-04.1a, FE-04.1b | | | Planned |
 | RF-03 | BE-02.1, FE-04.2a, FE-04.2b | BE-02.1: `apparel/__tests__/variants.unit.spec.ts`, `packages/shared-types/tests/apparel.test.ts`, `integration-tests/http/apparel-product.spec.ts` (variants, stock and availability, compare-at price, fabric metadata) | BE-02.1 PR | In progress |
 | RF-04 | BE-02.4, FE-04.3 | | | Planned |
-| RF-05 | BE-04.1, FE-05.1a, FE-05.1b | | | Planned |
+| RF-05 | BE-04.1, FE-05.1a, FE-05.1b | BE-04.1: `lib/__tests__/cart-errors.unit.spec.ts`, `lib/__tests__/cart-stock.unit.spec.ts`, `integration-tests/http/cart-rules.spec.ts` | BE-04.1: #25 | In progress |
 | RF-06 | BE-06.1, FE-05.2 | | | Planned |
 | RF-07 | BE-04.2, FE-05.2 | | | Planned |
 | RF-08 | BE-03.1, BE-03.4, BE-03.5, FE-06.1 | BE-03.1: `packages/shared-types/tests/cpf.test.ts` (check digits, shared schema, mask); `integration-tests/http/cart-cpf.spec.ts` (invalid CPF rejected end to end) | BE-03.1 PR | In progress |
