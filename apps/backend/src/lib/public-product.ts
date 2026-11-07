@@ -10,6 +10,10 @@ const PRIVATE_KEYS = new Set([
   "prices",
   "inventory_items",
   "location_levels",
+  "ean",
+  "upc",
+  "hs_code",
+  "mid_code",
 ])
 
 function strip(value: unknown): unknown {

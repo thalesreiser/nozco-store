@@ -1,6 +1,6 @@
 import type { MedusaNextFunction, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import { z } from "zod"
-import { parsePayload, validateBody } from "../validate-payload"
+import { checkBody, parsePayload, validateBody } from "../validate-payload"
 
 const schema = z.object({
   email: z.email(),
@@ -80,5 +80,34 @@ describe("validateBody", () => {
     expect(Object.keys(body).sort()).toEqual(["code", "message"])
     expect(body.code).toBe("invalid_payload")
     expect(next).not.toHaveBeenCalled()
+  })
+})
+
+describe("checkBody", () => {
+  const run = (body: unknown) => {
+    const req = { body } as MedusaRequest
+    const res = fakeResponse()
+    const next = jest.fn() as jest.Mock & MedusaNextFunction
+    checkBody(schema, "invalid_example")(req, res, next)
+    return { req, res, next }
+  }
+
+  it("lets a valid body through without touching the validated body", () => {
+    const { req, res, next } = run(valid)
+
+    expect(next).toHaveBeenCalledTimes(1)
+    expect(res.status).not.toHaveBeenCalled()
+    expect(req.validatedBody).toBeUndefined()
+  })
+
+  it("answers 400 under the given code and stops the request", () => {
+    const { res, next } = run({ email: "nope", items: [] })
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.status).toHaveBeenCalledWith(400)
+    expect(res.json).toHaveBeenCalledWith({
+      code: "invalid_example",
+      message: expect.stringMatching(/^email: /),
+    })
   })
 })

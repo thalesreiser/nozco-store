@@ -287,6 +287,42 @@ medusaIntegrationTestRunner({
         }
       })
 
+      it("keeps a cost in metadata out of the other standard routes", async () => {
+        const container = getContainer()
+        const { result: categories } = await createProductCategoriesWorkflow(container).run({
+          input: {
+            product_categories: [
+              { name: "Categoria", handle: "cat-custo", is_active: true, metadata: { cost: 1 } },
+            ],
+          },
+        })
+        const { result: collections } = await createCollectionsWorkflow(container).run({
+          input: {
+            collections: [{ title: "Coleção", handle: "col-custo", metadata: { cost: 2 } }],
+          },
+        })
+        const { productId } = await createProduct("custo-outras", {
+          product: { category_ids: [categories[0]?.id ?? ""], collection_id: collections[0]?.id },
+        })
+
+        const answers = [
+          await get<unknown>("/store/collections", { fields: "+metadata" }),
+          await get<unknown>("/store/product-categories", { fields: "+metadata" }),
+          await get<unknown>("/store/product-variants", {
+            product_id: productId,
+            fields: "+metadata,+barcode,+ean,+upc",
+          }),
+        ]
+        for (const answer of answers) {
+          const body = JSON.stringify(answer.data)
+
+          expect(answer.status).toBe(200)
+          expect(body).toContain('"id"')
+          expect(body).not.toMatch(/"(metadata|barcode|ean|upc|hs_code|mid_code)"/)
+          expect(body).not.toContain("cost")
+        }
+      })
+
       it("exposes nothing private", async () => {
         const container = getContainer()
         const { result: categories } = await createProductCategoriesWorkflow(container).run({

@@ -32,7 +32,10 @@ Thales chose to hide the fields and to add the limit.
 
 The fields are stripped from the response rather than refused in `fields`, because refusing would miss
 what the defaults already return. The keys are removed at any depth: `metadata`, `external_id`, `barcode`,
-`prices`, `inventory_items` and `location_levels`.
+`ean`, `upc`, `hs_code`, `mid_code`, `prices`, `inventory_items` and `location_levels`.
+
+The rule covers `/store/products`, `/store/product-variants`, `/store/product-categories`,
+`/store/product-tags`, `/store/product-types` and `/store/collections`.
 
 The rule is `catalog`, shared by the three routes: 600 requests per address per minute by default, set by
 `RATE_LIMIT_CATALOG_MAX_PER_IP` and `RATE_LIMIT_CATALOG_WINDOW_SECONDS`.
@@ -41,8 +44,8 @@ The rule is `catalog`, shared by the three routes: 600 requests per address per 
 
 - Garment metadata reaches the store only through `/store/catalog`, which returns the fields of
   `apparelMetadataSchema` and nothing else. `apparel-product.spec.ts` now reads it there.
-- Other standard routes are not covered: `/store/product-variants`, `/store/collections` and
-  `/store/product-categories` list some of these fields too.
+- A later Medusa upgrade may add store routes that return products. They need adding to the list in
+  `apps/backend/src/api/middlewares.ts`.
 - Medusa sees the storefront Worker's address (see `apps/storefront/server/utils/medusa.ts`), so requests
   through one Worker address share one counter until that pending decision is taken. The default is high
   for this reason.

@@ -12,5 +12,6 @@ export interface Money {
 export type * from "./store.js"
 export * from "./apparel.js"
 export * from "./catalog.js"
+export * from "./cart.js"
 export * from "./cpf.js"
 export * from "./privacy.js"

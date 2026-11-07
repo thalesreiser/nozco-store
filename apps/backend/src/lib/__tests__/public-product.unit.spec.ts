@@ -13,6 +13,10 @@ describe("withoutPrivateProductFields", () => {
             {
               id: "variant_1",
               barcode: "000",
+              ean: "000",
+              upc: "000",
+              hs_code: "000",
+              mid_code: "000",
               metadata: { cost: 2 },
               prices: [{ amount: 1 }],
               inventory_items: [{ inventory: { location_levels: [{ stocked_quantity: 9 }] } }],
