@@ -1,4 +1,9 @@
-import type { MedusaNextFunction, MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+import type {
+  AuthenticatedMedusaRequest,
+  MedusaNextFunction,
+  MedusaRequest,
+  MedusaResponse,
+} from "@medusajs/framework/http"
 import type { Logger } from "@medusajs/framework/types"
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils"
 import { Redis } from "ioredis"
@@ -83,7 +88,10 @@ export async function applyRateLimit(
     rule,
     policy: config.policies[rule],
     ip: req.ip,
-    identifier: accountIdentifier(req.body),
+    // On an authenticated route the session names the account; a body is the client's to vary.
+    identifier:
+      (req as Partial<AuthenticatedMedusaRequest>).auth_context?.actor_id ??
+      accountIdentifier(req.body),
   })
   if (decision.allowed) {
     next()

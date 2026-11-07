@@ -24,8 +24,8 @@ the architecture or the interface, an ADR.
 
 | ID | Decision | Recommendation | Blocks | Status |
 |---|---|---|---|---|
-| DEC-01 | Visual tokens within black, white and grey: fonts, and whether one accent colour is used for purchase buttons | Decide after the brand guide (FE-12.2), comparing mock-ups with and without an accent. | FE-01.2 | Open |
-| DEC-02 | Base component style: hard outlines and offset shadows, clean surfaces, or sticker/stencil | Compare three directions on one mock-up page, as done for the tabacaria. | FE-12.1 | Open |
+| DEC-01 | Visual tokens: black, white and greys, no accent colour; Big Shoulders Display and Archivo | [ADR 005](adr/005-visual-direction.md) | FE-01.2 | Decided on 2026-11-06 |
+| DEC-02 | Base component style: mix D, brand of A with the store of B | [ADR 005](adr/005-visual-direction.md) | FE-12.1 | Decided on 2026-11-06 |
 | DEC-03 | Checkout on a single page or in steps | Mock up both on mobile before choosing. | FE-06.1 | Open |
 | DEC-04 | Analytics tool and advertising pixel. The tabacaria banned pixels because of tobacco ad rules; that reason does not apply to apparel | PostHog for the funnel, plus a Meta pixel behind consent only if paid ads are planned. | FE-08.1 | Open |
 | DEC-05 | Guest checkout or account required | Guest checkout, with an optional account later. | BE-03.2, FE-03.1, FE-06.1 | Open |

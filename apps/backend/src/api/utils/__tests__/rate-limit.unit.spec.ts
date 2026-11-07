@@ -81,6 +81,32 @@ describe("applyRateLimit", () => {
     }
   })
 
+  it("counts the authenticated actor, whatever the body says", async () => {
+    const { config } = setup()
+    const sendAs = async (actorId: string, email: string) => {
+      const res = { setHeader: jest.fn(), status: jest.fn().mockReturnThis(), json: jest.fn() }
+      const next = jest.fn()
+      const req = {
+        ip: "203.0.113.2",
+        params: {},
+        body: { email },
+        auth_context: { actor_id: actorId },
+      } as unknown as MedusaRequest
+      await applyRateLimit(
+        "privacy_read",
+        config,
+        req,
+        res as unknown as MedusaResponse,
+        next as unknown as MedusaNextFunction,
+      )
+      return next
+    }
+
+    expect(await sendAs("cus_1", "a@example.com")).toHaveBeenCalledTimes(1)
+    expect(await sendAs("cus_1", "b@example.com")).not.toHaveBeenCalled()
+    expect(await sendAs("cus_2", "b@example.com")).toHaveBeenCalledTimes(1)
+  })
+
   it("does nothing when switched off", async () => {
     const { config } = setup(false)
     await send(config)
