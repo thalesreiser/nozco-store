@@ -26,6 +26,14 @@ export default defineConfig({
       NUXT_PUBLIC_PUBLISHABLE_KEY: process.env.NUXT_PUBLIC_PUBLISHABLE_KEY ?? "pk_e2e_placeholder",
       NUXT_PUBLIC_APP_ENV: process.env.NUXT_PUBLIC_APP_ENV ?? "preview",
       NUXT_PUBLIC_DATA_SOURCE: process.env.NUXT_PUBLIC_DATA_SOURCE ?? "api",
+      // Fictional store details, so the footer shows every element (tests/e2e/global-layout.spec.ts).
+      NUXT_PUBLIC_WHATSAPP_NUMBER: "5500000000000",
+      NUXT_PUBLIC_LEGAL_NAME: "[Razão social fictícia]",
+      NUXT_PUBLIC_CNPJ: "00.000.000/0000-00",
+      NUXT_PUBLIC_LEGAL_ADDRESS: "[Rua de Exemplo, 100, Cidade Exemplo]",
+      NUXT_PUBLIC_CONTACT_EMAIL: "contato@example.com",
+      NUXT_PUBLIC_SOCIAL_LINKS: "[Rede A]|https://example.com/a,[Rede B]|https://example.com/b",
+      NUXT_PUBLIC_PAYMENT_METHODS: "[Forma de pagamento A],[Forma de pagamento B]",
     },
   },
 })

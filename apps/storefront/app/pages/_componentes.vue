@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { createError, useRuntimeConfig, useSeoMeta } from "#imports"
+import { createError, definePageMeta, useRuntimeConfig, useSeoMeta } from "#imports"
 import { GALLERY_MARKER, isGalleryAllowedIn } from "#shared/gallery"
 import BasePrice from "~/components/base/BasePrice.vue"
 import BaseSkeleton from "~/components/base/BaseSkeleton.vue"
@@ -21,6 +21,9 @@ if (!isGalleryAllowedIn(useRuntimeConfig().public.appEnv)) {
   throw createError({ statusCode: 404, fatal: true })
 }
 useSeoMeta({ robots: "noindex, nofollow" })
+
+// The gallery tests each component alone, so the store's header and footer stay out of it.
+definePageMeta({ layout: false })
 
 const grounds = [
   { id: "store", className: "ground-store", title: "[Fundo branco: loja]" },
