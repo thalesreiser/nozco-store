@@ -1,8 +1,8 @@
 # 004 - Apparel product model
 
-- **Status:** proposed
+- **Status:** accepted
 - **Date:** 2026-11-06
-- **Decided by:** pending, Thales Reiser
+- **Decided by:** Thales Reiser, on 2026-11-07
 - **Reference:** Q-03, BE-02.1
 
 ## Context
@@ -75,8 +75,8 @@ has `title` where `StoreProductTaxon` has `name`, so BE-02.4 maps that field.
 
 ## Decision
 
-The options marked "chosen", proposed by the BE-02.1 implementation and awaiting Thales. The answer to
-Q-03 only adds data, unless it asks for a rule that a grid must be the same across products.
+Thales accepted the options marked "chosen" on 2026-11-07, including weight and dimensions in metadata.
+The answer to Q-03 only adds data, unless it asks for a rule that a grid must be the same across products.
 
 ## Consequences
 
