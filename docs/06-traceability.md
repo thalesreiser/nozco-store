@@ -6,9 +6,9 @@ delivered it. Updated in every PR (Definition of Done).
 | Req. | Task(s) | Tests | PR | Status |
 |---|---|---|---|---|
 | RF-01 | BE-02.5, FE-11.1 | | | Planned |
-| RF-02 | BE-02.4, FE-04.1a, FE-04.1b | | | Planned |
-| RF-03 | BE-02.1, FE-04.2a, FE-04.2b | | | Planned |
-| RF-04 | BE-02.4, FE-04.3 | | | Planned |
+| RF-02 | BE-02.4, FE-04.1a, FE-04.1b | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `packages/shared-types/tests/catalog.test.ts`, `apps/storefront/tests/server/product-mappers.test.ts`, `integration-tests/http/store-catalog.spec.ts` (filters, facets, sorting, availability, privacy) | BE-02.4 PR | In progress |
+| RF-03 | BE-02.1, FE-04.2a, FE-04.2b | BE-02.1: `apparel/__tests__/variants.unit.spec.ts`, `packages/shared-types/tests/apparel.test.ts`, `integration-tests/http/apparel-product.spec.ts` (variants, stock and availability, compare-at price, fabric metadata) | BE-02.1 PR | In progress |
+| RF-04 | BE-02.4, FE-04.3 | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `integration-tests/http/store-catalog.spec.ts` (text search) | BE-02.4 PR | In progress |
 | RF-05 | BE-04.1, FE-05.1a, FE-05.1b | | | Planned |
 | RF-06 | BE-06.1, FE-05.2 | | | Planned |
 | RF-07 | BE-04.2, FE-05.2 | | | Planned |
@@ -19,7 +19,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RF-12 | BE-07.3, FE-06.4, FE-07.1 | | | Planned |
 | RF-13 | BE-07.2, FE-07.2 | | | Planned |
 | RF-14 | BE-01.3 | | | Planned |
-| RF-15 | BE-02.1, BE-02.2, BE-02.3, BE-02.5 | | | Planned |
+| RF-15 | BE-02.1, BE-02.2, BE-02.3, BE-02.5 | BE-02.1: `integration-tests/http/apparel-product.spec.ts` (categories, collections and types through Medusa's models) | BE-02.1 PR | In progress |
 | RF-16 | BE-06.2, BE-07.1, BE-07.4 | | | Planned |
 | RF-17 | BE-07.2 | | | Planned |
 | RF-18 | BE-08.1 | | | Planned |
@@ -38,7 +38,7 @@ delivered it. Updated in every PR (Definition of Done).
 | RNF-07 | FE-04.4 | | | Planned |
 | RNF-08 | EST-04.4, FE-08.1, FE-08.2 | | | Planned |
 | RNF-09 | EST-01.2, EST-01.3, EST-01.4, EST-03.1, BE-01.1, BE-10.1, FE-01.1, FE-02.1, FE-09.1 | EST-01.3: `pnpm lint`, `pnpm typecheck`, `pnpm format:check`, commit-msg hook; FE-01.1: storefront `vue-tsc` and typed lint, `pnpm test` (runtime config, components), `pnpm test:e2e` (SSR smoke, axe); BE-01.1: backend `tsc` and typed lint, `pnpm test` (env validation, Redis modules); `integration-tests/http/health.spec.ts`; EST-03.1: CI jobs `quality`, `build`, `backend-integration` (migrations twice, schema diff, `test:integration`), `backend-boot-smoke` (real `medusa start`, server and worker, refusal on missing variables), `storefront-e2e`, `ci-ok`; FE-02.1: `tests/unit/composables.test.ts`, `tests/unit/data-source.test.ts`, `tests/unit/runtime-config.test.ts`, `scripts/check-fixtures.mjs` after each build | #3, #6, #7, #10, #16 | In progress |
-| RN-01 | BE-01.2, BE-02.1 | BE-01.2: `pnpm test` (`store-setup/__tests__/plan.unit.spec.ts`: Brazil region in BRL); `integration-tests/http/store-setup.spec.ts` passes in CI | #14 | In progress |
+| RN-01 | BE-01.2, BE-02.1 | BE-01.2: `pnpm test` (`store-setup/__tests__/plan.unit.spec.ts`: Brazil region in BRL); `integration-tests/http/store-setup.spec.ts` passes in CI; BE-02.1: `apparel/__tests__/sale.unit.spec.ts`, `integration-tests/http/apparel-product.spec.ts` (regular and sale price in major units, per ADR 004) | #14, BE-02.1 PR | In progress |
 | RN-02 | BE-05.3, FE-06.3 | | | Planned |
 | RN-03 | BE-05.4 | | | Planned |
 | RN-04 | BE-07.2, FE-07.2 | | | Planned |

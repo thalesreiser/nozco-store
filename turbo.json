@@ -17,6 +17,7 @@
       "dependsOn": ["^build"]
     },
     "dev": {
+      "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
     },
@@ -42,6 +43,7 @@
       "passThroughEnv": ["DB_*", "REDIS_URL"]
     },
     "db:migrate": {
+      "dependsOn": ["^build"],
       "cache": false,
       "passThroughEnv": [
         "NODE_ENV",

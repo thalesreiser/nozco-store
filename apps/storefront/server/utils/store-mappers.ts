@@ -1,11 +1,14 @@
-import type {
-  Cents,
-  StoreAddress,
-  StoreCart,
-  StoreCartShippingOption,
-  StoreOrder,
-  StorePaymentProvider,
-  StorePaymentSession,
+import {
+  apparelMetadataSchema,
+  type Cents,
+  type StoreAddress,
+  type StoreCart,
+  type StoreCartShippingOption,
+  type StoreOrder,
+  type StorePaymentProvider,
+  type StorePaymentSession,
+  type StoreProduct,
+  type StoreProductFacets,
 } from "@nozco/shared-types"
 import { z } from "zod"
 
@@ -183,3 +186,72 @@ export const customerResponse = z
     }),
   })
   .transform((value) => value.customer)
+
+const image = z.object({ id: z.string(), url: z.string(), rank: z.number() })
+const optionValue = z.object({ id: z.string(), value: z.string(), option_id: z.string() })
+
+// Medusa's `original_amount` is the regular price, so it is a "from" price only when above the price.
+const variantPrice = z
+  .object({
+    calculated_amount: amount,
+    original_amount: amount.nullish(),
+    currency_code: z.literal("brl"),
+  })
+  .transform(({ calculated_amount, original_amount, currency_code }) => ({
+    calculated_amount,
+    compare_at_amount:
+      original_amount && original_amount > calculated_amount ? original_amount : null,
+    currency_code,
+  }))
+
+const product = z.object({
+  id: z.string(),
+  title: z.string(),
+  handle: z.string(),
+  subtitle: nullableText,
+  description: nullableText,
+  thumbnail: nullableText,
+  options: z.array(z.object({ id: z.string(), title: z.string(), values: z.array(optionValue) })),
+  variants: z.array(
+    z.object({
+      id: z.string(),
+      product_id: z.string(),
+      title: z.string(),
+      sku: nullableText,
+      inventory_quantity: z.number(),
+      in_stock: z.boolean(),
+      options: z.array(optionValue),
+      images: z.array(image),
+      calculated_price: variantPrice,
+    }),
+  ),
+  images: z.array(image),
+  categories: z.array(z.object({ id: z.string(), handle: z.string(), name: z.string() })),
+  // Medusa's collection has `title` where the store's taxon has `name`.
+  collection: z
+    .object({ id: z.string(), handle: z.string(), title: z.string() })
+    .transform(({ id, handle, title }) => ({ id, handle, name: title }))
+    .nullish()
+    .transform((value) => value ?? null),
+  // Bad metadata hides the garment's specs and does not take the whole listing down.
+  metadata: apparelMetadataSchema.nullish().catch(null),
+}) satisfies z.ZodType<StoreProduct>
+
+export const productListResponse = z.object({
+  products: z.array(product),
+  count: z.number(),
+  limit: z.number(),
+  offset: z.number(),
+})
+
+export const productResponse = z.object({ product }).transform((value) => value.product)
+
+export const productFacetsResponse = z.object({
+  options: z.array(
+    z.object({
+      title: z.string(),
+      values: z.array(z.object({ value: z.string(), count: z.number() })),
+    }),
+  ),
+  price: z.object({ min: amount, max: amount }).nullable(),
+}) satisfies z.ZodType<StoreProductFacets>
