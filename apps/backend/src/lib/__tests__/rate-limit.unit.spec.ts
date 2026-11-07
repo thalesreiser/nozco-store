@@ -113,6 +113,7 @@ describe("buildRateLimitPolicies", () => {
     })
 
     expect(policies.catalog).toEqual({ maxPerIp: 600, maxPerAccount: 600, windowMs: 60_000 })
+    expect(policies.content).toEqual(policies.catalog)
 
     expect(policies.login).toEqual({ maxPerIp: 100, maxPerAccount: 10, windowMs: 900_000 })
     expect(policies.password_reset).toEqual({ maxPerIp: 60, maxPerAccount: 5, windowMs: 3_600_000 })

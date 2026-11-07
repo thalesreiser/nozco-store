@@ -11,6 +11,7 @@ export type RateLimitRule =
   | "privacy_read"
   | "privacy_review"
   | "catalog"
+  | "content"
 
 export interface RateLimitPolicy {
   maxPerIp: number
@@ -58,6 +59,12 @@ export function buildRateLimitPolicies(env: RateLimitEnv): Record<RateLimitRule,
     maxPerAccount: env.RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT,
     windowMs: env.RATE_LIMIT_LOGIN_WINDOW_SECONDS * 1000,
   }
+  // Anonymous reads have no account, so only the address counts.
+  const anonymousRead: RateLimitPolicy = {
+    maxPerIp: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
+    maxPerAccount: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
+    windowMs: env.RATE_LIMIT_CATALOG_WINDOW_SECONDS * 1000,
+  }
   return {
     login,
     register: sensitive,
@@ -67,12 +74,9 @@ export function buildRateLimitPolicies(env: RateLimitEnv): Record<RateLimitRule,
     // Reading a status and working through a queue are routine, so the tighter limit would get in the way.
     privacy_read: login,
     privacy_review: login,
-    // Anonymous reads have no account, so only the address counts.
-    catalog: {
-      maxPerIp: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
-      maxPerAccount: env.RATE_LIMIT_CATALOG_MAX_PER_IP,
-      windowMs: env.RATE_LIMIT_CATALOG_WINDOW_SECONDS * 1000,
-    },
+    catalog: anonymousRead,
+    // Same limit, its own counter: every page of the storefront reads the announcement bar.
+    content: anonymousRead,
   }
 }
 
