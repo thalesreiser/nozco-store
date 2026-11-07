@@ -4,7 +4,7 @@ import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from "reka
 import { computed } from "vue"
 import { Button } from "~/components/ui/button"
 import type { ListingState } from "~/lib/listing"
-import { withOption } from "~/lib/listing"
+import { filterLabel, withOption } from "~/lib/listing"
 import ListingOptionFilter from "./ListingOptionFilter.vue"
 import ListingPriceFilter from "./ListingPriceFilter.vue"
 
@@ -22,10 +22,7 @@ const popoverClass = "z-30 flex w-80 flex-col gap-stack bg-popover p-4 shadow-ov
   <PopoverRoot v-for="facet in facets.options" :key="facet.title">
     <PopoverTrigger as-child>
       <Button variant="outline">
-        {{ facet.title
-        }}<template v-if="state.options[facet.title]">
-          : {{ state.options[facet.title] }}
-        </template>
+        {{ filterLabel(facet.title, state.options[facet.title]) }}
         <span aria-hidden="true">&#9662;</span>
       </Button>
     </PopoverTrigger>
@@ -42,8 +39,9 @@ const popoverClass = "z-30 flex w-80 flex-col gap-stack bg-popover p-4 shadow-ov
   <PopoverRoot>
     <PopoverTrigger as-child>
       <Button variant="outline">
-        {{ $t("listing.filters.price")
-        }}<template v-if="hasPrice"> : {{ $t("listing.price.set") }} </template>
+        {{
+          filterLabel($t("listing.filters.price"), hasPrice ? $t("listing.price.set") : undefined)
+        }}
         <span aria-hidden="true">&#9662;</span>
       </Button>
     </PopoverTrigger>

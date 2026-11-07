@@ -125,6 +125,10 @@ export function withOption(state: ListingState, title: string, value: string | u
   return value ? { ...others, [title]: value } : others
 }
 
+/** One text, so a screen reader hears the filter and its value as written. */
+export const filterLabel = (name: string, value: string | undefined) =>
+  value ? `${name}: ${value}` : name
+
 /** The numbers to link: the ends and the current page's neighbours, with `null` for a gap. */
 export function paginationItems(page: number, pageCount: number): (number | null)[] {
   const items: (number | null)[] = []

@@ -5,7 +5,7 @@ import { computed, onBeforeUnmount, onMounted, shallowRef, useId } from "vue"
 import { Button } from "~/components/ui/button"
 import { PRODUCT_ORDERS } from "~/lib/catalog-contract"
 import type { ListingState } from "~/lib/listing"
-import { activeFilterCount } from "~/lib/listing"
+import { activeFilterCount, filterLabel } from "~/lib/listing"
 
 const props = defineProps<{ facets: StoreProductFacets | null; state: ListingState }>()
 const emit = defineEmits<{ change: [patch: Partial<ListingState>]; clear: [] }>()
@@ -60,15 +60,16 @@ onBeforeUnmount(() => wide?.removeEventListener("change", onWidthChange))
             variant="outline"
             class="hidden lg:inline-flex"
           >
-            {{ facet.title
-            }}<template v-if="state.options[facet.title]">
-              : {{ state.options[facet.title] }}
-            </template>
+            {{ filterLabel(facet.title, state.options[facet.title]) }}
             <span aria-hidden="true">&#9662;</span>
           </Button>
           <Button variant="outline" class="hidden lg:inline-flex">
-            {{ $t("listing.filters.price")
-            }}<template v-if="hasPrice"> : {{ $t("listing.price.set") }} </template>
+            {{
+              filterLabel(
+                $t("listing.filters.price"),
+                hasPrice ? $t("listing.price.set") : undefined,
+              )
+            }}
             <span aria-hidden="true">&#9662;</span>
           </Button>
         </template>

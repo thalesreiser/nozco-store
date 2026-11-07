@@ -6,6 +6,7 @@ import type { ListingState } from "~/lib/listing"
 import {
   LISTING_PAGE_SIZE,
   activeFilterCount,
+  filterLabel,
   paginationItems,
   parseListingState,
   toFiltersQuery,
@@ -110,6 +111,13 @@ describe("listing queries", () => {
 
     expect(withOption(current, "Cor", "Verde")).toEqual({ Cor: "Verde", Tamanho: "M" })
     expect(withOption(current, "Cor", undefined)).toEqual({ Tamanho: "M" })
+  })
+})
+
+describe("filterLabel", () => {
+  it("adds the value only when there is one", () => {
+    expect(filterLabel("Cor", undefined)).toBe("Cor")
+    expect(filterLabel("Cor", "Azul")).toBe("Cor: Azul")
   })
 })
 
