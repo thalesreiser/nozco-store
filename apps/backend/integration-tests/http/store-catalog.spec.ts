@@ -306,8 +306,12 @@ medusaIntegrationTestRunner({
         })
 
         const answers = [
-          await get<unknown>("/store/collections", { fields: "+metadata" }),
-          await get<unknown>("/store/product-categories", { fields: "+metadata" }),
+          // These two refuse the region_id that the helper sends by default.
+          await get<unknown>("/store/collections", { fields: "+metadata", region_id: undefined }),
+          await get<unknown>("/store/product-categories", {
+            fields: "+metadata",
+            region_id: undefined,
+          }),
           await get<unknown>("/store/product-variants", {
             product_id: productId,
             fields: "+metadata,+barcode,+ean,+upc",
