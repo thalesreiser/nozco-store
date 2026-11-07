@@ -38,9 +38,9 @@ function renderHeader(cartCount: number | null) {
 }
 
 describe("brand mark", () => {
-  it("renders the text wordmark", async () => {
+  it("renders the logo with its name", async () => {
     await renderSuspended(BrandMark)
-    expect(screen.getByText("NOZCO")).toBeTruthy()
+    expect(screen.getByRole("img", { name: "NoZCo" })).toBeTruthy()
   })
 })
 
