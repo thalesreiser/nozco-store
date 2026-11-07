@@ -25,6 +25,7 @@ export default defineConfig({
         resolve: { alias: { "#shared": fileURLToPath(new URL("./shared", import.meta.url)) } },
         test: { name: "server", environment: "node", include: ["tests/server/**/*.test.ts"] },
       },
+      { test: { name: "design", environment: "node", include: ["tests/design/**/*.test.ts"] } },
     ],
   },
 })
