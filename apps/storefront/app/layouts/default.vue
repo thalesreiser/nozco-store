@@ -2,6 +2,7 @@
 import { onMounted } from "vue"
 import SiteFooter from "~/components/layout/SiteFooter.vue"
 import SiteHeader from "~/components/layout/SiteHeader.vue"
+import WhatsAppButton from "~/components/layout/WhatsAppButton.vue"
 import { useCartCount } from "~/composables/useCartCount"
 import { useCatalogMenu } from "~/composables/useCatalogMenu"
 import { useStoreInfo } from "~/composables/useStoreInfo"
@@ -27,6 +28,7 @@ const { data: menuLinks } = await useCatalogMenu()
       :cart-count="count"
       :whats-app-url="storeInfo.whatsAppUrl"
     />
+    <WhatsAppButton v-if="storeInfo.whatsAppUrl" :href="storeInfo.whatsAppUrl" />
     <main id="conteudo" class="flex-1 focus-visible:outline-none" tabindex="-1">
       <slot />
     </main>

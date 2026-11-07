@@ -31,6 +31,7 @@
     "home": "NozCo, página inicial",
     "opensInNewTab": "(abre em nova aba)",
     "whatsApp": "[Falar no WhatsApp]",
+    "contactLabel": "Atendimento",
     "nav": {
       "label": "Principal",
       "tracking": "Rastreio"
@@ -38,7 +39,9 @@
     "search": {
       "label": "Buscar produtos",
       "placeholder": "[Buscar]",
-      "submit": "Buscar"
+      "submit": "Buscar",
+      "open": "Abrir busca",
+      "close": "Fechar busca"
     },
     "cart": {
       "text": "Carrinho",
