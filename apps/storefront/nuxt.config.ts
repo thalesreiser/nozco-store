@@ -36,6 +36,14 @@ export default defineNuxtConfig({
       publishableKey: "",
       appEnv: "",
       dataSource: "",
+      // Optional store details, absent from the public repository. An empty one hides its element.
+      whatsappNumber: "",
+      legalName: "",
+      cnpj: "",
+      legalAddress: "",
+      contactEmail: "",
+      socialLinks: "",
+      paymentMethods: "",
     },
   },
   // The store and its server routes share one origin, so no response needs CORS headers.
