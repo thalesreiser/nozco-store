@@ -96,7 +96,8 @@ pnpm dev                                                # http://localhost:3000
 ```
 
 The server refuses to start if a `NUXT_PUBLIC_*` variable in `.env.example` is missing or invalid,
-and the error names each one. `nuxt preview` reads `.env`; a production server must receive the
+and the error names each one. With `NUXT_PUBLIC_APP_ENV=production` the legal data is required too.
+`nuxt preview` reads `.env`; a production server must receive the
 variables from its environment.
 
 The first e2e run needs a browser, which is not installed with the dependencies:

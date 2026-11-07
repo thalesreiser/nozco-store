@@ -42,5 +42,5 @@ delivered it. Updated in every PR (Definition of Done).
 | RN-02 | BE-05.3, FE-06.3 | | | Planned |
 | RN-03 | BE-05.4 | | | Planned |
 | RN-04 | BE-07.2, FE-07.2 | | | Planned |
-| RST-01 | EST-04.1, EST-05.1, FE-11.2, FE-11.3 | FE-11.3 (footer, from runtime config): `tests/components/layout.test.ts`, `tests/e2e/global-layout.spec.ts` | FE-11.3 PR | In progress |
+| RST-01 | EST-04.1, EST-05.1, FE-11.2, FE-11.3 | FE-11.3 (footer, from runtime config): `tests/components/layout.test.ts`, `tests/e2e/global-layout.spec.ts`; FE-11.4 (required in production): `tests/unit/runtime-config.test.ts`, `tests/e2e/phone-layout.spec.ts` | FE-11.3 and FE-11.4 PRs | In progress |
 | RST-02 | EST-02.1 | EST-02.1: `infra/docker-compose.yml` validated structurally only; `pnpm infra:up` not run, as the laptop has no Docker | #9 | In progress |

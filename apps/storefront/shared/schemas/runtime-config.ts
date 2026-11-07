@@ -5,6 +5,14 @@ import { isSocialLinkList } from "../store-info"
 // Nuxt turns a numeric environment variable into a number, so these are read as text first.
 const text = z.union([z.string(), z.number()]).transform(String)
 
+// Shown in the footer (RST-01, Q-11). Other environments run without them and hide what is absent.
+const REQUIRED_IN_PRODUCTION = {
+  legalName: "NUXT_PUBLIC_LEGAL_NAME",
+  cnpj: "NUXT_PUBLIC_CNPJ",
+  legalAddress: "NUXT_PUBLIC_LEGAL_ADDRESS",
+  contactEmail: "NUXT_PUBLIC_CONTACT_EMAIL",
+} as const
+
 export const publicRuntimeConfigSchema = z
   .object({
     apiUrl: z.url({ protocol: /^https?$/ }),
@@ -34,6 +42,17 @@ export const publicRuntimeConfigSchema = z
   .refine((config) => config.dataSource !== "mock" || isMockAllowedIn(config.appEnv), {
     path: ["dataSource"],
     message: "the mock source is refused in production",
+  })
+  .superRefine((config, context) => {
+    if (config.appEnv !== "production") return
+    for (const [field, variable] of Object.entries(REQUIRED_IN_PRODUCTION)) {
+      if (config[field as keyof typeof REQUIRED_IN_PRODUCTION]?.trim()) continue
+      context.addIssue({
+        code: "custom",
+        path: [field],
+        message: `required in production, set ${variable}`,
+      })
+    }
   })
 
 export type PublicRuntimeConfig = z.infer<typeof publicRuntimeConfigSchema>
