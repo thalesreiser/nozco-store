@@ -116,15 +116,17 @@ for (const [name, use] of Object.entries({ desktop, mobile })) {
   })
 }
 
-test("keeps the initial JS within the 170 KB gzip budget", async ({ request }) => {
-  const html = await (await request.get("/")).text()
-  // Blocking JS only: a rel="prefetch" chunk is fetched when the browser is idle and does not count.
-  const tags = html.match(/<(?:script|link)\b[^>]*>/g) ?? []
-  const files = new Set(
-    tags
-      .filter((tag) => !tag.includes('rel="prefetch"'))
-      .flatMap((tag) => /(?:src|href)="(\/_nuxt\/[^"]+\.js)"/.exec(tag)?.[1] ?? []),
-  )
+test("keeps the initial JS within the 170 KB gzip budget", async ({ browser, request }) => {
+  // Without scripts the page shows what the server sent. Blocking JS only: a rel="prefetch" chunk is
+  // fetched when the browser is idle and does not count.
+  const context = await browser.newContext({ javaScriptEnabled: false })
+  const page = await context.newPage()
+  await page.goto("/")
+  const urls = await page
+    .locator('script[src], link[rel="modulepreload"]')
+    .evaluateAll((tags) => tags.map((tag) => tag.getAttribute("src") ?? tag.getAttribute("href")))
+  await context.close()
+  const files = new Set(urls.filter((url): url is string => Boolean(url?.endsWith(".js"))))
   expect(files.size).toBeGreaterThan(0)
 
   let bytes = 0
