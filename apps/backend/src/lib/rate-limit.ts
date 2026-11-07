@@ -2,7 +2,14 @@ import { createHash } from "node:crypto"
 import { isIP } from "node:net"
 import type { Env } from "./env"
 
-export type RateLimitRule = "login" | "register" | "password_reset" | "verification"
+export type RateLimitRule =
+  | "login"
+  | "register"
+  | "password_reset"
+  | "verification"
+  | "privacy_request"
+  | "privacy_read"
+  | "privacy_review"
 
 export interface RateLimitPolicy {
   maxPerIp: number
@@ -43,15 +50,20 @@ export function buildRateLimitPolicies(env: RateLimitEnv): Record<RateLimitRule,
     maxPerAccount: env.RATE_LIMIT_SENSITIVE_MAX_PER_ACCOUNT,
     windowMs: env.RATE_LIMIT_SENSITIVE_WINDOW_SECONDS * 1000,
   }
+  const login: RateLimitPolicy = {
+    maxPerIp: env.RATE_LIMIT_LOGIN_MAX_PER_IP,
+    maxPerAccount: env.RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT,
+    windowMs: env.RATE_LIMIT_LOGIN_WINDOW_SECONDS * 1000,
+  }
   return {
-    login: {
-      maxPerIp: env.RATE_LIMIT_LOGIN_MAX_PER_IP,
-      maxPerAccount: env.RATE_LIMIT_LOGIN_MAX_PER_ACCOUNT,
-      windowMs: env.RATE_LIMIT_LOGIN_WINDOW_SECONDS * 1000,
-    },
+    login,
     register: sensitive,
     password_reset: sensitive,
     verification: sensitive,
+    privacy_request: sensitive,
+    // Reading a status and working through a queue are routine, so the tighter limit would get in the way.
+    privacy_read: login,
+    privacy_review: login,
   }
 }
 

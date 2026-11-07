@@ -22,5 +22,5 @@ module.exports = defineConfig({
       cookieSecret: env.COOKIE_SECRET,
     },
   },
-  modules: redisModules(env.REDIS_URL),
+  modules: [...redisModules(env.REDIS_URL), { resolve: "./src/modules/privacy-request" }],
 })
