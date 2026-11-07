@@ -79,14 +79,26 @@ function makeProduct(input: FixtureInput): StoreProduct {
     variants,
     images,
     categories: [
-      { id: `cat_mock_${input.category}`, handle: input.category, name: input.category },
+      { id: `cat_mock_${input.category}`, handle: input.category, name: taxonName(input.category) },
     ],
     collection: input.collection
-      ? { id: `col_mock_${input.collection}`, handle: input.collection, name: input.collection }
+      ? {
+          id: `col_mock_${input.collection}`,
+          handle: input.collection,
+          name: taxonName(input.collection),
+        }
       : null,
     metadata: { fixture: FIXTURE_MARKER },
   }
 }
+
+const TAXON_NAMES: Record<string, string> = {
+  "camisetas-exemplo": "Camisetas exemplo",
+  "moletons-exemplo": "Moletons exemplo",
+  "colecao-exemplo": "Coleção exemplo",
+}
+
+const taxonName = (handle: string) => TAXON_NAMES[handle] ?? handle
 
 export const productFixtures: StoreProduct[] = [
   makeProduct({
