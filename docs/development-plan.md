@@ -12,10 +12,10 @@ launch; **C** tasks are backlog.
 | Track | Tasks | Total | Needed for launch (M) |
 |---|---|---|---|
 | Structural | 16 | 49 h | 49 h |
-| Backend (Medusa v2) | 33 | 109 h | 99 h |
-| Frontend (Nuxt 4) | 33 | 122 h | 111 h |
+| Backend (Medusa v2) | 34 | 124 h | 114 h |
+| Frontend (Nuxt 4) | 35 | 127 h | 116 h |
 | Post-launch backlog | 2 | 5 h | 0 h |
-| **Total** | **84** | **285 h** | **259 h** |
+| **Total** | **87** | **305 h** | **279 h** |
 
 ## Process
 - **Definition of Ready:** requirement and acceptance criterion written, dependencies done (tasks,
@@ -104,17 +104,19 @@ launch; **C** tasks are backlog.
 
 ## Backend (Medusa v2)
 
-### BE-01 - Medusa setup (8 h)
+### BE-01 - Medusa setup (23 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
 | BE-01.1 | Medusa scaffold | RNF-09 | M | 3 h | EST-01.3 |
 | BE-01.2 | Store setup | RN-01 | M | 3 h | BE-01.1 |
 | BE-01.3 | Admin access spike | RF-14, RNF-03 | M | 2 h | BE-01.1, Q-07 |
+| BE-01.4 | Back-office access: option C | RNF-03, RF-14 | M | 15 h | BE-01.3 |
 
 - **BE-01.1** Medusa v2 from the official starter, without demo seed · Zod validation of environment variables · Server and worker modes · Health route
 - **BE-01.2** Brazil region in BRL · loja-online sales channel and publishable key · Stock location · Idempotent script and integration test
 - **BE-01.3** Check 2FA and role support in the current Medusa version · Options: extension, proxy-level access control or reduced requirement · ADR with the decision
+- **BE-01.4** Refuse admins with no 2FA · Login limit in Redis · Audit module, middleware and read-only route
 
 ### BE-02 - Apparel catalog (18 h)
 
@@ -260,7 +262,7 @@ launch; **C** tasks are backlog.
 
 - **FE-03.1** Sign in, sign up and password reset · VeeValidate and Zod forms · Route middleware for the account area
 
-### FE-04 - Catalog pages (22 h)
+### FE-04 - Catalog pages (27 h)
 
 | ID | Task | Req. | Prio. | Est. | Depends on |
 |---|---|---|---|---|---|
@@ -270,6 +272,8 @@ launch; **C** tasks are backlog.
 | FE-04.2b | Product page: integration | RF-03 | M | 2 h | FE-04.2a, BE-02.4 |
 | FE-04.3 | Search | RF-04 | S | 3 h | FE-04.1b |
 | FE-04.4 | Catalog SEO | RNF-07 | M | 3 h | FE-04.2b |
+| FE-04.5 | Card details of ADR 012 | RF-02, RF-03 | M | 1 h | FE-04.1a |
+| FE-04.6 | Choosing a size on the card | RF-05 | M | 4 h | FE-04.2a, FE-05.1a |
 
 - **FE-04.1a** Category and collection routes · Size, colour and price filters; mobile filter drawer · Sorting and pagination · State in the URL · Loading, empty, error and content states
 - **FE-04.1b** api source in the composable · routeRules with 10 min SWR
@@ -277,6 +281,8 @@ launch; **C** tasks are backlog.
 - **FE-04.2b** api source and SSR · Fresh stock check on the client
 - **FE-04.3** Header search field · Results page · No-results state
 - **FE-04.4** Meta tags and Open Graph · schema.org Product and Offer · Sitemap and robots · Canonical URLs for filters
+- **FE-04.5** Discount percentage on the sale badge · "Últimas" at 5 units or fewer
+- **FE-04.6** Size picker on the card · Add to cart · Several colours go to the product page · Inside the JavaScript budget
 
 ### FE-05 - Cart (10 h)
 

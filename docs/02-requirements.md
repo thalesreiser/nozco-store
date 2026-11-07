@@ -18,7 +18,7 @@ Priorities: **M** must, **S** should, **C** could, **W** won't (this version).
 | RF-11 | Transactional e-mails: order received, payment approved, shipped (tracking code), exchange updates | M | Given a shipped order, then the customer receives the tracking code by e-mail |
 | RF-12 | Order tracking page by order number + e-mail | M | Given a valid pair, then status history and tracking link are shown |
 | RF-13 | Exchange/return request (size exchange; right of withdrawal within 7 days, CDC art. 49) | M | Given a request within the window, then it is recorded and the operator is notified |
-| RF-14 | Back office (Medusa Admin) login with 2FA and roles (admin, operator); the way to deliver this is decided after spike BE-01.3 | M | Given an operator, then they cannot change prices or users |
+| RF-14 | Back office (Medusa Admin) login with 2FA. One admin role at launch (ADR 012); the operator role comes later | M | Given a back-office user with no 2FA, then they cannot sign in, and sensitive changes are logged by person |
 | RF-15 | Back office (Medusa Admin): products, variants, stock, images, categories, collections, banners | M | Given a stock change, then the storefront reflects it |
 | RF-16 | Back office (Medusa Admin and extensions): orders (status, notes), shipping label purchase and tracking code via Melhor Envio | M | Given a paid order, then the operator can buy a label and the order becomes `shipped` |
 | RF-17 | Back office: exchanges/returns and refunds via Mercado Pago | S | Given an approved return, then the refund is issued and stock is restocked |
