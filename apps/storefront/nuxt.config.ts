@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url"
 import tailwindcss from "@tailwindcss/vite"
 import { shouldBundleMockSource } from "./shared/data-source"
+import { GALLERY_PATH, isGalleryAllowedIn } from "./shared/gallery"
 
 // The alias decides at build time, so a build without fixtures has no import path that reaches them.
 const mockSourceFile = shouldBundleMockSource(process.env) ? "index" : "excluded"
@@ -35,16 +36,34 @@ export default defineNuxtConfig({
       publishableKey: "",
       appEnv: "",
       dataSource: "",
+      // Optional store details, absent from the public repository. An empty one hides its element.
+      whatsappNumber: "",
+      legalName: "",
+      cnpj: "",
+      legalAddress: "",
+      contactEmail: "",
+      socialLinks: "",
+      paymentMethods: "",
     },
   },
   // The store and its server routes share one origin, so no response needs CORS headers.
-  security: { corsHandler: false },
+  // Fonts are self-hosted, so the default font-src (which allows any https: origin) is narrowed.
+  security: {
+    corsHandler: false,
+    headers: { contentSecurityPolicy: { "font-src": ["'self'"] } },
+  },
   routeRules: {
     // The XSS validator refuses text containing `<`, which is valid in a password. The route validates
     // with Zod and only forwards the value to Medusa as JSON.
     "/api/auth/login": { security: { xssValidator: false } },
   },
   hooks: {
+    // Leaves the internal gallery out of the build, so production has no route and no chunk for it.
+    "pages:extend"(pages) {
+      if (isGalleryAllowedIn(process.env.NUXT_PUBLIC_APP_ENV)) return
+      const index = pages.findIndex((page) => page.path === GALLERY_PATH)
+      if (index !== -1) pages.splice(index, 1)
+    },
     // Nuxt only adds its own handler when none is set, so this one is put in front of it from here.
     "nitro:config"(config) {
       const nuxtHandlers = config.errorHandler ? [config.errorHandler].flat() : []

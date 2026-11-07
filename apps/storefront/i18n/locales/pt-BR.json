@@ -2,5 +2,72 @@
   "home": {
     "title": "NozCo",
     "underConstruction": "Nossa loja está em construção."
+  },
+  "price": {
+    "previous": "Preço anterior:"
+  },
+  "stock": {
+    "in": "[EM ESTOQUE]",
+    "low": "Últimas",
+    "out": "[ESGOTADO]"
+  },
+  "quantity": {
+    "decrease": "Diminuir quantidade",
+    "increase": "Aumentar quantidade"
+  },
+  "option": {
+    "unavailable": "indisponível"
+  },
+  "state": {
+    "loading": "Carregando"
+  },
+  "product": {
+    "buy": "Comprar",
+    "buyNamed": "Comprar {name}"
+  },
+  "layout": {
+    "skipToContent": "Pular para o conteúdo",
+    "announcement": "[AVISO DA LOJA: FRETE, PARCELAMENTO OU COLEÇÃO NOVA]",
+    "home": "NozCo, página inicial",
+    "opensInNewTab": "(abre em nova aba)",
+    "whatsApp": "[Falar no WhatsApp]",
+    "nav": {
+      "label": "Principal",
+      "tracking": "Rastreio"
+    },
+    "search": {
+      "label": "Buscar produtos",
+      "placeholder": "[Buscar]",
+      "submit": "Buscar"
+    },
+    "cart": {
+      "text": "Carrinho",
+      "labelUnknown": "Carrinho",
+      "label": "Carrinho, nenhum item | Carrinho, 1 item | Carrinho, {count} itens"
+    },
+    "menu": {
+      "open": "Abrir menu",
+      "close": "Fechar menu",
+      "title": "[MENU]",
+      "navLabel": "Menu"
+    },
+    "footer": {
+      "help": "[Ajuda]",
+      "faq": "[Perguntas frequentes]",
+      "about": "[Sobre]",
+      "contact": "[Contato]",
+      "social": "[Redes sociais]",
+      "payment": "[Formas de pagamento]",
+      "cnpj": "CNPJ: {cnpj}"
+    },
+    "newsletter": {
+      "title": "[Newsletter]",
+      "email": "[E-mail]",
+      "emailError": "[Informe um e-mail válido.]",
+      "consent": "[Texto de consentimento LGPD, a definir]",
+      "consentError": "[Marque o consentimento para continuar.]",
+      "submit": "[Assinar]",
+      "notSent": "[Cadastro ainda indisponível. Nenhum dado foi enviado.]"
+    }
   }
 }
