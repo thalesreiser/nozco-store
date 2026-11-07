@@ -51,6 +51,8 @@ lawyer (see below).
 - A token issued before the anonymisation stays valid until it expires, and Medusa's own routes still
   accept it. The privacy routes answer 404 to it. Anything the person sends with it is new data.
 - Backups hold the old data until they rotate.
+- The CPF is read from metadata for now. BE-03.4 moves it to protected storage and must update the export
+  and the anonymisation; the order's CPF stays there under the same rule.
 - Data of integrations that do not exist yet is not covered, and each one must extend
   `anonymiseCustomer` when it arrives: Mercado Pago payment sessions and account holders (BE-05),
   Melhor Envio shipping method data (BE-06), the e-mail notification log (BE-09.1), the newsletter

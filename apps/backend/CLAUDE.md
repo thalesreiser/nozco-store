@@ -21,7 +21,7 @@ integration-tests/
 
 - Medusa is the single source of truth for products, prices, stock, carts and orders. Use its modules
   before writing custom ones.
-- Money is stored in integer cents (BRL).
+- Medusa stores money in major units (BRL: 20.5 is R$ 20,50). The storefront converts to integer cents.
 - Business rules (CPF validation, order state transitions, webhook signatures, exchange deadlines) live
   in pure functions with unit tests; workflows and routes call them.
 - Every custom route validates input with the Zod schemas in `packages/shared-types` and returns errors
