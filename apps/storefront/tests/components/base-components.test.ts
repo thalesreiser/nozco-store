@@ -187,6 +187,16 @@ describe("ProductCard", () => {
     expect(screen.queryByText("Novidade")).toBeNull()
   })
 
+  it("marks the badge in amber only when the product is on sale (ADR 010)", async () => {
+    const view = await renderSuspended(ProductCard, { props: { ...props, badge: "Novidade" } })
+    expect(screen.getByText("Novidade").className).toContain("bg-primary")
+
+    await view.rerender({ compareAt: 12990 })
+
+    expect(screen.getByText("Novidade").className).toContain("bg-highlight")
+    expect(screen.getByText("Novidade").className).toContain("text-highlight-foreground")
+  })
+
   it("shows the previous price and note only when given", async () => {
     const view = await renderSuspended(ProductCard, { props })
     expect(view.container.querySelector("s")).toBeNull()

@@ -75,6 +75,7 @@ const TEXT_PAIRS: Pair[] = [
   pair("error", "error-surface"),
   pair("success", "background"),
   pair("success", "success-surface"),
+  pair("highlight-foreground", "highlight"),
 ]
 
 // WCAG 1.4.11: field outlines and the focus ring need 3:1 against what is next to them.
@@ -83,9 +84,12 @@ const UI_PAIRS: Pair[] = [
   pair("ring", "background", LARGE_TEXT_OR_UI),
 ]
 
-// Colours nothing must read against: decorative dividers. A new colour token fails the test below
-// until it is in a pair or here.
-const DECORATIVE = new Set(["border"])
+// Colours nothing must read against: decorative dividers and the wire. A new colour token fails the
+// test below until it is in a pair or here.
+const DECORATIVE = new Set(["border", "sheen"])
+
+// ADR 010: the only colours allowed to leave the greys. They are details, never text on white.
+const ACCENTS = new Set(["--highlight", "--sheen"])
 
 describe("WCAG contrast computation", () => {
   it("matches published values", () => {
@@ -112,11 +116,31 @@ describe.each(Object.entries(grounds))("%s ground", (_name, ground) => {
     expect(ratio).toBeGreaterThanOrEqual(min)
   })
 
-  it("defines only grey colours: the palette has no accent", () => {
-    for (const name of Object.keys(ground)) {
+  it("defines only grey colours outside the two accents", () => {
+    for (const name of Object.keys(ground).filter((token) => !ACCENTS.has(token))) {
       const [r, g, b] = channels(resolve(ground, name.slice(2)))
       expect([name, g, b]).toEqual([name, r, r])
     }
+  })
+})
+
+describe("accents (ADR 010)", () => {
+  const black = resolve(grounds.brand, "background")
+
+  it.each(["highlight", "sheen"])("%s stands out on the black ground", (name) => {
+    expect(contrast(resolve(grounds.brand, name), black)).toBeGreaterThanOrEqual(LARGE_TEXT_OR_UI)
+  })
+
+  it("has the same value on both grounds", () => {
+    for (const name of ["highlight", "highlight-foreground", "sheen"]) {
+      expect(resolve(grounds.store, name)).toBe(resolve(grounds.brand, name))
+    }
+  })
+
+  it("keeps the amber out of text on the store ground, where it cannot be read", () => {
+    const white = resolve(grounds.store, "background")
+    expect(contrast(resolve(grounds.store, "highlight"), white)).toBeLessThan(NORMAL_TEXT)
+    expect(TEXT_PAIRS.some(({ text }) => text === "highlight" || text === "sheen")).toBe(false)
   })
 })
 

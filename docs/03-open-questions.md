@@ -24,7 +24,7 @@ the architecture or the interface, an ADR.
 
 | ID | Decision | Recommendation | Blocks | Status |
 |---|---|---|---|---|
-| DEC-01 | Visual tokens: black, white and greys, no accent colour; Big Shoulders Display and Archivo | [ADR 005](adr/005-visual-direction.md) | FE-01.2 | Decided on 2026-11-06 |
+| DEC-01 | Visual tokens: black, white and greys, with silver and amber for small details; Big Shoulders Display and Archivo | [ADR 005](adr/005-visual-direction.md), [ADR 010](adr/010-accent-colours.md) | FE-01.2 | Decided on 2026-11-06, amended on 2026-11-07 |
 | DEC-02 | Base component style: mix D, brand of A with the store of B | [ADR 005](adr/005-visual-direction.md) | FE-12.1 | Decided on 2026-11-06 |
 | DEC-03 | Checkout on a single page or in steps | Mock up both on mobile before choosing. | FE-06.1 | Open |
 | DEC-04 | Analytics tool and advertising pixel. The tabacaria banned pixels because of tobacco ad rules; that reason does not apply to apparel | PostHog for the funnel, plus a Meta pixel behind consent only if paid ads are planned. | FE-08.1 | Open |
