@@ -1,7 +1,7 @@
 /**
  * What Medusa's standard product routes may not return, at any depth. Refusing `fields` would not be
  * enough: their defaults already include `*variants`, which holds `barcode` and `metadata`. See
- * `docs/adr/006-store-product-exposure-and-rate-limit.md`.
+ * `docs/adr/007-store-product-exposure-and-rate-limit.md`.
  */
 const PRIVATE_KEYS = new Set([
   "metadata",

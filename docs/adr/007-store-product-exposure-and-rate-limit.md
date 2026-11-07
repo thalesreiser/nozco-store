@@ -1,4 +1,4 @@
-# 006 - Store product exposure and catalog rate limit
+# 007 - Store product exposure and catalog rate limit
 
 - **Status:** accepted
 - **Date:** 2026-11-07
