@@ -14,6 +14,11 @@ Object.assign(globalThis, h3, {
       publishableKey: "pk_test_fictional",
       appEnv: "production",
       dataSource: "api",
+      // Fictional: a production config must carry the legal data (shared/schemas/runtime-config.ts).
+      legalName: "[Razão social fictícia]",
+      cnpj: "00.000.000/0000-00",
+      legalAddress: "[Rua de Exemplo, 100]",
+      contactEmail: "contato@example.com",
     },
   }),
 })
