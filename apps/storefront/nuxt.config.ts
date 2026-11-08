@@ -36,7 +36,8 @@ export default defineNuxtConfig({
       publishableKey: "",
       appEnv: "",
       dataSource: "",
-      // Optional store details, absent from the public repository. An empty one hides its element.
+      // Store details, absent from the public repository. An empty one hides its element, and the legal
+      // data is required in production (shared/schemas/runtime-config.ts).
       whatsappNumber: "",
       legalName: "",
       cnpj: "",

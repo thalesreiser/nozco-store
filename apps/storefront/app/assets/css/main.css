@@ -13,6 +13,17 @@
     @apply border-border;
   }
 
+  /* A focused or linked element stops clear of what is fixed on screen, focus outline included: the
+     WhatsApp button below and, on phones, the sticky header row (py-2 + h-touch + border-b-3 = 63 px). */
+  html {
+    scroll-padding-top: calc(var(--spacing-touch) + 1rem + 3px + 0.5rem);
+    scroll-padding-bottom: calc(var(--spacing-touch) + 2rem + env(safe-area-inset-bottom));
+
+    @variant lg {
+      scroll-padding-top: 0;
+    }
+  }
+
   body {
     @apply bg-background text-foreground;
   }

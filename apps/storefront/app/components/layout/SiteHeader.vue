@@ -6,6 +6,7 @@ import BrandMark from "~/components/base/BrandMark.vue"
 import { Button } from "~/components/ui/button"
 import AnnouncementBar from "./AnnouncementBar.vue"
 import MobileMenu from "./MobileMenu.vue"
+import MobileSearch from "./MobileSearch.vue"
 import SearchForm from "./SearchForm.vue"
 
 const props = defineProps<{
@@ -28,21 +29,27 @@ const cartLabel = computed(() =>
 )
 </script>
 
+<!-- On phones the header box is removed, so the row sticks against the whole page and not only against
+     the header. Its height (63 px) is also in the scroll padding of main.css. -->
 <template>
-  <header>
+  <header class="contents lg:block">
     <AnnouncementBar />
     <div
-      class="ground-brand flex items-center justify-between gap-inline border-b-3 px-4 py-2 max-[22.5rem]:gap-2 lg:px-page lg:py-5"
+      class="ground-brand flex items-center justify-between gap-2 border-b-3 px-4 py-2 max-lg:sticky max-lg:top-0 max-lg:z-30 lg:gap-inline lg:px-page lg:py-5"
     >
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 max-lg:min-w-0 max-lg:flex-1">
         <div class="lg:hidden">
           <MobileMenu :links="links" :whats-app-url="whatsAppUrl" />
         </div>
-        <NuxtLink to="/" :aria-label="$t('layout.home')" class="flex min-h-touch items-center">
-          <BrandMark />
+        <NuxtLink
+          to="/"
+          :aria-label="$t('layout.home')"
+          class="flex min-h-touch items-center max-lg:max-w-39 max-lg:min-w-0 max-lg:flex-1"
+        >
+          <BrandMark class="max-lg:h-auto max-lg:w-full" />
         </NuxtLink>
       </div>
-      <div class="flex items-center gap-inline">
+      <div class="flex items-center gap-1 max-lg:shrink-0 lg:gap-inline">
         <nav class="hidden lg:block" :aria-label="$t('layout.nav.label')">
           <ul class="flex items-center gap-inline">
             <li v-for="link in links" :key="link.to">
@@ -56,7 +63,8 @@ const cartLabel = computed(() =>
           </ul>
         </nav>
         <SearchForm class="hidden lg:flex" />
-        <Button as-child class="max-[22.5rem]:px-2">
+        <MobileSearch />
+        <Button as-child class="max-lg:px-2">
           <NuxtLink to="/carrinho" :aria-label="cartLabel">
             {{ $t("layout.cart.text") }}
             <span :class="{ invisible: cartCount === null }">({{ cartCount ?? 0 }})</span>

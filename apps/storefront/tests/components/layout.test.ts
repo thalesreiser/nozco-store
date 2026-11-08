@@ -2,9 +2,11 @@ import { renderSuspended } from "@nuxt/test-utils/runtime"
 import { fireEvent, screen, waitFor } from "@testing-library/vue"
 import { beforeEach, describe, expect, it } from "vitest"
 import BrandMark from "~/components/base/BrandMark.vue"
+import MobileSearch from "~/components/layout/MobileSearch.vue"
 import NewsletterForm from "~/components/layout/NewsletterForm.vue"
 import SiteFooter from "~/components/layout/SiteFooter.vue"
 import SiteHeader from "~/components/layout/SiteHeader.vue"
+import WhatsAppButton from "~/components/layout/WhatsAppButton.vue"
 import type { StoreInfo } from "~/composables/useStoreInfo"
 import { resetDataSources } from "~/data"
 
@@ -175,5 +177,31 @@ describe("cart count", () => {
     const { count, refresh } = useCartCount()
     await refresh()
     expect(count.value).toBeNull()
+  })
+})
+
+describe("mobile search", () => {
+  it("opens with the field focused, closes on Escape and gives focus back", async () => {
+    await renderSuspended(MobileSearch)
+    const icon = screen.getByRole("button", { name: "Abrir busca" })
+    const field = screen.getByLabelText<HTMLInputElement>("Buscar produtos")
+
+    await fireEvent.click(icon)
+    expect(document.activeElement).toBe(field)
+    expect(icon.getAttribute("aria-expanded")).toBe("true")
+
+    await fireEvent.keyDown(field, { key: "Escape" })
+    expect(document.activeElement).toBe(icon)
+    expect(icon.getAttribute("aria-expanded")).toBe("false")
+  })
+})
+
+describe("WhatsApp button", () => {
+  it("opens in a new tab with an accessible name", async () => {
+    await renderSuspended(WhatsAppButton, { props: { href: "https://wa.me/5500000000000" } })
+    const link = screen.getByRole("link", { name: /WhatsApp.*abre em nova aba/ })
+
+    expect(link.getAttribute("target")).toBe("_blank")
+    expect(link.getAttribute("rel")).toBe("noopener")
   })
 })

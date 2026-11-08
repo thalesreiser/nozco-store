@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { useId } from "vue"
+import { useId, useTemplateRef } from "vue"
 import { Button } from "~/components/ui/button"
 
 const inputId = useId()
+const input = useTemplateRef<HTMLInputElement>("input")
+
+defineExpose({ focus: () => input.value?.focus() })
 </script>
 
 <!-- A plain GET form: it works before hydration and adds no script. -->
@@ -11,6 +14,7 @@ const inputId = useId()
     <label :for="inputId" class="sr-only">{{ $t("layout.search.label") }}</label>
     <input
       :id="inputId"
+      ref="input"
       type="search"
       name="q"
       required
