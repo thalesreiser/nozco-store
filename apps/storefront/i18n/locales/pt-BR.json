@@ -74,7 +74,7 @@
     "categoryFallback": "[Categoria]",
     "collectionFallback": "[Coleção]",
     "count": "[Nenhum produto] | [1 produto] | [{count} produtos]",
-    "saleBadge": "[% OFF]",
+    "saleBadge": "-{percent}%",
     "filters": {
       "open": "[Filtrar]",
       "title": "[FILTROS]",

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue"
+import { useI18n } from "vue-i18n"
 import type { RouteLocationRaw } from "vue-router"
 import EmptyState from "~/components/base/EmptyState.vue"
 import ErrorState from "~/components/base/ErrorState.vue"
 import { Button, buttonVariants } from "~/components/ui/button"
 import type { ProductCardData } from "~/lib/listing"
-import { LISTING_PAGE_SIZE, productPath } from "~/lib/listing"
+import { LISTING_PAGE_SIZE, discountPercent, productPath } from "~/lib/listing"
 import ListingPagination from "./ListingPagination.vue"
 import ProductCard from "./ProductCard.vue"
 import ProductCardSkeleton from "./ProductCardSkeleton.vue"
@@ -20,6 +21,14 @@ const props = defineProps<{
   pageTo: (page: number) => RouteLocationRaw
 }>()
 const emit = defineEmits<{ retry: []; clear: []; buy: [product: ProductCardData] }>()
+
+const { t } = useI18n()
+
+/** No badge when the discount rounds down to 0%: the amber "from" price still shows the sale. */
+function saleBadge(product: ProductCardData) {
+  const percent = discountPercent(product.price, product.compareAt)
+  return percent === null ? undefined : t("listing.saleBadge", { percent })
+}
 
 const pageCount = computed(() => Math.ceil(props.count / LISTING_PAGE_SIZE))
 const skeletons = 8
@@ -85,7 +94,7 @@ const gridClass =
           :to="productPath(product.handle)"
           :price="product.price"
           :compare-at="product.compareAt"
-          :badge="product.compareAt ? $t('listing.saleBadge') : undefined"
+          :badge="saleBadge(product)"
           :stock="product.stock"
           :image-src="product.image ?? undefined"
           @buy="emit('buy', product)"
