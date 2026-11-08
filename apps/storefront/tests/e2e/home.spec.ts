@@ -115,8 +115,16 @@ test.describe("banner carousel", () => {
     await expect(page.getByRole("link", { name: "[Ver coleção]" })).toBeHidden()
 
     const hero = page.getByRole("region", { name: "[Destaques]" })
-    expect(await hero.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(
-      0,
+    // The buttons' colour fade on focus and hover is not motion; anything else would be.
+    const motion = await hero.evaluate((element) =>
+      element
+        .getAnimations({ subtree: true })
+        .filter(
+          (animation) =>
+            !(animation instanceof CSSTransition && animation.transitionProperty.includes("color")),
+        )
+        .map((animation) => animation.constructor.name),
     )
+    expect(motion).toEqual([])
   })
 })
