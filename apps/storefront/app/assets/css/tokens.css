@@ -141,6 +141,9 @@
   --spacing-stack: 0.75rem;
   --spacing-touch: 2.75rem;
 
+  /* The product photo in cards: follows the card's width, so the card fits any grid. */
+  --aspect-product: 4 / 5;
+
   /* Square corners everywhere. The sm to xl names are the ones shadcn-vue components ask for. */
   --radius-control: 0;
   --radius-surface: 0;

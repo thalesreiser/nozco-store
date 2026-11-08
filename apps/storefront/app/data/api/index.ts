@@ -23,6 +23,7 @@ export function createApiSource(_client: MedusaClient): DataSource {
     },
     products: {
       listProducts: notImplemented("listProducts", "FE-04.1b"),
+      listFacets: notImplemented("listFacets", "FE-04.1b"),
       getProduct: notImplemented("getProduct", "FE-04.2b"),
     },
     cart: {

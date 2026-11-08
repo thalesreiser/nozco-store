@@ -2,10 +2,12 @@ import type {
   StoreCart,
   StoreCartLineItem,
   StoreProduct,
+  StoreProductFacet,
   StoreProductListQuery,
 } from "@nozco/shared-types"
+import { OPTION_TITLES } from "~/lib/catalog-contract"
 import { DataSourceError } from "../errors"
-import type { DataSource } from "../source"
+import type { DataSource, StoreProductFiltersQuery } from "../source"
 import {
   homeContentFixture,
   paymentProviderFixtures,
@@ -26,25 +28,73 @@ function sortByQuery(products: StoreProduct[], order: StoreProductListQuery["ord
   if (order === "on_sale") products.sort((a, b) => Number(isOnSale(b)) - Number(isOnSale(a)))
 }
 
-function matchesQuery(product: StoreProduct, query: StoreProductListQuery) {
+const inStock = (product: StoreProduct) =>
+  product.variants.filter((variant) => variant.inventory_quantity > 0)
+
+/** Size and colour filters match only variants in stock (ADR 011). No filter keeps every variant. */
+function variantsMatching(product: StoreProduct, wanted: Record<string, string[]>) {
+  const titles = new Map(product.options.map((option) => [option.id, option.title]))
+  const entries = Object.entries(wanted)
+  if (entries.length === 0) return product.variants
+  return inStock(product).filter((variant) =>
+    entries.every(([title, values]) =>
+      variant.options.some(
+        (value) => titles.get(value.option_id) === title && values.includes(value.value),
+      ),
+    ),
+  )
+}
+
+function matchesPrice(product: StoreProduct, query: StoreProductFiltersQuery) {
   const price = lowestPrice(product)
-  const wanted = Object.entries(query.option_values ?? {})
+  return (
+    (query.min_price === undefined || price >= query.min_price) &&
+    (query.max_price === undefined || price <= query.max_price)
+  )
+}
+
+function matchesBase(product: StoreProduct, query: StoreProductFiltersQuery) {
   return (
     (!query.q || product.title.toLowerCase().includes(query.q.toLowerCase())) &&
     (!query.category_handle ||
       product.categories.some((category) => category.handle === query.category_handle)) &&
-    (!query.collection_handle || product.collection?.handle === query.collection_handle) &&
-    (query.min_price === undefined || price >= query.min_price) &&
-    (query.max_price === undefined || price <= query.max_price) &&
-    product.variants.some((variant) =>
-      wanted.every(([title, values]) => {
-        const optionId = product.options.find((option) => option.title === title)?.id
-        return variant.options.some(
-          (value) => value.option_id === optionId && values.includes(value.value),
-        )
-      }),
-    )
+    (!query.collection_handle || product.collection?.handle === query.collection_handle)
   )
+}
+
+function matchesQuery(product: StoreProduct, query: StoreProductFiltersQuery) {
+  return (
+    matchesBase(product, query) &&
+    matchesPrice(product, query) &&
+    variantsMatching(product, query.option_values ?? {}).length > 0
+  )
+}
+
+/** Same rules as `buildFacets` in the backend: each option is counted with the others' filters only. */
+function facetFor(
+  products: StoreProduct[],
+  title: string,
+  wanted: Record<string, string[]>,
+): StoreProductFacet {
+  const { [title]: _ignored, ...others } = wanted
+  const counts = new Map<string, number>()
+  for (const product of products) {
+    const optionId = product.options.find((option) => option.title === title)?.id
+    // Picking a value offered here must find something, so a facet counts in-stock variants only.
+    const matching = Object.keys(others).length
+      ? variantsMatching(product, others)
+      : inStock(product)
+    const values = matching.flatMap((variant) =>
+      variant.options.filter((value) => value.option_id === optionId).map((value) => value.value),
+    )
+    for (const value of new Set(values)) counts.set(value, (counts.get(value) ?? 0) + 1)
+  }
+  return {
+    title,
+    values: [...counts]
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => a.value.localeCompare(b.value, "pt-BR", { numeric: true })),
+  }
 }
 
 function findVariant(variantId: string) {
@@ -155,6 +205,20 @@ export function createMockSource(): DataSource {
           count: matches.length,
           limit,
           offset,
+        }
+      },
+      async listFacets(query = {}) {
+        const base = productFixtures.filter((product) => matchesBase(product, query))
+        const wanted = query.option_values ?? {}
+        const prices = base
+          .filter((product) => variantsMatching(product, wanted).length > 0)
+          .map(lowestPrice)
+        const inPriceRange = base.filter((product) => matchesPrice(product, query))
+        return {
+          options: [OPTION_TITLES.size, OPTION_TITLES.color].map((title) =>
+            facetFor(inPriceRange, title, wanted),
+          ),
+          price: prices.length ? { min: Math.min(...prices), max: Math.max(...prices) } : null,
         }
       },
       async getProduct(handle) {

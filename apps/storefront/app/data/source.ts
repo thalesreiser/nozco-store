@@ -8,6 +8,7 @@ import type {
   StorePaymentSession,
   StorePaymentStatus,
   StoreProduct,
+  StoreProductFacets,
   StoreProductListQuery,
   StoreProductListResponse,
   StoreStartPayment,
@@ -18,8 +19,13 @@ import type {
 // the choice of source can never change what a page sees. All failures reject with a DataSourceError.
 // Declared as function properties because callers destructure them: `const { addItem } = useCart()`.
 
+/** A listing's filters, without its order and page: what `listFacets` receives. */
+export type StoreProductFiltersQuery = Omit<StoreProductListQuery, "order" | "limit" | "offset">
+
 export interface ProductsApi {
   listProducts: (query?: StoreProductListQuery) => Promise<StoreProductListResponse>
+  /** What the filter controls offer for these filters. */
+  listFacets: (query?: StoreProductFiltersQuery) => Promise<StoreProductFacets>
   /** Resolves to null when no product has this handle. */
   getProduct: (handle: string) => Promise<StoreProduct | null>
 }
