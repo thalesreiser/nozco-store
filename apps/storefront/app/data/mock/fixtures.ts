@@ -1,5 +1,6 @@
 import type {
   StoreCartShippingOption,
+  StoreHomeContent,
   StorePaymentProvider,
   StoreProduct,
   StoreProductOption,
@@ -77,7 +78,8 @@ function makeProduct(input: FixtureInput): StoreProduct {
     handle: input.slug,
     subtitle: "Produto fictício para desenvolvimento",
     description: "Peça inventada, usada apenas para testar as telas da loja.",
-    thumbnail: images[0]?.url ?? null,
+    // No photo exists and the CSP blocks other hosts, so a listing shows ProductCard's placeholder.
+    thumbnail: null,
     options: [sizes, colors],
     variants,
     images,
@@ -137,6 +139,39 @@ export const productFixtures: StoreProduct[] = [
     stock: { "M/Cinza": 0, "G/Cinza": 0 },
   }),
 ]
+
+/**
+ * Two banners, so a mock build shows the carousel; the second has no button. `image_url` is empty only
+ * here, where it means the design's black ground: no photo exists and the CSP blocks other hosts. The
+ * API always sends an https URL (`homeBannerPayloadSchema`).
+ */
+export const homeContentFixture: StoreHomeContent = {
+  banners: [
+    {
+      id: "banner_mock_1",
+      title: "[Título da coleção]",
+      image_url: "",
+      image_alt: "[Descrição da imagem do banner]",
+      cta_label: "[Ver coleção]",
+      cta_url: "/colecao/colecao-exemplo",
+    },
+    {
+      id: "banner_mock_2",
+      title: "[Título da campanha]",
+      image_url: "",
+      image_alt: "[Descrição da imagem do banner]",
+      cta_label: null,
+      cta_url: null,
+    },
+  ],
+  announcements: [
+    {
+      id: "announcement_mock_1",
+      message: "[AVISO DA LOJA: FRETE, PARCELAMENTO OU COLEÇÃO NOVA]",
+      link_url: null,
+    },
+  ],
+}
 
 export const shippingOptionFixtures: StoreCartShippingOption[] = [
   { id: "so_mock_economica", name: "Entrega fictícia econômica", amount: 1500 },

@@ -6,7 +6,12 @@ import type {
 } from "@nozco/shared-types"
 import { DataSourceError } from "../errors"
 import type { DataSource } from "../source"
-import { paymentProviderFixtures, productFixtures, shippingOptionFixtures } from "./fixtures"
+import {
+  homeContentFixture,
+  paymentProviderFixtures,
+  productFixtures,
+  shippingOptionFixtures,
+} from "./fixtures"
 
 const lowestPrice = (product: StoreProduct) =>
   Math.min(...product.variants.map((variant) => variant.calculated_price.calculated_amount))
@@ -134,6 +139,11 @@ export function createMockSource(): DataSource {
   // `async` turns every throw above into a rejection, the same way the api source fails.
   /* eslint-disable @typescript-eslint/require-await */
   return {
+    content: {
+      async getHomeContent() {
+        return structuredClone(homeContentFixture)
+      },
+    },
     products: {
       async listProducts(query = {}) {
         const limit = query.limit ?? 20

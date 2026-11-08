@@ -3,6 +3,7 @@ import type {
   StoreCart,
   StoreCartShippingOption,
   StoreCheckoutContact,
+  StoreHomeContent,
   StorePaymentProvider,
   StorePaymentSession,
   StorePaymentStatus,
@@ -42,7 +43,13 @@ export interface CheckoutApi {
   getPaymentStatus: () => Promise<StorePaymentStatus>
 }
 
+export interface ContentApi {
+  /** Only what is published and inside its dates, each list in display order. */
+  getHomeContent: () => Promise<StoreHomeContent>
+}
+
 export interface DataSource {
+  content: ContentApi
   products: ProductsApi
   cart: CartApi
   checkout: CheckoutApi

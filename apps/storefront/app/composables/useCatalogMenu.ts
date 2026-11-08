@@ -18,6 +18,8 @@ export function menuLinksFrom(products: StoreProduct[]): MenuLink[] {
   ]
 }
 
+export const isCollectionLink = (link: MenuLink) => link.to.startsWith("/colecao/")
+
 /** A failed call leaves the menu without these links; the rest of the layout still works. */
 export function useCatalogMenu() {
   const { listProducts } = useProducts()

@@ -18,6 +18,9 @@ function notImplemented(operation: string, task: string) {
  */
 export function createApiSource(_client: MedusaClient): DataSource {
   return {
+    content: {
+      getHomeContent: notImplemented("getHomeContent", "FE-11.1"),
+    },
     products: {
       listProducts: notImplemented("listProducts", "FE-04.1b"),
       getProduct: notImplemented("getProduct", "FE-04.2b"),
