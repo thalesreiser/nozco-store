@@ -2,13 +2,12 @@ import AxeBuilder from "@axe-core/playwright"
 import { expect, test } from "@playwright/test"
 
 test.describe("home page", () => {
-  test("is server-rendered with the placeholder text", async ({ request }) => {
+  test("is server-rendered with its title", async ({ request }) => {
     const response = await request.get("/")
 
     expect(response.status()).toBe(200)
     const html = await response.text()
-    expect(html).toContain("<h1>NozCo</h1>")
-    expect(html).toContain("Nossa loja está em construção.")
+    expect(html).toMatch(/<h1[^>]*>[^<]+<\/h1>/)
     expect(html).toMatch(/<html\s+lang="pt-BR"/)
   })
 
@@ -29,7 +28,7 @@ test.describe("home page", () => {
 
     await page.goto("/")
 
-    await expect(page.getByRole("heading", { level: 1, name: "NozCo" })).toBeVisible()
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible()
     // Vue sets this when the client bundle mounts, so it fails if the CSP or SRI blocks the bundle.
     await page.waitForFunction(() => "__vue_app__" in (document.querySelector("#__nuxt") ?? {}))
     const { violations } = await new AxeBuilder({ page }).analyze()

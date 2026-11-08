@@ -27,7 +27,11 @@ async function controlsBelowTouchSize(page: Page) {
         return style.display !== "none" && (element as HTMLElement).offsetParent !== null
       })
       .map((element) => {
-        const { width, height } = element.getBoundingClientRect()
+        // A stretched link (ProductCard) is touched through its ::after, which fills the positioned
+        // block around it, so that block is the target to measure.
+        const stretched = getComputedStyle(element, "::after").position === "absolute"
+        const target = stretched ? ((element as HTMLElement).offsetParent ?? element) : element
+        const { width, height } = target.getBoundingClientRect()
         return { text: element.textContent.trim(), width, height }
       })
       .filter(({ width, height }) => width < 44 || height < 44),

@@ -5,7 +5,7 @@ delivered it. Updated in every PR (Definition of Done).
 
 | Req. | Task(s) | Tests | PR | Status |
 |---|---|---|---|---|
-| RF-01 | BE-02.5, FE-11.1 | BE-02.5: `content/__tests__/home.unit.spec.ts`, `packages/shared-types/tests/content.test.ts`, `integration-tests/http/home-content.spec.ts` (banners and announcements for the store) | BE-02.5 PR | In progress |
+| RF-01 | BE-02.5, FE-11.1 | BE-02.5: `content/__tests__/home.unit.spec.ts`, `packages/shared-types/tests/content.test.ts`, `integration-tests/http/home-content.spec.ts` (banners and announcements for the store). FE-11.1: `apps/storefront/tests/components/home-page.test.ts`, `apps/storefront/tests/e2e/home.spec.ts` (on mock data) | BE-02.5 PR, FE-11.1 PR | In progress |
 | RF-02 | BE-02.4, FE-04.1a, FE-04.1b | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `packages/shared-types/tests/catalog.test.ts`, `apps/storefront/tests/server/product-mappers.test.ts`, `integration-tests/http/store-catalog.spec.ts` (filters, facets, sorting, availability, privacy) | BE-02.4 PR | In progress |
 | RF-03 | BE-02.1, FE-04.2a, FE-04.2b | BE-02.1: `apparel/__tests__/variants.unit.spec.ts`, `packages/shared-types/tests/apparel.test.ts`, `integration-tests/http/apparel-product.spec.ts` (variants, stock and availability, compare-at price, fabric metadata) | BE-02.1 PR | In progress |
 | RF-04 | BE-02.4, FE-04.3 | BE-02.4: `catalog/__tests__/listing.unit.spec.ts`, `integration-tests/http/store-catalog.spec.ts` (text search) | BE-02.4 PR | In progress |
