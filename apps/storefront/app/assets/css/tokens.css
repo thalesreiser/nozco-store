@@ -112,7 +112,9 @@
   --font-weight-action: 700;
   --font-weight-heavy: 900;
 
-  --text-display: 6.5rem;
+  /* ADR 011: fluid on phones. 52 px on a 390 px screen, up to 104 px from a 1280 px screen. In rem as
+     well as vw, so browser zoom and text size settings still enlarge it. */
+  --text-display: clamp(3rem, 1.83rem + 5.83vw, 6.5rem);
   --text-display--line-height: 0.9;
   --text-heading: 2.5rem;
   --text-heading--line-height: 1;
@@ -130,7 +132,8 @@
   --tracking-label: 0.04em;
 
   /* Named steps; the numeric scale (p-4, h-9) still works through --spacing. */
-  --spacing-page: 3rem;
+  /* ADR 011: the page gutter is 16 px on phones and 48 px from the lg breakpoint (--page-gutter). */
+  --spacing-page: var(--page-gutter);
   --spacing-hero: 2.5rem;
   --spacing-section: 2rem;
   --spacing-inline: 2rem;
@@ -151,6 +154,17 @@
 
   /* Only for what floats above the page. Cards have no outline and no offset shadow, so no token. */
   --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.16);
+}
+
+/* The responsive value behind --spacing-page. Outside @theme, so it is not a utility of its own. */
+:root {
+  --page-gutter: 1rem;
+}
+
+@media (width >= 64rem) {
+  :root {
+    --page-gutter: 3rem;
+  }
 }
 
 /* Inline, so utilities read the variable where they are used and follow the ground. */

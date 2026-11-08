@@ -1,5 +1,6 @@
 import type {
   StoreCartShippingOption,
+  StoreHomeContent,
   StorePaymentProvider,
   StoreProduct,
   StoreProductOption,
@@ -169,6 +170,39 @@ export const productFixtures: StoreProduct[] = [
   }),
   ...printFixtures(),
 ]
+
+/**
+ * Two banners, so a mock build shows the carousel; the second has no button. `image_url` is empty only
+ * here, where it means the design's black ground: no photo exists and the CSP blocks other hosts. The
+ * API always sends an https URL (`homeBannerPayloadSchema`).
+ */
+export const homeContentFixture: StoreHomeContent = {
+  banners: [
+    {
+      id: "banner_mock_1",
+      title: "[Título da coleção]",
+      image_url: "",
+      image_alt: "[Descrição da imagem do banner]",
+      cta_label: "[Ver coleção]",
+      cta_url: "/colecao/colecao-exemplo",
+    },
+    {
+      id: "banner_mock_2",
+      title: "[Título da campanha]",
+      image_url: "",
+      image_alt: "[Descrição da imagem do banner]",
+      cta_label: null,
+      cta_url: null,
+    },
+  ],
+  announcements: [
+    {
+      id: "announcement_mock_1",
+      message: "[AVISO DA LOJA: FRETE, PARCELAMENTO OU COLEÇÃO NOVA]",
+      link_url: null,
+    },
+  ],
+}
 
 export const shippingOptionFixtures: StoreCartShippingOption[] = [
   { id: "so_mock_economica", name: "Entrega fictícia econômica", amount: 1500 },

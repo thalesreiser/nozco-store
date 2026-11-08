@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs"
 import { afterEach, describe, expect, expectTypeOf, it } from "vitest"
 import { shouldBundleMockSource } from "#shared/data-source"
-import { resetDataSources } from "~/data"
+import { resetDataSources, useDataSource } from "~/data"
 import { createApiSource } from "~/data/api"
 import { createMedusaClient } from "~/data/api/client"
 import { DataSourceError } from "~/data/errors"
@@ -13,7 +13,12 @@ import type { CartApi, CheckoutApi, DataSource, ProductsApi } from "~/data/sourc
 function useSource(name: string) {
   useRuntimeConfig().public.dataSource = name
   resetDataSources()
-  return { products: useProducts(), cart: useCart(), checkout: useCheckout() }
+  return {
+    content: useDataSource().content,
+    products: useProducts(),
+    cart: useCart(),
+    checkout: useCheckout(),
+  }
 }
 
 function shape(source: object) {
