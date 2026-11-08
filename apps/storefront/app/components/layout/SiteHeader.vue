@@ -49,7 +49,7 @@ const cartLabel = computed(() =>
           <BrandMark class="max-lg:h-auto max-lg:w-full" />
         </NuxtLink>
       </div>
-      <div class="flex shrink-0 items-center gap-1 lg:gap-inline">
+      <div class="flex items-center gap-1 max-lg:shrink-0 lg:gap-inline">
         <nav class="hidden lg:block" :aria-label="$t('layout.nav.label')">
           <ul class="flex items-center gap-inline">
             <li v-for="link in links" :key="link.to">
