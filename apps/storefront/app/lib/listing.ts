@@ -154,23 +154,41 @@ export interface ProductCardData {
 
 export const productPath = (handle: string) => `/produto/${handle}`
 
+/** "Últimas" shows at this many units or fewer (ADR 012). Public stock is capped at 10, so it still applies. */
+export const LOW_STOCK_MAX = 5
+
+export function stockStatus(quantity: number): StockStatus {
+  if (quantity <= 0) return "out"
+  return quantity <= LOW_STOCK_MAX ? "low" : "in"
+}
+
 /**
- * The card shows the lowest price, the one the price filter and sorting use. "Low" stock is not derived:
- * its quantity is a business rule nobody has set yet (see StockBadge).
+ * The whole percentage off, rounded down so the badge never promises more than the real discount.
+ * `null` when there is no sale or the discount is under 1%.
  */
+export function discountPercent(price: Cents, compareAt: Cents | null): number | null {
+  if (!compareAt || compareAt <= price) return null
+  const percent = Math.floor(((compareAt - price) * 100) / compareAt)
+  return percent >= 1 ? percent : null
+}
+
+/** The card shows the lowest price, the one the price filter and sorting use. */
 export function toProductCard(product: StoreProduct): ProductCardData {
   const prices = product.variants.map((variant) => variant.calculated_price)
   const lowest = prices.reduce<(typeof prices)[number] | null>(
     (best, price) => (!best || price.calculated_amount < best.calculated_amount ? price : best),
     null,
   )
-  const soldOut = product.variants.every((variant) => variant.inventory_quantity <= 0)
+  const units = product.variants.reduce(
+    (sum, variant) => sum + Math.max(variant.inventory_quantity, 0),
+    0,
+  )
   return {
     handle: product.handle,
     title: product.title,
     price: lowest?.calculated_amount ?? 0,
     compareAt: lowest?.compare_at_amount ?? null,
-    stock: soldOut ? "out" : "in",
+    stock: stockStatus(units),
     image: product.thumbnail,
   }
 }

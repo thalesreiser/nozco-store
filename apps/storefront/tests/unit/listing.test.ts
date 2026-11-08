@@ -5,10 +5,13 @@ import { productFixtures } from "~/data/mock/fixtures"
 import type { ListingState } from "~/lib/listing"
 import {
   LISTING_PAGE_SIZE,
+  LOW_STOCK_MAX,
   activeFilterCount,
+  discountPercent,
   filterLabel,
   paginationItems,
   parseListingState,
+  stockStatus,
   toFiltersQuery,
   toListQuery,
   toProductCard,
@@ -158,8 +161,54 @@ describe("toProductCard", () => {
     expect(toProductCard(soldOut).stock).toBe("out")
   })
 
+  it("is low when the units of all variants add up to 5 or fewer", () => {
+    const few = structuredClone(product)
+    for (const variant of few.variants) variant.inventory_quantity = 0
+    few.variants[0]!.inventory_quantity = 3
+    few.variants[1]!.inventory_quantity = 2
+
+    expect(toProductCard(few).stock).toBe("low")
+  })
+
   it("carries no variants, so the page payload stays small", () => {
     expect(Object.keys(toProductCard(product))).not.toContain("variants")
+  })
+})
+
+describe("stockStatus", () => {
+  it.each([
+    [-1, "out"],
+    [0, "out"],
+    [1, "low"],
+    [LOW_STOCK_MAX, "low"],
+    [LOW_STOCK_MAX + 1, "in"],
+    [10, "in"],
+  ] as const)("maps %i units to %s", (quantity, status) => {
+    expect(stockStatus(quantity)).toBe(status)
+  })
+
+  it("keeps the ADR 012 threshold of 5 units", () => {
+    expect(LOW_STOCK_MAX).toBe(5)
+  })
+})
+
+describe("discountPercent", () => {
+  it.each([
+    [8000, 10000, 20],
+    [4990, 6990, 28], // 28.6%, rounded down
+    [9001, 10000, 9], // 9.99%, never shown as 10%
+    [100, 300, 66], // 66.67%
+    [9901, 10000, null], // 0.99%: under 1%
+    [9900, 10000, 1],
+    [1, 1, null],
+  ])("is %s off %s: %s", (price, compareAt, percent) => {
+    expect(discountPercent(price, compareAt)).toBe(percent)
+  })
+
+  it("is null without a higher previous price", () => {
+    expect(discountPercent(5000, null)).toBeNull()
+    expect(discountPercent(5000, 5000)).toBeNull()
+    expect(discountPercent(5000, 4000)).toBeNull()
   })
 })
 

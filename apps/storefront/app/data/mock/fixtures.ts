@@ -105,7 +105,7 @@ const TAXON_NAMES: Record<string, string> = {
 
 const taxonName = (handle: string) => TAXON_NAMES[handle] ?? handle
 
-/** More than one page of a listing, with sales, a sold-out product and a name that needs to wrap. */
+/** More than one page of a listing, with sales, a sold-out product, a last-units one and a name that wraps. */
 function printFixtures() {
   const sizes = ["P", "M", "G", "GG"]
   return Array.from({ length: 24 }, (_, index) => {
@@ -124,11 +124,15 @@ function printFixtures() {
       colors,
       category: "estampas-exemplo",
       collection: null,
+      // 02 is sold out; 03 has 4 units in all, so it shows "Últimas".
       stock:
-        index === 2
-          ? Object.fromEntries(
-              sizes.flatMap((size) => colors.map((color) => [`${size}/${color}`, 0])),
-            )
+        index === 2 || index === 3
+          ? {
+              ...Object.fromEntries(
+                sizes.flatMap((size) => colors.map((color) => [`${size}/${color}`, 0])),
+              ),
+              ...(index === 3 && { "M/Azul": 3, "G/Verde": 1 }),
+            }
           : undefined,
     })
   })
