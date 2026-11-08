@@ -7,7 +7,7 @@
     aria-label="NoZCo"
     fill="currentColor"
     fill-rule="evenodd"
-    class="h-6 w-auto"
+    class="h-6 w-auto max-[22.5rem]:h-5"
   >
     <path d="M0 0H40L104 58V0H130V100H92L26 40V100H0Z" />
     <path transform="translate(142)" d="M14 26H90L104 40V86L90 100H14L0 86V40ZM26 46V80H78V46Z" />

@@ -32,7 +32,7 @@ const cartLabel = computed(() =>
   <header>
     <AnnouncementBar />
     <div
-      class="ground-brand flex items-center justify-between gap-inline border-b-3 px-4 py-2 lg:px-page lg:py-5"
+      class="ground-brand flex items-center justify-between gap-inline border-b-3 px-4 py-2 max-[22.5rem]:gap-2 lg:px-page lg:py-5"
     >
       <div class="flex items-center gap-2">
         <div class="lg:hidden">
@@ -56,7 +56,7 @@ const cartLabel = computed(() =>
           </ul>
         </nav>
         <SearchForm class="hidden lg:flex" />
-        <Button as-child>
+        <Button as-child class="max-[22.5rem]:px-2">
           <NuxtLink to="/carrinho" :aria-label="cartLabel">
             {{ $t("layout.cart.text") }}
             <span :class="{ invisible: cartCount === null }">({{ cartCount ?? 0 }})</span>

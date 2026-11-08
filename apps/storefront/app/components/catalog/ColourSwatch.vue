@@ -2,8 +2,9 @@
 import OptionGroup from "~/components/base/OptionGroup.vue"
 import type { SelectableOption } from "~/lib/options"
 
-// The name is always written, so colour is never the only signal. The chip only appears when an option
-// has `fill`: products have a colour name but no colour value yet (see the PR's pending decisions).
+// The name is always written, so colour is never the only signal. Each colour shows a chip and its name
+// (ADR 011). The chip waits for the colour value that BE-02.6 adds to the catalog, so an option without
+// `fill` shows the name alone.
 withDefaults(
   defineProps<{
     label: string
