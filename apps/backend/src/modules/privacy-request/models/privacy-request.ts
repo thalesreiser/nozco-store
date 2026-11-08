@@ -2,9 +2,9 @@ import { model } from "@medusajs/framework/utils"
 
 /**
  * The log of data-subject requests: who asked (`customer_id`), what (`type`), when (`created_at`) and
- * the result (`status`, `failure_code`). It has no free-text column, so it cannot end up holding a CPF
- * or other personal data, and it outlives the customer's anonymisation. No workspace imports here:
- * `db:migrate` loads this file without building the packages.
+ * the result (`status`, `failure_code`). It outlives the customer's anonymisation, so its only free-text
+ * column, `rejection_reason`, must not hold personal data. No workspace imports here: `db:migrate` loads
+ * this file without building the packages.
  */
 const PrivacyRequest = model
   .define("privacy_request", {
@@ -18,6 +18,8 @@ const PrivacyRequest = model
     completed_at: model.dateTime().nullable(),
     /** A fixed code, never an error message, which could quote personal data. */
     failure_code: model.text().nullable(),
+    /** Typed by the operator and shown to the customer. Never log it, not even inside an error. */
+    rejection_reason: model.text().nullable(),
   })
   .indexes([
     { on: ["customer_id"], where: "deleted_at IS NULL" },

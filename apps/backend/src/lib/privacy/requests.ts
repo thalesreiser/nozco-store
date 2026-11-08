@@ -9,6 +9,7 @@ export interface PrivacyRequestRow {
   decided_at?: string | Date | null
   completed_at?: string | Date | null
   failure_code?: string | null
+  rejection_reason?: string | null
   created_at?: string | Date | null
 }
 
@@ -32,7 +33,10 @@ export function reviewRefusal(
     : { code: "request_already_decided", message: "The request was already decided." }
 }
 
-/** What a customer sees of their own request: the operator's identity stays in the back office. */
+/**
+ * What a customer sees of their own request, with the reason for a refusal: the operator's identity
+ * stays in the back office.
+ */
 export function customerView(request: PrivacyRequestRow) {
   return {
     id: request.id,
@@ -40,6 +44,7 @@ export function customerView(request: PrivacyRequestRow) {
     status: request.status,
     created_at: request.created_at ?? null,
     completed_at: request.completed_at ?? null,
+    rejection_reason: request.rejection_reason ?? null,
   }
 }
 

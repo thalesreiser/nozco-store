@@ -16,6 +16,18 @@ export const privacyRequestPayloadSchema = z.strictObject({
 
 export type PrivacyRequestPayload = z.infer<typeof privacyRequestPayloadSchema>
 
+export const PRIVACY_REJECTION_REASON_MAX_LENGTH = 500
+
+/**
+ * Body of a refusal. The customer reads the reason, and it stays in the request log after an
+ * anonymisation, so operators must not type personal data in it. It is never logged.
+ */
+export const privacyRequestRejectionSchema = z.strictObject({
+  reason: z.string().trim().min(1).max(PRIVACY_REJECTION_REASON_MAX_LENGTH),
+})
+
+export type PrivacyRequestRejection = z.infer<typeof privacyRequestRejectionSchema>
+
 /** Query string of the back-office list. */
 export const privacyRequestListQuerySchema = z.strictObject({
   type: z.enum(PRIVACY_REQUEST_TYPES).optional(),

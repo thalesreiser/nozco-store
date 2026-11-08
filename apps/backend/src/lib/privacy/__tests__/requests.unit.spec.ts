@@ -54,4 +54,12 @@ describe("views", () => {
   it("shows the decision in the back office", () => {
     expect(adminView(row)).toMatchObject({ customer_id: "cus_1", decided_by: "user_1" })
   })
+
+  it("shows the reason for a refusal to both, and null when there is none", () => {
+    const refused = { ...row, status: "rejected" as const, rejection_reason: "Motivo de exemplo" }
+
+    expect(customerView(refused).rejection_reason).toBe("Motivo de exemplo")
+    expect(adminView(refused).rejection_reason).toBe("Motivo de exemplo")
+    expect(customerView(row).rejection_reason).toBeNull()
+  })
 })

@@ -12,7 +12,7 @@ legal wording are not decided here; the open points are listed at the end.
 | `GET /store/customers/me/privacy-requests` | Customer | Their own requests |
 | `GET /admin/privacy-requests` | Operator | The log, with `type`, `status`, `limit` and `offset` |
 | `POST /admin/privacy-requests/:id/approve` | Operator | Runs the anonymisation. Approving a failed request resumes it |
-| `POST /admin/privacy-requests/:id/reject` | Operator | Closes the request and changes no data |
+| `POST /admin/privacy-requests/:id/reject` `{ "reason": "..." }` | Operator | Closes the request and changes no data. The reason is required, up to 500 characters, and the customer sees it on `GET /store/customers/me/privacy-requests` |
 
 The customer comes from the session only; a body that names one is refused. Data is matched by
 `customer_id`, never by e-mail, because Medusa does not verify an address on registration.
@@ -44,7 +44,19 @@ lawyer (see below).
 | Payments, fulfillments and their addresses linked to the order | Proof of payment and delivery |
 | `order.customer_id`, `cart.customer_id`, the customer row's ID | Keep the record consistent and let a failed request resume. They point at an empty row and identify nobody on their own |
 | Cart rows, without personal data | A completed cart is linked to its order |
-| Request log: `customer_id`, `type`, `status`, dates, `decided_by`, `failure_code` | Proves that the request was answered. It has no free-text column, so it cannot hold a CPF |
+| Request log: `customer_id`, `type`, `status`, dates, `decided_by`, `failure_code`, `rejection_reason` | Proves that the request was answered. The reason is its only free text: see below |
+
+## The reason for a refusal
+
+Decided in [ADR 011](adr/011-store-decisions-2026-11-07.md) (BE-03.6). **Operators must not type personal data in the reason**: no CPF, name,
+address, order data or anything else that identifies the person. The customer reads it, and it stays in
+the log even if a later deletion of the same customer is approved, because an anonymisation does not change
+the log. The API cannot tell whether a text holds personal data, so this rule depends on the operator.
+
+The reason is never logged: validation errors name the field only, a failed save logs the error's name
+only, and neither repeats the text.
+
+The wording of the reasons still needs a lawyer's review.
 
 ## Known limits
 
