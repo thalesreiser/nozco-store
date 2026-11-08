@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { StoreHomeAnnouncement } from "@nozco/shared-types"
 import { computed } from "vue"
 import { useI18n } from "vue-i18n"
 import type { MenuLink } from "~/composables/useCatalogMenu"
@@ -13,6 +14,8 @@ const props = defineProps<{
   /** Null while unknown: the number stays out, keeping its space so the header does not move. */
   cartCount: number | null
   whatsAppUrl: string | null
+  /** The bar above the header. Without one it stays out. */
+  announcement?: StoreHomeAnnouncement | null
 }>()
 
 const { t } = useI18n()
@@ -30,7 +33,7 @@ const cartLabel = computed(() =>
 
 <template>
   <header>
-    <AnnouncementBar />
+    <AnnouncementBar v-if="announcement" :announcement="announcement" />
     <div
       class="ground-brand flex items-center justify-between gap-inline border-b-3 px-4 py-2 lg:px-page lg:py-5"
     >

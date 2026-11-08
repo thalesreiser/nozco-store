@@ -1,7 +1,31 @@
 {
   "home": {
     "title": "NozCo",
-    "underConstruction": "Nossa loja está em construção."
+    "retry": "[Tentar de novo]",
+    "hero": {
+      "label": "[Destaques]",
+      "carousel": "carrossel",
+      "previous": "[Destaque anterior]",
+      "next": "[Próximo destaque]",
+      "position": "{current} de {total}"
+    },
+    "value": {
+      "label": "[Vantagens]",
+      "shipping": "[Frete]",
+      "installments": "[Parcelamento]",
+      "exchanges": "[Troca]",
+      "security": "[Segurança]"
+    },
+    "newArrivals": {
+      "title": "[Novidades]",
+      "empty": "[Novidades em breve]",
+      "error": "[Não foi possível carregar as novidades.]",
+      "saleBadge": "[% OFF]"
+    },
+    "collections": {
+      "title": "[Coleções]",
+      "error": "[Não foi possível carregar as coleções.]"
+    }
   },
   "price": {
     "previous": "Preço anterior:"
@@ -27,7 +51,6 @@
   },
   "layout": {
     "skipToContent": "Pular para o conteúdo",
-    "announcement": "[AVISO DA LOJA: FRETE, PARCELAMENTO OU COLEÇÃO NOVA]",
     "home": "NozCo, página inicial",
     "opensInNewTab": "(abre em nova aba)",
     "whatsApp": "[Falar no WhatsApp]",
