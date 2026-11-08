@@ -14,6 +14,8 @@ export interface StoreProductOptionValue {
   id: string
   value: string
   option_id: string
+  /** A colour's value as `#rrggbb`. Null or absent: show the name only. Sizes never have one. */
+  color_hex?: string | null
 }
 
 /** A garment's option, such as size or colour. */
@@ -36,7 +38,10 @@ export interface StoreProductVariant {
   product_id: string
   title: string
   sku: string | null
-  /** Units available for this variant; 0 for a variant whose stock is not tracked. */
+  /**
+   * Units available for this variant, capped at `PUBLIC_STOCK_CAP`: that value means "this many or more".
+   * 0 for a variant whose stock is not tracked.
+   */
   inventory_quantity: number
   /** Whether it can be bought now. Decide with this: stock is not all that allows a sale. */
   in_stock: boolean
@@ -91,8 +96,16 @@ export interface StoreProductListResponse {
 
 export interface StoreProductFacetValue {
   value: string
-  /** Products that remain when this value is picked, keeping the filters of the other options. */
+  /**
+   * Products with a variant in stock that holds this value and the filters of the other options. A value
+   * with none in stock does not appear.
+   */
   count: number
+  /**
+   * The colour's value as `#rrggbb`; if products differ, the one most of them use. Null or absent: show
+   * the name only.
+   */
+  color_hex?: string | null
 }
 
 export interface StoreProductFacet {

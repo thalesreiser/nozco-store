@@ -6,6 +6,7 @@ import {
   sortCatalog,
   sumUnitsSold,
   toCatalogProduct,
+  type VariantAvailability,
 } from "../listing"
 
 // Example only: the real size grid is pending in Q-03.
@@ -51,8 +52,19 @@ function row(
   }
 }
 
-function item(...args: Parameters<typeof row>): CatalogProduct {
-  const mapped = toCatalogProduct(row(...args), {})
+/** Every variant has stock unless `availability` says otherwise. */
+function item(
+  id: string,
+  grid: [size: string, color: string][],
+  overrides: Partial<CatalogProductRow> = {},
+  price?: { calculated_amount: number; original_amount: number },
+  availability: VariantAvailability = {},
+): CatalogProduct {
+  const source = row(id, grid, overrides, price)
+  const stocked = Object.fromEntries(
+    (source.variants ?? []).map((variant) => [variant.id, { availability: 5 }]),
+  )
+  const mapped = toCatalogProduct(source, { ...stocked, ...availability })
   if (!mapped) throw new Error("expected a product")
   return mapped
 }
@@ -92,6 +104,110 @@ describe("toCatalogProduct", () => {
       "sku",
       "title",
     ])
+  })
+
+  it("returns a product's sizes in the grid's order, with unknown ones after, and keeps colours", () => {
+    const product = toCatalogProduct(
+      row("a", [
+        ["GG", "Preto"],
+        ["Especial", "Branco"],
+        ["G", "Preto"],
+        ["P", "Azul"],
+      ]),
+      {},
+    )?.product
+    const valuesOf = (title: string) =>
+      product?.options.find((option) => option.title === title)?.values.map(({ value }) => value)
+
+    expect(valuesOf("Tamanho")).toEqual(["P", "G", "GG", "Especial"])
+    expect(valuesOf("Cor")).toEqual(["Preto", "Branco", "Preto", "Azul"])
+  })
+
+  describe("public stock", () => {
+    const variantWith = (availability: number | null, overrides = {}) => {
+      const source = row("a", [["P", "Preto"]])
+      source.variants = source.variants?.map((variant) => ({ ...variant, ...overrides }))
+      return toCatalogProduct(source, { a_P_Preto: { availability } })?.product.variants[0]
+    }
+
+    it.each([
+      [0, 0, false],
+      [1, 1, true],
+      [9, 9, true],
+      [10, 10, true],
+      [11, 10, true],
+      [250, 10, true],
+    ])("shows %i units as %i, in stock: %s", (units, shown, in_stock) => {
+      expect(variantWith(units)).toMatchObject({ inventory_quantity: shown, in_stock })
+    })
+
+    it("keeps every quantity below the cap exact, so a low-stock status can read it", () => {
+      for (let units = 1; units < 10; units += 1) {
+        expect(variantWith(units)?.inventory_quantity).toBe(units)
+      }
+    })
+
+    it("sells an untracked or backorder variant, with no number to show", () => {
+      expect(variantWith(null, { manage_inventory: false })).toMatchObject({
+        inventory_quantity: 0,
+        in_stock: true,
+      })
+      expect(variantWith(0, { allow_backorder: true })).toMatchObject({
+        inventory_quantity: 0,
+        in_stock: true,
+      })
+    })
+  })
+
+  describe("colour value", () => {
+    const colored = (metadata: unknown) =>
+      toCatalogProduct(
+        row(
+          "a",
+          [
+            ["P", "Preto"],
+            ["P", "Branco"],
+          ],
+          { metadata },
+        ),
+        {},
+      )?.product
+    const colorValues = (metadata: unknown) => {
+      const option = colored(metadata)?.options.find(({ title }) => title === "Cor")
+      return Object.fromEntries((option?.values ?? []).map((v) => [v.value, v.color_hex]))
+    }
+
+    it("reads the product's flat key, and leaves a colour without one to its name", () => {
+      expect(colorValues({ "color_hex:Preto": "#111111" })).toEqual({
+        Preto: "#111111",
+        Branco: null,
+      })
+    })
+
+    it("gives the value on the variant's options too, and none to a size", () => {
+      const [variant] =
+        colored({ "color_hex:Preto": "#111111", "color_hex:P": "#222222" })?.variants ?? []
+      expect(variant?.options.map((option) => option.color_hex)).toEqual([null, "#111111"])
+    })
+
+    it("ignores a bad value instead of passing it on", () => {
+      expect(colorValues({ "color_hex:Preto": "preto" }).Preto).toBeNull()
+    })
+
+    it("gives each product its own value for the same colour name", () => {
+      const first = item("one", [["P", "Azul"]], { metadata: { "color_hex:Azul": "#000080" } })
+      const second = item("two", [["P", "Azul"]], { metadata: { "color_hex:Azul": "#87ceeb" } })
+      const valueOf = ({ product }: CatalogProduct) => product.variants[0]?.options[1]?.color_hex
+
+      expect(valueOf(first)).toBe("#000080")
+      expect(valueOf(second)).toBe("#87ceeb")
+    })
+
+    it("does not leave the colour keys in the public metadata", () => {
+      expect(colored({ fabric: "Exemplo", "color_hex:Preto": "#111111" })?.metadata).toEqual({
+        fabric: "Exemplo",
+      })
+    })
   })
 
   it("hides internal and inactive categories", () => {
@@ -166,6 +282,46 @@ describe("filterCatalog", () => {
   it("treats several values of one option as alternatives", () => {
     const query = { option_values: { Tamanho: ["P", "G"] } }
     expect(ids(filterCatalog([blackP, mixed], query))).toEqual(["black-p", "mixed"])
+  })
+
+  describe("with stock", () => {
+    const soldOut = { availability: 0 }
+    // P in black is sold out, M in black and P in white are not.
+    const product = item(
+      "stock",
+      [
+        ["P", "Preto"],
+        ["M", "Preto"],
+        ["P", "Branco"],
+      ],
+      {},
+      undefined,
+      { stock_P_Preto: soldOut },
+    )
+
+    it("does not match a variant that is sold out, even when each value has stock elsewhere", () => {
+      const query = { option_values: { Tamanho: ["P"], Cor: ["Preto"] } }
+      expect(filterCatalog([product], query)).toEqual([])
+    })
+
+    it("matches the variants still in stock", () => {
+      expect(ids(filterCatalog([product], { option_values: { Tamanho: ["M"] } }))).toEqual([
+        "stock",
+      ])
+      expect(ids(filterCatalog([product], { option_values: { Cor: ["Branco"] } }))).toEqual([
+        "stock",
+      ])
+    })
+
+    it("drops a product for a value with no stock at all", () => {
+      const white = item("white", [["G", "Branco"]], {}, undefined, { white_G_Branco: soldOut })
+      expect(filterCatalog([white], { option_values: { Tamanho: ["G"] } })).toEqual([])
+    })
+
+    it("keeps a sold-out product in a listing with no size or colour filter", () => {
+      const white = item("white", [["G", "Branco"]], {}, undefined, { white_G_Branco: soldOut })
+      expect(ids(filterCatalog([white], {}))).toEqual(["white"])
+    })
   })
 
   it("finds nothing for an option no product has", () => {
@@ -293,14 +449,16 @@ describe("buildFacets", () => {
   ])
   const two = item("two", [["P", "Branco"]], {}, { calculated_amount: 50, original_amount: 50 })
 
-  const values = (facets: ReturnType<typeof buildFacets>, title: string) =>
+  const facetOf = (facets: ReturnType<typeof buildFacets>, title: string) =>
     facets.options.find((facet) => facet.title === title)?.values
+  const values = (facets: ReturnType<typeof buildFacets>, title: string) =>
+    facetOf(facets, title)?.map(({ value, count }) => ({ value, count }))
 
   it("counts products once per value and gives the price range", () => {
     const facets = buildFacets([one, two], {})
     expect(values(facets, "Tamanho")).toEqual([
-      { value: "M", count: 1 },
       { value: "P", count: 2 },
+      { value: "M", count: 1 },
     ])
     expect(values(facets, "Cor")).toEqual([
       { value: "Branco", count: 1 },
@@ -322,6 +480,108 @@ describe("buildFacets", () => {
     const facets = buildFacets([one, two], { max_price: 5000 })
     expect(values(facets, "Tamanho")).toEqual([{ value: "P", count: 1 }])
     expect(facets.price).toEqual({ min: 50, max: 100 })
+  })
+
+  it("orders the size facet by the grid, with unknown sizes after, and colours by text", () => {
+    const product = item("grid", [
+      ["XGG", "Preto"],
+      ["Especial", "Azul"],
+      ["GG", "Preto"],
+      ["G", "Preto"],
+      ["M", "Preto"],
+      ["P", "Preto"],
+    ])
+    const facets = buildFacets([product], {})
+
+    expect(values(facets, "Tamanho")?.map(({ value }) => value)).toEqual([
+      "P",
+      "M",
+      "G",
+      "GG",
+      "XGG",
+      "Especial",
+    ])
+    expect(values(facets, "Cor")?.map(({ value }) => value)).toEqual(["Azul", "Preto"])
+  })
+
+  it("counts only variants in stock, on the same variant as the other filters", () => {
+    const product = item(
+      "stock",
+      [
+        ["P", "Preto"],
+        ["M", "Preto"],
+        ["P", "Branco"],
+        ["G", "Branco"],
+      ],
+      {},
+      undefined,
+      { stock_P_Preto: { availability: 0 }, stock_G_Branco: { availability: 0 } },
+    )
+
+    const all = buildFacets([product], {})
+    expect(values(all, "Tamanho")).toEqual([
+      { value: "P", count: 1 },
+      { value: "M", count: 1 },
+    ])
+    expect(values(all, "Cor")).toEqual([
+      { value: "Branco", count: 1 },
+      { value: "Preto", count: 1 },
+    ])
+
+    const black = buildFacets([product], { option_values: { Cor: ["Preto"] } })
+    expect(values(black, "Tamanho")).toEqual([{ value: "M", count: 1 }])
+    const small = buildFacets([product], { option_values: { Tamanho: ["P"] } })
+    expect(values(small, "Cor")).toEqual([{ value: "Branco", count: 1 }])
+  })
+
+  it("leaves out a value with nothing in stock", () => {
+    const product = item("gone", [["G", "Cinza"]], {}, undefined, {
+      gone_G_Cinza: { availability: 0 },
+    })
+    const facets = buildFacets([product], {})
+
+    expect(values(facets, "Tamanho")).toEqual([])
+    expect(values(facets, "Cor")).toEqual([])
+  })
+
+  it("agrees with the filter on the price range", () => {
+    const sold = item("gone", [["G", "Cinza"]], {}, undefined, {
+      gone_G_Cinza: { availability: 0 },
+    })
+    expect(buildFacets([sold], {}).price).toEqual({ min: 100, max: 100 })
+    expect(buildFacets([sold], { option_values: { Cor: ["Cinza"] } }).price).toBeNull()
+  })
+
+  describe("colour value", () => {
+    const withValue = (id: string, hex?: string) =>
+      item(id, [["P", "Azul"]], { metadata: hex ? { "color_hex:Azul": hex } : {} })
+
+    const blue = (items: CatalogProduct[]) =>
+      facetOf(buildFacets(items, {}), "Cor")?.find(({ value }) => value === "Azul")
+
+    it("gives each colour its value, and null to one with none and to sizes", () => {
+      expect(blue([withValue("a", "#000080")])).toEqual({
+        value: "Azul",
+        count: 1,
+        color_hex: "#000080",
+      })
+      expect(blue([withValue("a")])?.color_hex).toBeNull()
+      expect(
+        facetOf(buildFacets([withValue("a", "#000080")], {}), "Tamanho")?.[0]?.color_hex,
+      ).toBeNull()
+    })
+
+    it("uses the value most products give the name, with a stable tie", () => {
+      const items = [
+        withValue("a", "#87ceeb"),
+        withValue("b", "#000080"),
+        withValue("c", "#87ceeb"),
+      ]
+      expect(blue(items)).toMatchObject({ count: 3, color_hex: "#87ceeb" })
+      expect(blue([withValue("a", "#87ceeb"), withValue("b", "#000080")])?.color_hex).toBe(
+        "#000080",
+      )
+    })
   })
 
   it("has no range when nothing matches", () => {

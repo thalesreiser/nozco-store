@@ -54,6 +54,50 @@ describe("withoutPrivateProductFields", () => {
     expect(withoutPrivateProductFields(body)).toEqual(body)
   })
 
+  it("caps the stock at any depth and leaves a lower number exact", () => {
+    const body = {
+      variant: { inventory_quantity: 11 },
+      products: [
+        {
+          variants: [
+            { inventory_quantity: 250 },
+            { inventory_quantity: 10 },
+            { inventory_quantity: 9 },
+            { inventory_quantity: 0 },
+            { inventory_quantity: null },
+          ],
+        },
+      ],
+    }
+
+    expect(withoutPrivateProductFields(body)).toEqual({
+      variant: { inventory_quantity: 10 },
+      products: [
+        {
+          variants: [
+            { inventory_quantity: 10 },
+            { inventory_quantity: 10 },
+            { inventory_quantity: 9 },
+            { inventory_quantity: 0 },
+            { inventory_quantity: null },
+          ],
+        },
+      ],
+    })
+  })
+
+  it("removes the other fields that hold a stock number", () => {
+    const body = {
+      id: "variant_1",
+      inventory: [{ stocked_quantity: 250 }],
+      stocked_quantity: 250,
+      reserved_quantity: 1,
+      available_quantity: 249,
+    }
+
+    expect(withoutPrivateProductFields(body)).toEqual({ id: "variant_1" })
+  })
+
   it("sends a date as the response would, and reaches inside a class instance", () => {
     class Row {
       metadata = { cost: 1 }

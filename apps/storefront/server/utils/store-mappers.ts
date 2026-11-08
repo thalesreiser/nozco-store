@@ -1,6 +1,7 @@
 import {
   apparelMetadataSchema,
   type Cents,
+  colorHexSchema,
   type StoreAddress,
   type StoreCart,
   type StoreCartShippingOption,
@@ -188,7 +189,17 @@ export const customerResponse = z
   .transform((value) => value.customer)
 
 const image = z.object({ id: z.string(), url: z.string(), rank: z.number() })
-const optionValue = z.object({ id: z.string(), value: z.string(), option_id: z.string() })
+// A bad value shows the name alone and does not take the whole listing down.
+const colorHex = colorHexSchema
+  .nullish()
+  .catch(null)
+  .transform((value) => value ?? null)
+const optionValue = z.object({
+  id: z.string(),
+  value: z.string(),
+  option_id: z.string(),
+  color_hex: colorHex,
+})
 
 // Medusa's `original_amount` is the regular price, so it is a "from" price only when above the price.
 const variantPrice = z
@@ -250,7 +261,7 @@ export const productFacetsResponse = z.object({
   options: z.array(
     z.object({
       title: z.string(),
-      values: z.array(z.object({ value: z.string(), count: z.number() })),
+      values: z.array(z.object({ value: z.string(), count: z.number(), color_hex: colorHex })),
     }),
   ),
   price: z.object({ min: amount, max: amount }).nullable(),

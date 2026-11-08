@@ -13,6 +13,22 @@ describe("assertApparelMetadata", () => {
   })
 })
 
+describe("colour values in the metadata", () => {
+  it("accepts a valid value and names an invalid one, leaving its value out of the error", () => {
+    expect(() => assertApparelMetadata({ "color_hex:Preto": "#111111" })).not.toThrow()
+    expect(() => assertApparelMetadata({ "color_hex:Preto": "valor-secreto" })).toThrow(
+      "Invalid product metadata: color_hex:Preto",
+    )
+  })
+
+  it("lists an invalid colour value with the garment keys", () => {
+    expect(invalidApparelMetadataKeys({ weight_g: -1, "color_hex:Preto": 0 })).toEqual([
+      "weight_g",
+      "color_hex:Preto",
+    ])
+  })
+})
+
 describe("invalidApparelMetadataKeys", () => {
   it("lists only the keys that fail the schema", () => {
     expect(

@@ -2,6 +2,9 @@ import {
   APPAREL_OPTION_TITLES,
   apparelMetadataSchema,
   type ApparelMetadata,
+  capPublicStock,
+  colorHexFrom,
+  compareSizes,
   type StoreProductListQuery,
   type StoreProductOrder,
 } from "@nozco/shared-types"
@@ -56,7 +59,12 @@ export type CatalogProductRow = {
   tags?: Maybe<{ value: string }[]>
 }
 
-export type PublicOptionValue = { id: string; value: string; option_id: string }
+export type PublicOptionValue = {
+  id: string
+  value: string
+  option_id: string
+  color_hex: string | null
+}
 
 export type PublicVariant = {
   id: string
@@ -96,10 +104,31 @@ export type CatalogProduct = { product: PublicProduct; tags: string[]; createdAt
 /** Availability by variant ID, as Medusa computes it; null when no inventory item is linked. */
 export type VariantAvailability = Record<string, { availability: number | null } | undefined>
 
+type ToPublicOptionValue = (row: RowOptionValue) => PublicOptionValue
+
+/** Only the colour option has a value to show, so a size named like a colour does not get one. */
+function optionValueMapper(row: CatalogProductRow): ToPublicOptionValue {
+  const colorOptionIds = new Set(
+    (row.options ?? [])
+      .filter((option) => option.title === APPAREL_OPTION_TITLES.color)
+      .map((option) => option.id),
+  )
+  return (value) => ({
+    id: value.id,
+    value: value.value,
+    option_id: value.option_id ?? "",
+    color_hex: colorOptionIds.has(value.option_id ?? "")
+      ? colorHexFrom(row.metadata, value.value)
+      : null,
+  })
+}
+
+/** The number is capped; `in_stock` keeps reading the real one. */
 function toPublicVariant(
   row: CatalogVariantRow,
   productId: string,
   availability: VariantAvailability,
+  toPublicOptionValue: ToPublicOptionValue,
 ): PublicVariant | null {
   const price = row.calculated_price
   if (typeof price?.calculated_amount !== "number") {
@@ -112,7 +141,7 @@ function toPublicVariant(
     product_id: row.product_id ?? productId,
     title: row.title,
     sku: row.sku ?? null,
-    inventory_quantity: quantity,
+    inventory_quantity: capPublicStock(quantity),
     in_stock: !tracked || Boolean(row.allow_backorder) || quantity > 0,
     options: (row.options ?? []).map(toPublicOptionValue),
     images: (row.images ?? []).map(toPublicImage),
@@ -124,24 +153,22 @@ function toPublicVariant(
   }
 }
 
-function toPublicOptionValue(row: RowOptionValue): PublicOptionValue {
-  return { id: row.id, value: row.value, option_id: row.option_id ?? "" }
-}
-
 function toPublicImage(row: RowImage): RowImage {
   return { id: row.id, url: row.url, rank: row.rank }
 }
 
 /**
  * Null when no variant has a price in the region, since nothing of it can be sold there. Internal and
- * inactive categories are left out, and metadata keeps only the garment fields.
+ * inactive categories are left out, and metadata keeps only the garment fields: a colour's value leaves
+ * it through the option value.
  */
 export function toCatalogProduct(
   row: CatalogProductRow,
   availability: VariantAvailability,
 ): CatalogProduct | null {
+  const toPublicOptionValue = optionValueMapper(row)
   const variants = (row.variants ?? []).flatMap((variant) => {
-    const mapped = toPublicVariant(variant, row.id, availability)
+    const mapped = toPublicVariant(variant, row.id, availability, toPublicOptionValue)
     return mapped ? [mapped] : []
   })
   if (variants.length === 0) {
@@ -158,11 +185,17 @@ export function toCatalogProduct(
       subtitle: row.subtitle ?? null,
       description: row.description ?? null,
       thumbnail: row.thumbnail ?? null,
-      options: (row.options ?? []).map((option) => ({
-        id: option.id,
-        title: option.title,
-        values: (option.values ?? []).map(toPublicOptionValue),
-      })),
+      options: (row.options ?? []).map((option) => {
+        const values = (option.values ?? []).map(toPublicOptionValue)
+        return {
+          id: option.id,
+          title: option.title,
+          values:
+            option.title === APPAREL_OPTION_TITLES.size
+              ? values.sort((a, b) => compareSizes(a.value, b.value))
+              : values,
+        }
+      }),
       variants,
       images: (row.images ?? []).map(toPublicImage),
       categories: (row.categories ?? [])
@@ -199,17 +232,27 @@ function matchesText({ product, tags }: CatalogProduct, term: string) {
     .every((word) => haystack.includes(word))
 }
 
-/** One variant has to hold every value asked for: "M in black" is not "M in white and L in black". */
+/**
+ * One variant in stock has to hold every value asked for: "M in black" is not "M in white and L in
+ * black", and it is not a sold-out M in black either.
+ */
 function variantsMatching({ product }: CatalogProduct, wanted: Record<string, string[]>) {
   const titles = new Map(product.options.map((option) => [option.id, option.title]))
   const entries = Object.entries(wanted)
-  return product.variants.filter((variant) =>
-    entries.every(([title, values]) =>
-      variant.options.some(
-        (value) => titles.get(value.option_id) === title && values.includes(value.value),
+  return product.variants.filter(
+    (variant) =>
+      variant.in_stock &&
+      entries.every(([title, values]) =>
+        variant.options.some(
+          (value) => titles.get(value.option_id) === title && values.includes(value.value),
+        ),
       ),
-    ),
   )
+}
+
+/** Only the size and colour filters ask for stock: with none picked, a sold-out product still lists. */
+function matchesOptions(item: CatalogProduct, wanted: Record<string, string[]>) {
+  return Object.keys(wanted).length === 0 || variantsMatching(item, wanted).length > 0
 }
 
 type Filters = Omit<StoreProductListQuery, "order" | "limit" | "offset">
@@ -236,10 +279,7 @@ function matchesBase(item: CatalogProduct, query: Filters) {
 export function filterCatalog(items: CatalogProduct[], query: Filters) {
   const wanted = query.option_values ?? {}
   return items.filter(
-    (item) =>
-      matchesBase(item, query) &&
-      matchesPrice(item, query) &&
-      variantsMatching(item, wanted).length > 0,
+    (item) => matchesBase(item, query) && matchesPrice(item, query) && matchesOptions(item, wanted),
   )
 }
 
@@ -286,37 +326,56 @@ export function sumUnitsSold(orders: OrderRow[]) {
   return units
 }
 
-/** The sizes come out in text order until Q-03 settles a grid: nothing stores their sequence yet. */
+/** Two products can give one colour name different values. Ties fall to text order, to stay stable. */
+function mostUsed(values: string[]) {
+  const uses = new Map<string, number>()
+  for (const value of values) {
+    uses.set(value, (uses.get(value) ?? 0) + 1)
+  }
+  const [first] = [...uses].sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+  return first?.[0] ?? null
+}
+
+/** Sizes come out in the grid's order, and any other option in text order. */
 function facetFor(items: CatalogProduct[], title: string, query: Filters) {
   const { [title]: _ignored, ...others } = query.option_values ?? {}
-  const counts = new Map<string, number>()
+  const found = new Map<string, { count: number; hexes: string[] }>()
   for (const item of items) {
     const optionIds = new Set(
       item.product.options.filter((option) => option.title === title).map((option) => option.id),
     )
     const values = variantsMatching(item, others).flatMap((variant) =>
-      variant.options.filter((value) => optionIds.has(value.option_id)).map((value) => value.value),
+      variant.options.filter((value) => optionIds.has(value.option_id)),
     )
-    for (const value of new Set(values)) {
-      counts.set(value, (counts.get(value) ?? 0) + 1)
+    for (const [value, hex] of new Map(values.map((v) => [v.value, v.color_hex]))) {
+      const entry = found.get(value) ?? { count: 0, hexes: [] }
+      found.set(value, {
+        count: entry.count + 1,
+        hexes: hex ? [...entry.hexes, hex] : entry.hexes,
+      })
     }
   }
   return {
     title,
-    values: [...counts]
-      .map(([value, count]) => ({ value, count }))
-      .sort((a, b) => a.value.localeCompare(b.value, "pt-BR", { numeric: true })),
+    values: [...found]
+      .map(([value, { count, hexes }]) => ({ value, count, color_hex: mostUsed(hexes) }))
+      .sort((a, b) =>
+        title === APPAREL_OPTION_TITLES.size
+          ? compareSizes(a.value, b.value)
+          : a.value.localeCompare(b.value, "pt-BR", { numeric: true }),
+      ),
   }
 }
 
 /**
  * Each option is counted with the filters of the others only, so picking a size still shows the other
- * sizes. The price range ignores the price filter for the same reason.
+ * sizes, and only variants in stock count, as in the filters. The price range ignores the price filter
+ * for the same reason as the first rule.
  */
 export function buildFacets(items: CatalogProduct[], query: Filters) {
   const base = items.filter((item) => matchesBase(item, query))
   const wanted = query.option_values ?? {}
-  const priced = base.filter((item) => variantsMatching(item, wanted).length > 0).map(lowestPrice)
+  const priced = base.filter((item) => matchesOptions(item, wanted)).map(lowestPrice)
   const inPriceRange = base.filter((item) => matchesPrice(item, query))
   return {
     options: [APPAREL_OPTION_TITLES.size, APPAREL_OPTION_TITLES.color].map((title) =>

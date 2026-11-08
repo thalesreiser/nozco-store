@@ -1,4 +1,4 @@
-import type { StoreAddress } from "@nozco/shared-types"
+import { PUBLIC_STOCK_CAP, type StoreAddress } from "@nozco/shared-types"
 import { beforeEach, describe, expect, it } from "vitest"
 import { resetDataSources } from "~/data"
 import { productFixtures } from "~/data/mock/fixtures"
@@ -32,10 +32,24 @@ describe("fixtures", () => {
       for (const variant of product.variants) {
         expect(Number.isInteger(variant.calculated_price.calculated_amount)).toBe(true)
         expect(Number.isInteger(variant.inventory_quantity)).toBe(true)
+        expect(variant.inventory_quantity).toBeLessThanOrEqual(PUBLIC_STOCK_CAP)
         expect(variant.options).toHaveLength(2)
         expect(variant.images.length).toBeGreaterThan(0)
       }
     }
+  })
+})
+
+describe("colour values in the fixtures", () => {
+  const colorOf = (handle: string, name: string) =>
+    productFixtures
+      .find((product) => product.handle === handle)
+      ?.options.find((option) => option.title === "Cor")
+      ?.values.find((value) => value.value === name)
+
+  it("give a colour its value, and leave one with its name only", () => {
+    expect(colorOf(ALFA, "Preto")?.color_hex).toMatch(/^#[0-9a-f]{6}$/)
+    expect(colorOf("camiseta-ficticia-beta", "Cinza")?.color_hex).toBeNull()
   })
 })
 
