@@ -10,7 +10,7 @@ import { sendApiError } from "./api-error"
 
 /** Loads the request of `:id`, or answers 404 or 409 and returns null. */
 export async function loadForReview(
-  req: AuthenticatedMedusaRequest,
+  req: AuthenticatedMedusaRequest<unknown>,
   res: MedusaResponse,
   action: ReviewAction,
 ): Promise<{ log: PrivacyRequestModuleService; request: PrivacyRequestRow } | null> {

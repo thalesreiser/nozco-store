@@ -9,6 +9,7 @@ import {
   cartQuantitiesSchema,
   cpfPayloadSchema,
   privacyRequestPayloadSchema,
+  privacyRequestRejectionSchema,
 } from "@nozco/shared-types"
 import { withoutPrivateProductFields } from "../lib/public-product"
 import { cartErrorHandler } from "./utils/cart-error-handler"
@@ -91,9 +92,18 @@ export default defineMiddlewares({
       middlewares: [asOperator, rateLimit("privacy_read")],
     },
     {
-      matcher: "/admin/privacy-requests/:id/:decision",
+      matcher: "/admin/privacy-requests/:id/approve",
       method: ["POST"],
       middlewares: [asOperator, rateLimit("privacy_review")],
+    },
+    {
+      matcher: "/admin/privacy-requests/:id/reject",
+      method: ["POST"],
+      middlewares: [
+        asOperator,
+        rateLimit("privacy_review"),
+        validateBody(privacyRequestRejectionSchema),
+      ],
     },
     {
       matcher: "/auth/:actor_type/:auth_provider",

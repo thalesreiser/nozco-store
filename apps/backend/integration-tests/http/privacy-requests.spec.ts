@@ -112,6 +112,8 @@ medusaIntegrationTestRunner({
       api.post(ROUTE, { type }, { headers, validateStatus })
     const decide = (id: string, decision: string, headers: Headers = operator) =>
       api.post(`/admin/privacy-requests/${id}/${decision}`, {}, { headers, validateStatus })
+    const reject = (id: string, body: unknown, headers: Headers = operator) =>
+      api.post(`/admin/privacy-requests/${id}/reject`, body, { headers, validateStatus })
     const storedOrder = (id: string) =>
       getContainer()
         .resolve(Modules.ORDER)
@@ -440,7 +442,7 @@ medusaIntegrationTestRunner({
         const ana = await registerCustomer("ana")
         const { data } = await request(ana.headers, "deletion")
 
-        const rejected = await decide(data.request.id, "reject")
+        const rejected = await reject(data.request.id, { reason: "Motivo de exemplo" })
         const late = await decide(data.request.id, "approve")
 
         expect(rejected.data.request.status).toBe("rejected")
@@ -448,6 +450,81 @@ medusaIntegrationTestRunner({
         expect(late.data.code).toBe("request_already_decided")
         const customers = getContainer().resolve(Modules.CUSTOMER)
         expect((await customers.retrieveCustomer(ana.id)).email).toBe(ana.email)
+      })
+
+      it("needs a reason to reject, and leaves the request pending without one", async () => {
+        const ana = await registerCustomer("ana")
+        const { data } = await request(ana.headers, "deletion")
+
+        const answers = await Promise.all(
+          [{}, { reason: "   " }, { reason: "a".repeat(501) }, { reason: "Motivo", x: 1 }].map(
+            (body) => reject(data.request.id, body),
+          ),
+        )
+
+        for (const answer of answers) {
+          expect(answer.status).toBe(400)
+          expect(answer.data.code).toBe("invalid_payload")
+        }
+        const [row] = await requestLog().listPrivacyRequests({ id: data.request.id })
+        expect(row).toMatchObject({ status: "pending", rejection_reason: null })
+        expect((await reject(data.request.id, {}, ana.headers)).status).toBe(401)
+      })
+
+      it("shows the reason to the customer and never logs it", async () => {
+        const ana = await registerCustomer("ana")
+        const bia = await registerCustomer("bia")
+        const { data } = await request(ana.headers, "deletion")
+        const reason = "Motivo-de-exemplo-que-nao-vai-para-os-logs"
+        const levels = [
+          "info",
+          "warn",
+          "error",
+          "debug",
+          "http",
+          "log",
+          "verbose",
+          "silly",
+        ] as const
+        const spies = [
+          ...levels.map((level) => jest.spyOn(reporter, level)),
+          jest.spyOn(process.stdout, "write"),
+          jest.spyOn(process.stderr, "write"),
+        ]
+
+        const badLength = await reject(data.request.id, { reason: reason.repeat(20) })
+        const malformed = await api.post(
+          `/admin/privacy-requests/${data.request.id}/reject`,
+          `{"reason":"${reason}`,
+          { headers: { ...operator, "content-type": "application/json" }, validateStatus },
+        )
+        const rejected = await reject(data.request.id, { reason })
+        const again = await reject(data.request.id, { reason: `${reason}-de-novo` })
+        const list = await api.get(ROUTE, { headers: ana.headers, validateStatus })
+        const others = await api.get(ROUTE, { headers: bia.headers, validateStatus })
+
+        const logged = JSON.stringify(spies.flatMap((spy) => spy.mock.calls))
+        spies.forEach((spy) => spy.mockRestore())
+        expect(logged).not.toContain(reason)
+        expect(badLength.status).toBe(400)
+        expect(JSON.stringify(badLength.data)).not.toContain(reason)
+        expect(malformed.status).toBe(400)
+        expect(rejected.status).toBe(200)
+        expect(rejected.data.request).toMatchObject({
+          status: "rejected",
+          rejection_reason: reason,
+        })
+        expect(again.status).toBe(409)
+        expect(list.status).toBe(200)
+        expect(list.data.requests).toEqual([
+          expect.objectContaining({
+            id: data.request.id,
+            status: "rejected",
+            rejection_reason: reason,
+          }),
+        ])
+        expect(list.data.requests[0]).not.toHaveProperty("decided_by")
+        expect(JSON.stringify(others.data)).not.toContain(reason)
       })
 
       it("refuses to approve an export or a request that does not exist", async () => {

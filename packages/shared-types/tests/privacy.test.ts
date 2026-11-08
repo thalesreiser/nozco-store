@@ -1,5 +1,30 @@
 import { describe, expect, it } from "vitest"
-import { privacyRequestListQuerySchema, privacyRequestPayloadSchema } from "../src/privacy"
+import {
+  PRIVACY_REJECTION_REASON_MAX_LENGTH,
+  privacyRequestListQuerySchema,
+  privacyRequestPayloadSchema,
+  privacyRequestRejectionSchema,
+} from "../src/privacy"
+
+describe("privacyRequestRejectionSchema", () => {
+  it("accepts a reason up to the limit and trims it", () => {
+    const longest = "a".repeat(PRIVACY_REJECTION_REASON_MAX_LENGTH)
+    expect(privacyRequestRejectionSchema.parse({ reason: `  ${longest} ` })).toEqual({
+      reason: longest,
+    })
+  })
+
+  it.each([
+    ["no reason", {}],
+    ["an empty reason", { reason: "" }],
+    ["a blank reason", { reason: "   " }],
+    ["a reason over the limit", { reason: "a".repeat(PRIVACY_REJECTION_REASON_MAX_LENGTH + 1) }],
+    ["a reason that is not text", { reason: 1 }],
+    ["another field", { reason: "Motivo", status: "completed" }],
+  ])("refuses %s", (_case, body) => {
+    expect(privacyRequestRejectionSchema.safeParse(body).success).toBe(false)
+  })
+})
 
 describe("privacyRequestPayloadSchema", () => {
   it.each(["export", "deletion"])("accepts %s", (type) => {
