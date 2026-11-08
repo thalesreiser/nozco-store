@@ -4,6 +4,7 @@ import {
   createPriceListsWorkflow,
   createProductCategoriesWorkflow,
   createProductTagsWorkflow,
+  updateProductsWorkflow,
 } from "@medusajs/medusa/core-flows"
 import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
 import { buildSalePriceList } from "../../src/lib/apparel/sale"
@@ -24,13 +25,14 @@ type Product = {
   id: string
   handle: string
   metadata: Record<string, unknown> | null
+  options: { title: string; values: { value: string; color_hex: string | null }[] }[]
   categories: { handle: string }[]
   collection: { handle: string; title: string } | null
   variants: Variant[]
 }
 type ListResponse = { products: Product[]; count: number; limit: number; offset: number }
 type Facets = {
-  options: { title: string; values: { value: string; count: number }[] }[]
+  options: { title: string; values: { value: string; count: number; color_hex: string | null }[] }[]
   price: { min: number; max: number } | null
 }
 type Answer<T> = { status: number; data: T }
@@ -116,8 +118,22 @@ medusaIntegrationTestRunner({
       })
 
       it("filters by size and colour on one variant, and offers facets", async () => {
-        await createProduct("both", { sizes: ["Tam-1"], colors: ["Preto", "Branco"] })
-        await createProduct("mixed", { sizes: ["Tam-1", "Tam-2"], colors: ["Preto"] })
+        await createProduct("both", {
+          sizes: ["Tam-1"],
+          colors: ["Preto", "Branco"],
+          stock: [
+            { size: "Tam-1", color: "Preto", quantity: 1 },
+            { size: "Tam-1", color: "Branco", quantity: 1 },
+          ],
+        })
+        await createProduct("mixed", {
+          sizes: ["Tam-1", "Tam-2"],
+          colors: ["Preto"],
+          stock: [
+            { size: "Tam-1", color: "Preto", quantity: 1 },
+            { size: "Tam-2", color: "Preto", quantity: 1 },
+          ],
+        })
 
         const option_values = { Tamanho: ["Tam-2"], Cor: ["Preto"] }
         expect(await handles({ option_values })).toEqual(["mixed"])
@@ -128,18 +144,121 @@ medusaIntegrationTestRunner({
           {
             title: "Tamanho",
             values: [
-              { value: "Tam-1", count: 2 },
-              { value: "Tam-2", count: 1 },
+              { value: "Tam-1", count: 2, color_hex: null },
+              { value: "Tam-2", count: 1, color_hex: null },
             ],
           },
           {
             title: "Cor",
             values: [
-              { value: "Branco", count: 1 },
-              { value: "Preto", count: 2 },
+              { value: "Branco", count: 1, color_hex: null },
+              { value: "Preto", count: 2, color_hex: null },
             ],
           },
         ])
+      })
+
+      it("filters and counts only variants in stock, on the same variant", async () => {
+        await createProduct("partial", {
+          sizes: ["Tam-1", "Tam-2"],
+          colors: ["Preto", "Branco"],
+          stock: [
+            { size: "Tam-1", color: "Branco", quantity: 2 },
+            { size: "Tam-2", color: "Preto", quantity: 2 },
+          ],
+        })
+        await createProduct("gone", { sizes: ["Tam-3"], colors: ["Cinza"] })
+
+        expect(await handles({ option_values: { Tamanho: ["Tam-1"], Cor: ["Preto"] } })).toEqual([])
+        expect(await handles({ option_values: { Tamanho: ["Tam-2"], Cor: ["Preto"] } })).toEqual([
+          "partial",
+        ])
+        expect(await handles({ option_values: { Tamanho: ["Tam-3"] } })).toEqual([])
+        expect((await handles()).sort()).toEqual(["gone", "partial"])
+
+        const counts = (facets: Facets, title: string) =>
+          facets.options
+            .find((facet) => facet.title === title)
+            ?.values.map(({ value, count }) => [value, count])
+
+        const all = await facetsOf()
+        expect(counts(all, "Tamanho")).toEqual([
+          ["Tam-1", 1],
+          ["Tam-2", 1],
+        ])
+        expect(counts(all, "Cor")).toEqual([
+          ["Branco", 1],
+          ["Preto", 1],
+        ])
+        const black = await facetsOf({ option_values: { Cor: ["Preto"] } })
+        expect(counts(black, "Tamanho")).toEqual([["Tam-2", 1]])
+      })
+
+      it("returns sizes in the grid's order, with unknown ones after", async () => {
+        await createProduct("grade", {
+          sizes: ["XGG", "Especial", "GG", "G", "M", "P"],
+          stock: ["XGG", "Especial", "GG", "G", "M", "P"].map((size) => ({
+            size,
+            color: "Preto",
+            quantity: 1,
+          })),
+        })
+        const expected = ["P", "M", "G", "GG", "XGG", "Especial"]
+
+        const answer = await get<{ product: Product }>("/store/catalog/products/grade")
+        const sizes = answer.data.product.options.find((option) => option.title === "Tamanho")
+        expect(sizes?.values.map(({ value }) => value)).toEqual(expected)
+
+        const facet = (await facetsOf()).options.find((option) => option.title === "Tamanho")
+        expect(facet?.values.map(({ value }) => value)).toEqual(expected)
+      })
+
+      it("returns the colour value of each product, and null without one", async () => {
+        await createProduct("azul-escuro", {
+          colors: ["Azul", "Preto"],
+          stock: [{ size: "Tam-1", color: "Azul", quantity: 1 }],
+          product: { metadata: { "color_hex:Azul": "#000080", fabric: "Tecido de exemplo" } },
+        })
+        await createProduct("azul-claro", {
+          colors: ["Azul"],
+          stock: [{ size: "Tam-1", color: "Azul", quantity: 1 }],
+          product: { metadata: { "color_hex:Azul": "#87ceeb" } },
+        })
+
+        const colorsOf = async (handle: string) => {
+          const answer = await get<{ product: Product }>(`/store/catalog/products/${handle}`)
+          return {
+            metadata: answer.data.product.metadata,
+            values: Object.fromEntries(
+              answer.data.product.options
+                .find((option) => option.title === "Cor")
+                ?.values.map(({ value, color_hex }) => [value, color_hex]) ?? [],
+            ),
+          }
+        }
+
+        expect(await colorsOf("azul-escuro")).toEqual({
+          metadata: { fabric: "Tecido de exemplo" },
+          values: { Azul: "#000080", Preto: null },
+        })
+        expect((await colorsOf("azul-claro")).values).toEqual({ Azul: "#87ceeb" })
+      })
+
+      it("refuses an invalid colour value, on create and on update", async () => {
+        await expect(
+          createProduct("cor-errada", {
+            product: { metadata: { "color_hex:Preto": "preto" } },
+          }),
+        ).rejects.toMatchObject({ message: "Invalid product metadata: color_hex:Preto" })
+
+        const { productId } = await createProduct("cor-certa", {
+          product: { metadata: { "color_hex:Preto": "#111111" } },
+        })
+        await expect(
+          updateProductsWorkflow(getContainer()).run({
+            input: { products: [{ id: productId, metadata: { "color_hex:Preto": "#12" } }] },
+          }),
+        ).rejects.toMatchObject({ message: "Invalid product metadata: color_hex:Preto" })
       })
 
       it("filters by price in cents, with a sale counting at its sale price", async () => {
@@ -220,6 +339,57 @@ medusaIntegrationTestRunner({
           inventory_quantity: 0,
           in_stock: false,
         })
+      })
+
+      it("caps public stock at 10, on the catalog and on the standard routes", async () => {
+        const { productId } = await createProduct("muito", {
+          stock: [
+            { size: "Tam-1", color: "Preto", quantity: 137 },
+            { size: "Tam-2", color: "Preto", quantity: 9 },
+          ],
+        })
+        const expected = new Map([
+          ["MUITO-PRETO-TAM-1", 10],
+          ["MUITO-PRETO-TAM-2", 9],
+        ])
+        const quantities = (variants: Variant[]) =>
+          new Map(variants.map((variant) => [variant.sku, variant.inventory_quantity]))
+
+        const detail = await get<{ product: Product }>("/store/catalog/products/muito")
+        const listed = await list()
+        expect(quantities(detail.data.product.variants)).toEqual(expected)
+        expect(quantities(listed.products[0]?.variants ?? [])).toEqual(expected)
+        expect(detail.data.product.variants.every((variant) => variant.in_stock)).toBe(true)
+
+        // Asked for by the name each route accepts: the real number is on none of them.
+        const asked = {
+          product:
+            "+variants.inventory_quantity,+variants.sku,+variants.inventory_items.required_quantity," +
+            "*variants.inventory_items.inventory.location_levels",
+          variant: "+inventory_quantity,+sku",
+        }
+        const many = await get<{ products: { variants: Variant[] }[] }>("/store/products", {
+          fields: asked.product,
+        })
+        const one = await get<{ product: { variants: Variant[] } }>(
+          `/store/products/${productId}`,
+          { fields: asked.product },
+        )
+        const variants = await get<{ variants: Variant[] }>("/store/product-variants", {
+          product_id: productId,
+          fields: asked.variant,
+        })
+        const answers: Answer<unknown>[] = [many, one, variants]
+        expect(answers.map((answer) => answer.status)).toEqual([200, 200, 200])
+        expect(quantities(many.data.products[0]?.variants ?? [])).toEqual(expected)
+        expect(quantities(one.data.product.variants)).toEqual(expected)
+        expect(quantities(variants.data.variants)).toEqual(expected)
+        for (const answer of answers) {
+          expect(JSON.stringify(answer.data)).not.toContain("137")
+          expect(JSON.stringify(answer.data)).not.toMatch(
+            /"(stocked_quantity|reserved_quantity|available_quantity|location_levels)"/,
+          )
+        }
       })
 
       it("searches name, category and tag, and filters by taxon handle", async () => {

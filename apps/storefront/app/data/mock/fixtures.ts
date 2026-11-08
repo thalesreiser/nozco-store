@@ -14,6 +14,9 @@ import type {
 // reserved example.com domain and do not load, so
 // `thumbnail` is null: a listing shows the placeholder instead of asking another origin for a photo.
 
+/** Invented values. "Cinza" has none on purpose, so the screens also meet a colour with its name only. */
+const COLOR_HEX: Record<string, string> = { Preto: "#111111", Branco: "#f5f5f5" }
+
 /** Unique string that lets the build check find these fixtures. Keep in sync with that script. */
 export const FIXTURE_MARKER = "nozco-fictional-fixture-7f3a9c"
 
@@ -39,6 +42,7 @@ function makeProduct(input: FixtureInput): StoreProduct {
       id: `optval_mock_${input.slug}_${value}`,
       value,
       option_id: `opt_mock_${input.slug}_${title}`,
+      color_hex: title === "Cor" ? (COLOR_HEX[value] ?? null) : null,
     })),
   })
   const sizes = option("Tamanho", input.sizes)

@@ -5,7 +5,7 @@ import type {
   StoreProductFacet,
   StoreProductListQuery,
 } from "@nozco/shared-types"
-import { OPTION_TITLES } from "~/lib/catalog-contract"
+import { compareSizes, OPTION_TITLES } from "~/lib/catalog-contract"
 import { DataSourceError } from "../errors"
 import type { DataSource, StoreProductFiltersQuery } from "../source"
 import { paymentProviderFixtures, productFixtures, shippingOptionFixtures } from "./fixtures"
@@ -72,7 +72,7 @@ function facetFor(
   wanted: Record<string, string[]>,
 ): StoreProductFacet {
   const { [title]: _ignored, ...others } = wanted
-  const counts = new Map<string, number>()
+  const found = new Map<string, { count: number; color_hex: string | null }>()
   for (const product of products) {
     const optionId = product.options.find((option) => option.title === title)?.id
     // Picking a value offered here must find something, so a facet counts in-stock variants only.
@@ -80,15 +80,23 @@ function facetFor(
       ? variantsMatching(product, others)
       : inStock(product)
     const values = matching.flatMap((variant) =>
-      variant.options.filter((value) => value.option_id === optionId).map((value) => value.value),
+      variant.options.filter((value) => value.option_id === optionId),
     )
-    for (const value of new Set(values)) counts.set(value, (counts.get(value) ?? 0) + 1)
+    // The backend picks the value most products use; one value per name is enough for the fixtures.
+    for (const [value, hex] of new Map(values.map((v) => [v.value, v.color_hex ?? null]))) {
+      const entry = found.get(value)
+      found.set(value, { count: (entry?.count ?? 0) + 1, color_hex: entry?.color_hex ?? hex })
+    }
   }
   return {
     title,
-    values: [...counts]
-      .map(([value, count]) => ({ value, count }))
-      .sort((a, b) => a.value.localeCompare(b.value, "pt-BR", { numeric: true })),
+    values: [...found]
+      .map(([value, entry]) => ({ value, ...entry }))
+      .sort((a, b) =>
+        title === OPTION_TITLES.size
+          ? compareSizes(a.value, b.value)
+          : a.value.localeCompare(b.value, "pt-BR", { numeric: true }),
+      ),
   }
 }
 

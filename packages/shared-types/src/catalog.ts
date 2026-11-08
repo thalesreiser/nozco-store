@@ -13,6 +13,17 @@ export type StoreProductOrder = (typeof STORE_PRODUCT_ORDERS)[number]
 export const STORE_PRODUCT_DEFAULT_LIMIT = 20
 export const STORE_PRODUCT_MAX_LIMIT = 100
 
+/**
+ * The most stock a store response may show, so the exact number stays private: a value below this is
+ * exact, and this value itself means "this many or more". A "low stock" status must use a threshold of
+ * `quantity < N` with N at most this value.
+ */
+export const PUBLIC_STOCK_CAP = 10
+
+export function capPublicStock(quantity: number) {
+  return Math.min(quantity, PUBLIC_STOCK_CAP)
+}
+
 const text = z.string().trim().min(1).max(100)
 const cents = z.coerce.number().int().min(0)
 /** A query string gives a lone value as a string and repeated ones as a list. */

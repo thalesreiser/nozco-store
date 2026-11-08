@@ -94,8 +94,23 @@ describe("product mappers", () => {
     expect(parsed.products[0]?.variants[0]?.in_stock).toBe(true)
   })
 
-  it("converts the facet price range to cents", () => {
-    const options = [{ title: "Cor", values: [{ value: "Preto", count: 2 }] }]
+  it("passes a colour's value, normalised, and shows a missing or bad one as null", () => {
+    const withColor = (color_hex?: unknown) =>
+      productResponse.parse({
+        product: {
+          ...backendProduct,
+          options: [{ id: "opt_1", title: "Cor", values: [{ ...optionValue, color_hex }] }],
+        },
+      }).options[0]?.values[0]?.color_hex
+
+    expect(withColor("#AABBCC")).toBe("#aabbcc")
+    expect(withColor(null)).toBeNull()
+    expect(withColor()).toBeNull()
+    expect(withColor("red")).toBeNull()
+  })
+
+  it("converts the facet price range to cents and passes the colour value", () => {
+    const options = [{ title: "Cor", values: [{ value: "Preto", count: 2, color_hex: "#111111" }] }]
     expect(productFacetsResponse.parse({ options, price: { min: 50.5, max: 100 } })).toEqual({
       options,
       price: { min: 5050, max: 10000 },

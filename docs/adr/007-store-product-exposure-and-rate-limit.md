@@ -32,7 +32,8 @@ Thales chose to hide the fields and to add the limit.
 
 The fields are stripped from the response rather than refused in `fields`, because refusing would miss
 what the defaults already return. The keys are removed at any depth: `metadata`, `external_id`, `barcode`,
-`ean`, `upc`, `hs_code`, `mid_code`, `prices`, `inventory_items` and `location_levels`.
+`ean`, `upc`, `hs_code`, `mid_code`, `prices`, `inventory_items` and `location_levels`. [ADR 013](013-catalog-stock-and-colour-value.md)
+adds `inventory` and the stock quantity fields, and caps `inventory_quantity`.
 
 The rule covers `/store/products`, `/store/product-variants`, `/store/product-categories`,
 `/store/product-tags`, `/store/product-types` and `/store/collections`.

@@ -1,3 +1,4 @@
+import { APPAREL_SIZE_ORDER, compareSizes as sharedCompareSizes } from "@nozco/shared-types"
 import { beforeEach, describe, expect, it } from "vitest"
 import { centsToInput, priceFilterSchema } from "#shared/schemas/price-filter"
 import { resetDataSources } from "~/data"
@@ -198,6 +199,16 @@ describe("priceFilterSchema", () => {
   })
 })
 
+describe("size order", () => {
+  it("repeats the grid of shared-types, and sorts the same way", async () => {
+    const { SIZE_ORDER, compareSizes } = await import("~/lib/catalog-contract")
+    const sizes = ["XGG", "Único", "G", "Tam-10", "P", "GG", "Tam-2", "M"]
+
+    expect(SIZE_ORDER).toEqual(APPAREL_SIZE_ORDER)
+    expect([...sizes].sort(compareSizes)).toEqual([...sizes].sort(sharedCompareSizes))
+  })
+})
+
 describe("listFacets on the mock source", () => {
   beforeEach(() => {
     useRuntimeConfig().public.dataSource = "mock"
@@ -213,8 +224,8 @@ describe("listFacets on the mock source", () => {
     const facets = await useProducts().listFacets({ category_handle: "moletons-exemplo" })
 
     expect(valuesOf(facets, "Tamanho")).toEqual([
-      { value: "G", count: 1 },
-      { value: "M", count: 1 },
+      { value: "M", count: 1, color_hex: null },
+      { value: "G", count: 1, color_hex: null },
     ])
     expect(facets.price).toEqual({ min: 12990, max: 12990 })
   })
@@ -227,7 +238,7 @@ describe("listFacets on the mock source", () => {
 
     expect(valuesOf(facets, "Cor")?.map(({ value }) => value)).toEqual(["Branco", "Preto"])
     // G exists in Branco, but sold out.
-    expect(valuesOf(facets, "Tamanho")?.map(({ value }) => value)).toEqual(["M", "P"])
+    expect(valuesOf(facets, "Tamanho")?.map(({ value }) => value)).toEqual(["P", "M"])
   })
 
   it("keeps the price range when the price filter leaves nothing", async () => {
@@ -238,6 +249,16 @@ describe("listFacets on the mock source", () => {
 
     expect(facets.price).toEqual({ min: 12990, max: 12990 })
     expect(facets.options[0]?.values).toEqual([])
+  })
+
+  it("gives a colour its value, and null to a colour without one", async () => {
+    const facets = await useProducts().listFacets({})
+    const colors = Object.fromEntries(
+      (valuesOf(facets, "Cor") ?? []).map(({ value, color_hex }) => [value, color_hex]),
+    )
+
+    expect(colors.Preto).toMatch(/^#[0-9a-f]{6}$/)
+    expect(colors.Cinza).toBeNull()
   })
 
   it("has no range for a category without products", async () => {

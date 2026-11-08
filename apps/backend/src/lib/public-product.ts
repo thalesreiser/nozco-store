@@ -1,3 +1,5 @@
+import { capPublicStock } from "@nozco/shared-types"
+
 /**
  * What Medusa's standard product routes may not return, at any depth. Refusing `fields` would not be
  * enough: their defaults already include `*variants`, which holds `barcode` and `metadata`. See
@@ -14,7 +16,15 @@ const PRIVATE_KEYS = new Set([
   "upc",
   "hs_code",
   "mid_code",
+  "inventory",
+  "stocked_quantity",
+  "reserved_quantity",
+  "available_quantity",
 ])
+
+/** The same cap as `/store/catalog`, so these routes cannot be used to read the exact number. */
+const capStock = (key: string, value: unknown) =>
+  key === "inventory_quantity" && typeof value === "number" ? capPublicStock(value) : strip(value)
 
 function strip(value: unknown): unknown {
   if (Array.isArray(value)) {
@@ -26,7 +36,7 @@ function strip(value: unknown): unknown {
   return Object.fromEntries(
     Object.entries(value)
       .filter(([key]) => !PRIVATE_KEYS.has(key))
-      .map(([key, field]) => [key, strip(field)]),
+      .map(([key, field]) => [key, capStock(key, field)]),
   )
 }
 
