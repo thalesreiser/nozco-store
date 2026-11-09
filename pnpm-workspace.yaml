@@ -14,7 +14,7 @@ catalog:
   lint-staged: 17.6.0
   prettier: 3.9.10
   turbo: 2.11.10
-  typescript: 5.9.3
+  typescript: 7.0.2
   typescript-eslint: 8.72.1
   zod: 4.6.7
 
