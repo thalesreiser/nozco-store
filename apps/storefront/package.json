@@ -16,7 +16,7 @@
   "dependencies": {
     "@fontsource/archivo": "5.3.0",
     "@fontsource/big-shoulders-display": "5.3.0",
-    "@medusajs/js-sdk": "2.22.3",
+    "@medusajs/js-sdk": "2.22.4",
     "@nuxtjs/i18n": "10.6.0",
     "@pinia/nuxt": "1.0.3",
     "@tailwindcss/vite": "4.3.4",
@@ -39,7 +39,7 @@
     "@nozco/eslint-config": "workspace:*",
     "@nozco/shared-types": "workspace:*",
     "@nuxt/test-utils": "4.3.4",
-    "@playwright/test": "1.64.1",
+    "@playwright/test": "1.65.0",
     "@testing-library/vue": "8.1.0",
     "@types/node": "catalog:",
     "@vue/test-utils": "2.5.1",
