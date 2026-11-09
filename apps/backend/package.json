@@ -28,7 +28,7 @@
     "@nozco/shared-types": "workspace:*",
     "@tanstack/react-query": "5.64.2",
     "ioredis": "5.11.1",
-    "react-i18next": "13.5.0",
+    "react-i18next": "17.1.13",
     "react-router-dom": "7.18.2",
     "zod": "catalog:"
   },
