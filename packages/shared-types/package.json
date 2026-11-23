@@ -25,6 +25,6 @@
     "@nozco/eslint-config": "workspace:*",
     "eslint": "catalog:",
     "typescript": "catalog:",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   }
 }
